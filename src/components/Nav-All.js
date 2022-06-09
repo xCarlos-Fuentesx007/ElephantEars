@@ -26,6 +26,9 @@ const NavAll = () => {
                         <a class="nav-link" href="/gym">Gym</a>
                     </li>
                     <li class="nav-item px-3">
+                        <a class="nav-link" href="/exercise">Exercise</a>
+                    </li>
+                    <li class="nav-item px-3">
                         <a class="nav-link" href="/reset1">Reset1</a>
                     </li>
                     <li class="nav-item px-3">
@@ -36,6 +39,12 @@ const NavAll = () => {
                     </li>
                     <li class="nav-item px-3">
                         <a class="nav-link" href="/score">Score</a>
+                    </li>
+                    <li class="nav-item px-3">
+                        <a class="nav-link" href="/register">Register</a>
+                    </li>
+                    <li class="nav-item px-3">
+                        <a class="nav-link" href="/login">Login</a>
                     </li>
                 </ul>
             </div>

@@ -1,9 +1,14 @@
-.App {
-  text-align: center;
+/* .Margins {
+  margin-right: 5%;
+  margin-left: 5%; 
+} */
+
+/* Welcome Page */
+.WelcomeLogo {
+  margin: auto;
+  width: 250px;
+  max-width: 60%;
+  height: auto;
 }
 
-.landing {
-  position: relative;
-  background: url('./img/Logo.jpg') no-repeat center center/cover;
-  height: 100vh;
-}
+/* __ Page */
