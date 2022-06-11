@@ -8,7 +8,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
-// import Logo from '../images/Logo.PNG';
+import Logo from '../img/Logo.PNG';
 import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
@@ -36,16 +36,16 @@ const Login = () => {
           alignItems: 'center',
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+        {/* <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
           <AccountCircleRoundedIcon />
-        </Avatar>
+        </Avatar> */}
 
-        {/* <Avatar
+        <Avatar
           alt="Logo"
           src={Logo}
           variant="rounded"
           sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}
-        /> */}
+        />
 
         <Typography component="h1" variant="h4">
           Sign in

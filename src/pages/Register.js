@@ -5,7 +5,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-// import Logo from '../images/Logo.PNG';
+import Logo from '../img/Logo.PNG';
 import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
@@ -36,16 +36,16 @@ const Register = () => {
           alignItems: 'center',
         }}
       >
-        {/* <Avatar
+        <Avatar
           alt="Logo"
           src={Logo}
           variant="rounded"
           sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}
-        /> */}
+        />
 
-        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+        {/* <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
           <AccountCircleRoundedIcon />
-        </Avatar>
+        </Avatar> */}
 
         <Typography component="h1" variant="h4">
           Create a new account
