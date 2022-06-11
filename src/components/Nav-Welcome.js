@@ -1,10 +1,11 @@
 import React from 'react'
+import Logo from '../img/Logo.PNG'
 
 const NavWel = () => {
   return (
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="dashboard">
-            <img src="../img/Logo.jpg" width="30" height="30" class="d-inline-block align-top" alt="" />
+            <img src={Logo} width="30" height="30" class="d-inline-block align-top" alt="" />
             Elephant Ears
         </a>
         <div class="navbar-collapse collapse justify-content-right">

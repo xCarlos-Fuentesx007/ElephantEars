@@ -1,9 +1,7 @@
 import React, { Fragment } from 'react'
 //import { Container } from 'react-bootstrap';
 import NavWel from "../components/Nav-Welcome"
-
-//src="../img/Logo.jpg"
-//Will fix when properly hosted (probably)
+import Logo from '../img/Logo.PNG'
 
 const Welcome = () => {
   return (
@@ -11,7 +9,7 @@ const Welcome = () => {
       <NavWel />
       <link rel="style" href="../App.css" />
       <div>Welcome</div>
-      <img src="../img/Logo.jpg" class="WelcomeLogo" alt="Logo" />
+      <img src={Logo} class="WelcomeLogo" alt="Logo" />
       <h1>Welcome to Elephant Ears!</h1>
 
       <div>
