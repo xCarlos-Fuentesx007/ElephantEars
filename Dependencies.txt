@@ -9,3 +9,9 @@ npm install react-router-dom@6
 
 Tone.js
 npm install tone
+
+Material UI - mui
+npm install @mui/material @emotion/react @emotion/styled
+
+MUI icons
+npm install @mui/icons-material
