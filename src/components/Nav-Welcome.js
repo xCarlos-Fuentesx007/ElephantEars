@@ -3,9 +3,9 @@ import Logo from '../img/Logo.PNG'
 
 const NavWel = () => {
   return (
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="dashboard">
-            <img src={Logo} width="30" height="30" class="d-inline-block align-top" alt="" />
+    <nav class="navbar navbar-expand-lg navbar-light mx-4">
+        <a class="navbar-brand" href="/">
+            <img src={Logo} width="40" height="40" class="d-inline-block align-top mx-2" alt="" />
             Elephant Ears
         </a>
         <div class="navbar-collapse collapse justify-content-right">

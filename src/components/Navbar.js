@@ -3,9 +3,9 @@ import Logo from '../img/Logo.PNG'
 
 const Navbar = () => {
   return (
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light mx-4">
         <a class="navbar-brand" href="dashboard">
-            <img src={Logo} width="30" height="30" class="d-inline-block align-top" alt="Logo" />
+            <img src={Logo} width="40" height="40" class="d-inline-block align-top mx-2" alt="Logo" />
             Elephant Ears
         </a>
         <div class="navbar-collapse collapse justify-content-right">

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
+//import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -89,14 +89,14 @@ const Login = () => {
 
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
+              <Link href="/reset1" variant="body2">
                 Forgot password?
               </Link>
             </Grid>
             <Grid item>
               <Typography variant="body2">
                 {'New to Elephant Ears? '}
-                <Link href="#" variant="body2">
+                <Link href="/register" variant="body2">
                   {'Sign Up'}
                 </Link>
               </Typography>

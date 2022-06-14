@@ -1,6 +1,6 @@
 import React from 'react';
 
-import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
+//import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
@@ -140,7 +140,7 @@ const Register = () => {
           <Grid item xs={12}>
             <Typography variant="body2" align="center">
               {'Already have an account? '}
-              <Link href="#" variant="body2">
+              <Link href="/login" variant="body2">
                 {'Log in'}
               </Link>
             </Typography>
