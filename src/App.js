@@ -20,6 +20,7 @@ import Exercise from "./pages/Exercise";
 
 //Components
 import NavAll from "./components/Nav-All";
+import VerifyEmail from "./pages/VerifyEmail";
 
 const App = () => (
   <Fragment>
@@ -38,6 +39,7 @@ const App = () => (
         <Route path="score" element={<Score />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="verify-email" element={<VerifyEmail />} />
         <Route path="exercise" element={<Exercise />} />
       </Routes>
     </Router>

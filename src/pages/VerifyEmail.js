@@ -8,36 +8,27 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Logo from "../img/Logo.PNG";
-import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
-const Register = () => {
+const VerifyEmail = () => {
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
 
-  const { signup, error, isLoading, isLoggedIn } = authCtx;
+  const { verifyEmail, error, isLoading, isLoggedIn } = authCtx;
   const onFormSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    signup({
-      email: data.get("email"),
-      firstname: data.get("firstName"),
-      lastname: data.get("lastName"),
-      username: data.get("username"),
-      password: data.get("password"),
-    });
+    const token = data.get("token");
+    verifyEmail(token);
   };
 
   useEffect(() => {
-    if (error?.includes("Thanks for signing up.")) {
-      navigate("/verify-email");
-    }
     if (isLoggedIn) {
       navigate("/");
     }
-  }, [isLoggedIn, error, navigate]);
+  }, [isLoggedIn, navigate]);
 
   return (
     <Container maxWidth="xs">
@@ -62,8 +53,12 @@ const Register = () => {
           <AccountCircleRoundedIcon />
         </Avatar> */}
 
-        <Typography component="h1" variant="h4">
-          Create a new account
+        <Typography component="h1" variant="h4" mt={3}>
+          Verify email
+        </Typography>
+        <Typography component="p" variant="p">
+          Please enter the verification code sent to your email to verify your
+          account
         </Typography>
 
         <Grid
@@ -79,65 +74,11 @@ const Register = () => {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="token"
+              label="Enter Token"
+              name="token"
+              autoComplete="token"
               autoFocus
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="firstName"
-              label="First Name"
-              name="firstName"
-              autoComplete="given-name"
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="lastName"
-              label="Last Name"
-              name="lastName"
-              autoComplete="family-name"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="username"
-              label="Username"
-              id="username"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="confirmPassword"
-              label="Confirm Password"
-              type="password"
-              id="confirmPassword"
             />
           </Grid>
 
@@ -149,7 +90,7 @@ const Register = () => {
               sx={{ mt: 3, mb: 3 }}
               disabled={isLoading ? true : false}
             >
-              Create Account
+              Submit
             </Button>
           </Grid>
 
@@ -164,19 +105,10 @@ const Register = () => {
               </Typography>
             </Grid>
           )}
-
-          <Grid item xs={12} mt={1}>
-            <Typography variant="body2" align="center">
-              {"Already have an account? "}
-              <Link href="/login" variant="body2">
-                {"Log in"}
-              </Link>
-            </Typography>
-          </Grid>
         </Grid>
       </Paper>
     </Container>
   );
 };
 
-export default Register;
+export default VerifyEmail;

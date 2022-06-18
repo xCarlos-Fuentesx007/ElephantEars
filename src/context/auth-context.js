@@ -9,6 +9,7 @@ export const AuthContext = React.createContext({
   error: undefined,
   login: (userData) => {},
   signup: (userData) => {},
+  verifyEmail: (token) => {},
   logout: () => {},
 });
 
@@ -73,6 +74,25 @@ const AuthContextProvider = (props) => {
       setError(responseData.message);
       return;
     }
+    // setIsLoggedIn(true);
+    // setToken(responseData.token);
+    // const expirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
+    // localStorage.setItem(
+    //   "userData",
+    //   JSON.stringify({ token: responseData.token, expiresIn: expirationDate })
+    // );
+  };
+
+  const verifyEmail = async (token) => {
+    setIsLoading(true);
+    setError(undefined);
+    const response = await fetch(`${url}/verify-email?token=${token}`);
+    const responseData = await response.json();
+    setIsLoading(false);
+    if (responseData.error) {
+      setError(responseData.error);
+      return;
+    }
     setIsLoggedIn(true);
     setToken(responseData.token);
     const expirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
@@ -96,6 +116,7 @@ const AuthContextProvider = (props) => {
         login: login,
         signup: signup,
         logout: logout,
+        verifyEmail: verifyEmail,
         error: error,
         isLoading: isLoading,
       }}
