@@ -8,18 +8,18 @@ Time spent: **x** hours spent in total
 
 The following **required** functionality is completed:
 
-- [ ] 
-- [ ]	
-- [ ] 
+- [x] Register/Login/Logout system 
+- [x] JWT - Authentication system
+- [ ] ...
+- [ ] ...
 
 The following **optional** features are implemented:
 
-- [ ] 
-- [ ] 
+- [ ] React-Native mobile application
 
 The following **additional** features are implemented:
 
-- [ ] 
+- [x] Email verification system (Link+Code)
 
 ## Video Walkthrough
 
@@ -35,8 +35,8 @@ GIF created with [Recordit](https://recordit.co/).
 
 ## Open-source libraries used
 
-- [Android Async HTTP](https://github.com/codepath/CPAsyncHttpClient) - Simple asynchronous HTTP requests with JSON parsing
-- [Glide](https://github.com/bumptech/glide) - Image loading and caching library for Android
+- [Tone.js](https://tonejs.github.io/) - a Web Audio framework for creating interactive music in the browser.
+- [Tonal.js](https://github.com/tonaljs/tonal) - a Music theory library.
 
 ## License
 
