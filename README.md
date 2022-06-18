@@ -37,6 +37,7 @@ GIF created with [Recordit](https://recordit.co/).
 
 - [Tone.js](https://tonejs.github.io/) - a Web Audio framework for creating interactive music in the browser.
 - [Tonal.js](https://github.com/tonaljs/tonal) - a Music theory library.
+- [SendGrid](https://github.com/sendgrid/sendgrid-nodejs) - a library to quickly and easily use the Twilio SendGrid Web API v3 via Node.js.
 
 ## License
 
