@@ -1,34 +1,35 @@
 import React from 'react'
-import { Container, Paper, Typography, TextField, Button, /*Alert*/ } from '@mui/material';
+import { Container, Paper, Typography, TextField, Button, Alert } from '@mui/material';
 
-// const DisplayErr = (errorCode) => {
+const DisplayErr = (errorCode) => {
 
-//   switch (errorCode) {
-//     case 1:
-//       return (
-//         <Alert severity="severe">
-//           Error: Emails do not match
-//         </Alert>
-//       )
-//     case 2:
-//       return (
-//         <Alert severity="severe">
-//           Error: Incorrect Email
-//         </Alert>
-//       )
-//     default:
-//       return (
-//         <Alert severity="severe">
-//           An unknown error has occurred
-//         </Alert>
-//       )
-//   }
+  switch (errorCode) {
+    case 1:
+      return (
+        <Alert severity="error">
+          Error: Emails do not match
+        </Alert>
+      )
+    case 2:
+      return (
+        <Alert severity="error">
+          Error: Incorrect Email
+        </Alert>
+      )
+    default:
+      return (
+        <Alert severity="error">
+          An unknown error has occurred
+        </Alert>
+      )
+  }
   
-// }
+}
 
 const Reset1 = () => {
   return (
     <Container maxWidth="xs">
+      {DisplayErr(1)}
       <Paper
           elevation={6}
           sx={{
@@ -37,7 +38,7 @@ const Reset1 = () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            bgcolor: '#E5E5E5',
+            //bgcolor: '#E5E5E5',
           }}
         >
 

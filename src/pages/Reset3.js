@@ -36,7 +36,7 @@ const Reset3 = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          bgcolor: '#E5E5E5',
+          //bgcolor: '#E5E5E5',
         }}
         >
           <Typography variant="h5" component="h1" sx={{padding: 1}}>
@@ -58,7 +58,7 @@ const Reset3 = () => {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              bgcolor: '#E5E5E5',
+              //bgcolor: '#E5E5E5',
             }}
           >
             <Typography variant="h4" component="h2" sx={{marginTop: 2}}>

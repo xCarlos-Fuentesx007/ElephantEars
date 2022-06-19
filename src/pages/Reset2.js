@@ -31,7 +31,7 @@ const Reset2 = () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            bgcolor: '#E5E5E5',
+            //bgcolor: '#E5E5E5',
           }}
         >
 
