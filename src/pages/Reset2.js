@@ -1,24 +1,27 @@
 import React from 'react'
-import { Container, Paper, Typography, TextField, Button, /*Alert*/ } from '@mui/material';
+import { Container, Paper, Typography, TextField, Button, Alert, Link } from '@mui/material';
+//import { Link } from 'react-router-dom';
 
-// const DisplayErr = (errorCode) => {
+const DisplayErr = (errorCode) => {
 
-//   switch (errorCode) {
-//     case 1:
-//       return (
-//         <Alert severity="severe">
-//           Error: Incorrect Code
-//         </Alert>
-//       )
-//     default:
-//       return (
-//         <Alert severity="severe">
-//           An unknown error has occurred
-//         </Alert>
-//       )
-//   }
+  switch (errorCode) {
+    case 0:
+      return
+    case 1:
+      return (
+        <Alert severity="error">
+          Error: Incorrect Code
+        </Alert>
+      )
+    default:
+      return (
+        <Alert severity="error">
+          An unknown error has occurred
+        </Alert>
+      )
+  }
   
-// }
+}
 
 const Reset2 = () => {
   return (
@@ -62,9 +65,11 @@ const Reset2 = () => {
             Confirm
           </Button>
 
-          <Typography variant="body2" component="b1" align="center" sx={{padding: 2}} /*Needs button on "here" */>
-            If you did not receieve an email, click here to send another.
+          <Typography variant="body2" component="b1" align="center" sx={{padding: 2}}>
+            If you did not receieve an email, click <Link href="/reset2" variant="body2">here</Link> to send another.
           </Typography>
+
+          {DisplayErr(1)}
 
         </Paper>
     </Container>

@@ -4,6 +4,8 @@ import { Container, Paper, Typography, TextField, Button, Alert } from '@mui/mat
 const DisplayErr = (errorCode) => {
 
   switch (errorCode) {
+    case 0:
+      return
     case 1:
       return (
         <Alert severity="error">
@@ -29,7 +31,6 @@ const DisplayErr = (errorCode) => {
 const Reset1 = () => {
   return (
     <Container maxWidth="xs">
-      {DisplayErr(1)}
       <Paper
           elevation={6}
           sx={{
@@ -83,6 +84,8 @@ const Reset1 = () => {
           >
             Reset
           </Button>
+          
+          {DisplayErr(1)}
 
         </Paper>
     </Container>

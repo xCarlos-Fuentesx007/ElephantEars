@@ -1,30 +1,32 @@
 import React from 'react'
-import { Container, Paper, Typography, TextField, Button, Grid, /*Alert*/ } from '@mui/material';
+import { Container, Paper, Typography, TextField, Button, Grid, Alert } from '@mui/material';
 
-// const DisplayErr = (errorCode) => {
+const DisplayErr = (errorCode) => {
 
-//   switch (errorCode) {
-//     case 1:
-//       return (
-//         <Alert severity="severe">
-//           Error: Password does not meet complexity requirements
-//         </Alert>
-//       )
-//     case 2:
-//       return (
-//         <Alert severity="severe">
-//           Error: Passwords do not match
-//         </Alert>
-//       )
-//     default:
-//       return (
-//         <Alert severity="severe">
-//           An unknown error has occurred
-//         </Alert>
-//       )
-//   }
+  switch (errorCode) {
+    case 0:
+      return
+    case 1:
+      return (
+        <Alert severity="error">
+          Error: Password does not meet complexity requirements
+        </Alert>
+      )
+    case 2:
+      return (
+        <Alert severity="error">
+          Error: Passwords do not match
+        </Alert>
+      )
+    default:
+      return (
+        <Alert severity="error">
+          An unknown error has occurred
+        </Alert>
+      )
+  }
   
-// }
+}
 
 const Reset3 = () => {
   return (
@@ -102,6 +104,8 @@ const Reset3 = () => {
             >
               Confirm
             </Button>
+
+            {DisplayErr(1)}
 
           </Paper>
       </Grid>
