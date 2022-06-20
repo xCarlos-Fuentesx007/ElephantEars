@@ -11,31 +11,53 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { IconButton } from '@mui/material';
 
-import {Intervals} from '../exercises/toneFunctions';
+import { Intervals } from '../exercises/toneFunctions';
 
 const Exercise = () => {
   const progress = 76;
-  const numAnswers = 4;
 
-  const AnswerButton = () => {
-    const [buttonVariant, setButtonVariant] = useState('outlined');
-    const [buttonBackground, setButtonBackground] = useState({
-      bgcolor: 'white',
-    });
-    const changeVariant = () => {
-      setButtonBackground(
-        buttonVariant === 'contained' ? { bgcolor: 'white' } : {}
-      );
-      setButtonVariant(buttonVariant === 'outlined' ? 'contained' : 'outlined');
-    };
+  const [active, setActive] = useState('');
+
+  const AnswerButtonGroup = () => {
+    const answers = [
+      'Minor 2nd',
+      'Major 2nd',
+      'Minor 3rd',
+      'Major 3rd',
+      'Perfect 4th',
+      'Tritone',
+      'Perfect 5th',
+      'Minor 6th',
+      'Major 6th',
+      'Minor 7th',
+      'Major 7th',
+      'Octave',
+    ];
+
     return (
-      <Button
-        variant={buttonVariant}
-        onClick={changeVariant}
-        sx={buttonBackground}
+      <Grid
+        container
+        spacing={3}
+        sx={{
+          padding: 3,
+          height: '50%',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+        }}
       >
-        Answer
-      </Button>
+        {answers.map((type) => (
+          <Grid item xs={4} md={3}>
+            <Button
+              variant={active === type ? 'contained' : 'outlined'}
+              onClick={() => setActive(type)}
+              sx={{ width: '100%', bgcolor: active === type ? '' : 'white' }}
+            >
+              {type}
+            </Button>
+          </Grid>
+        ))}
+      </Grid>
     );
   };
 
@@ -71,21 +93,16 @@ const Exercise = () => {
             sx={{
               marginTop: 6,
               padding: 3,
-              width: '80%',
+              width: '100%',
               height: '40%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              //bgcolor: '#fff',
-              //borderRadius: 1,
-              //boxShadow: 6,
             }}
           >
-            {Array.from(Array(numAnswers)).map((_, index) => (
-              <Grid item xs={4} md={3} key={index}>
-                <AnswerButton />
-              </Grid>
-            ))}
+            <Grid item xs={12}>
+              <AnswerButtonGroup />
+            </Grid>
             <Grid item xs={11}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Box sx={{ width: '100%', mr: 2 }}>
@@ -101,6 +118,15 @@ const Exercise = () => {
                   </Typography>
                 </Box>
               </Box>
+            </Grid>
+            <Grid item>
+              <Button
+                size="large"
+                variant="contained"
+                onClick={() => console.log(active)}
+              >
+                Submit
+              </Button>
             </Grid>
           </Grid>
         </Paper>
