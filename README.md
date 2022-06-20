@@ -1,27 +1,36 @@
 # Senior Design Project - *Elephant Ears*
 
-**Elephant Ears** is a web application...
+**Elephant Ears** is a MERN web application.
 
 Time spent: **x** hours spent in total
 
-## User Stories
+## Table of Contents
+1. [Overview](#Overview)
+1. [Product Spec](#Product-Spec)
+1. [GIFS](#GIFS)
+1. [Notes](#Notes)
+## Overview
+### Description
+...
 
-The following **required** functionality is completed:
+## Product Spec
+### User Stories (Required and Optional)
+
+**Required Must-have Stories**
 
 - [x] Register/Login/Logout system 
 - [x] JWT - Authentication system
 - [ ] ...
 - [ ] ...
 
-The following **optional** features are implemented:
-
-- [ ] React-Native mobile application
-
-The following **additional** features are implemented:
+**Optional Nice-to-have Stories**
 
 - [x] Email verification system (Link+Code)
+- [ ] ...
+- [ ] React-Native mobile application
 
-## Video Walkthrough
+## GIFS
+### Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
