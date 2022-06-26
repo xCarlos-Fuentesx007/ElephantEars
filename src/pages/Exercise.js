@@ -1,24 +1,31 @@
 import React, { Fragment, useState } from 'react';
 import Navbar from '../components/Navbar';
+import AnswerFeedback from '../components/AnswerFeedback';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
 import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import { IconButton } from '@mui/material';
 
 import { Intervals } from '../exercises/toneFunctions';
 
 const Exercise = () => {
+  // hard-coded data
   const progress = 76;
+  const correctAnswer = 'Minor 6th';
 
   const [active, setActive] = useState('');
+  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [showSubmit, setShowSubmit] = useState(true);
 
   const AnswerButtonGroup = () => {
+    // hard-coded data
     const answers = [
       'Minor 2nd',
       'Major 2nd',
@@ -50,6 +57,7 @@ const Exercise = () => {
           <Grid item xs={4} md={3}>
             <Button
               variant={active === type ? 'contained' : 'outlined'}
+              disabled={buttonDisabled}
               onClick={() => setActive(type)}
               sx={{ width: '100%', bgcolor: active === type ? '' : 'white' }}
             >
@@ -59,6 +67,12 @@ const Exercise = () => {
         ))}
       </Grid>
     );
+  };
+
+  const renderFeedback = () => {
+    setShowSubmit(false);
+    setShowFeedback(true);
+    setButtonDisabled(true);
   };
 
   return (
@@ -103,16 +117,23 @@ const Exercise = () => {
             <Grid item xs={12}>
               <AnswerButtonGroup />
             </Grid>
-            <Grid item xs={11}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Box sx={{ width: '100%', mr: 2 }}>
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 3,
+                }}
+              >
+                <Box sx={{ width: '85%', mr: 2 }}>
                   <LinearProgress
                     variant="determinate"
                     value={progress}
                     sx={{ height: 10, borderRadius: 5 }}
                   />
                 </Box>
-                <Box sx={{ minWidth: 35 }}>
+                <Box>
                   <Typography component="body2" variant="body2">
                     {progress}%
                   </Typography>
@@ -120,14 +141,22 @@ const Exercise = () => {
               </Box>
             </Grid>
             <Grid item>
-              <Button
-                size="large"
-                variant="contained"
-                onClick={() => console.log(active)}
-              >
-                Submit
-              </Button>
+              {showSubmit && (
+                <Button
+                  size="large"
+                  variant="contained"
+                  onClick={renderFeedback}
+                >
+                  Submit
+                </Button>
+              )}
             </Grid>
+            {showFeedback && (
+              <AnswerFeedback
+                chosenAnswer={active}
+                correctAnswer={correctAnswer}
+              />
+            )}
           </Grid>
         </Paper>
       </Container>
