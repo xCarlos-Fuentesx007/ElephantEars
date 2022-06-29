@@ -9,6 +9,7 @@ Time spent: **x** hours spent in total
 1. [Product Spec](#Product-Spec)
 1. [GIFS](#GIFS)
 1. [Notes](#Notes)
+1. [Figma](#Figma-Design)
 ## Overview
 ### Description
 ...
@@ -18,15 +19,20 @@ Time spent: **x** hours spent in total
 
 **Required Must-have Stories**
 
+- [x] Front-end FIGMA design implemented
 - [x] Register/Login/Logout system 
 - [x] JWT - Authentication system
-- [ ] ...
-- [ ] ...
+- [ ] Password Reset system
+- [ ] Music exercises from Tone.js implemented
+- [ ] Spaced-Repetition algorithm added
+- [ ] User statistics implemented
 
 **Optional Nice-to-have Stories**
 
 - [x] Email verification system (Link+Code)
-- [ ] ...
+- [ ] Duolingo module-like music theory course
+- [ ] Add different musical instruments to play the Tone.js sounds
+- [ ] Add additional music theory exercises
 - [ ] React-Native mobile application
 
 ## GIFS
@@ -41,6 +47,12 @@ GIF created with [Recordit](https://recordit.co/).
 ## Notes
 
 1. 
+
+## Figma Design
+### Front-end
+
+Here's the [Figma](https://www.figma.com/file/aq4mBz36NleyTT3qrRG3Yp/Design) design for Elephant Ears!
+
 
 ## Open-source libraries used
 
