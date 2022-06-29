@@ -1,73 +1,72 @@
-import React from 'react'
-import { Container, Paper, Typography, TextField, Button, Grid, Alert } from '@mui/material';
+import React from "react";
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  Alert,
+} from "@mui/material";
 
 const DisplayErr = (errorCode) => {
-
   switch (errorCode) {
     case 0:
-      return
+      return;
     case 1:
       return (
         <Alert severity="error">
           Error: Password does not meet complexity requirements
         </Alert>
-      )
+      );
     case 2:
-      return (
-        <Alert severity="error">
-          Error: Passwords do not match
-        </Alert>
-      )
+      return <Alert severity="error">Error: Passwords do not match</Alert>;
     default:
-      return (
-        <Alert severity="error">
-          An unknown error has occurred
-        </Alert>
-      )
+      return <Alert severity="error">An unknown error has occurred</Alert>;
   }
-  
-}
+};
 
 const Reset3 = () => {
   return (
-    <Grid container spacing={5} justifyContent='center' alignItems='baseline'>
-      <Grid item xs={2.5}>
-        <Paper elevation={6} sx={{
-          marginTop: 8,
-          padding: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          //bgcolor: '#E5E5E5',
-        }}
+    <Container>
+      <Grid container spacing={5} justifyContent="center" alignItems="center">
+        <Grid
+          item
+          xs={12}
+          md={5}
+          lg={4}
+          sx={{ textAlign: "center", marginTop: 6 }}
         >
-          <Typography variant="h5" component="h1" sx={{padding: 1}}>
+          <Typography variant="h5" component="h1" sx={{ padding: 1 }}>
             Password Requirements:
           </Typography>
-          <Typography variant="body1" component="b1">
-            Between 8-20 characters <br/>
-            At least one lower case character <br/>
-            At least one upper case character <br/>
-            At least one number <br/>
+          <Typography variant="body1" component="h1">
+            Between 8-20 characters <br />
+            At least one lower case character <br />
+            At least one upper case character <br />
+            At least one number <br />
             At least one special symbol
           </Typography>
-        </Paper>
-      </Grid>
-      <Grid item xs={3}>
-        <Paper elevation={6} sx={{
-              marginTop: 8,
+        </Grid>
+        <Grid item xs={12} md={5} lg={4}>
+          <Paper
+            elevation={6}
+            sx={{
+              marginTop: 6,
               padding: 3,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              //bgcolor: '#E5E5E5',
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              backgroundColor: "#E5E5E5",
+              borderRadius: "20px",
+              textAlign: "center",
             }}
           >
-            <Typography variant="h4" component="h2" sx={{marginTop: 2}}>
+            <Typography variant="h4" component="h2" sx={{ marginTop: 2 }}>
               Change Password
             </Typography>
 
-            <Typography variant="body1" component="b2" sx={{padding: 2}}>
+            <Typography variant="body1" component="h2" sx={{ padding: 2 }}>
               Enter your new password.
             </Typography>
 
@@ -96,21 +95,23 @@ const Reset3 = () => {
               />
             </Container>
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 5, mb: 3 }}
-            >
-              Confirm
-            </Button>
+            <Container>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ my: 3 }}
+              >
+                Confirm
+              </Button>
+            </Container>
 
-            {DisplayErr(1)}
-
+            <Container> {DisplayErr(1)}</Container>
           </Paper>
+        </Grid>
       </Grid>
-    </Grid>
-  )
-}
+    </Container>
+  );
+};
 
 export default Reset3;

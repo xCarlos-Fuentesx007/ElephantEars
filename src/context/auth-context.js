@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 const url = process.env.REACT_APP_BACKEND_USERS_URL;
 
 export const AuthContext = React.createContext({
+  userData: [],
   isLoggedIn: false,
   token: null,
   isLoading: false,
@@ -14,6 +15,7 @@ export const AuthContext = React.createContext({
 });
 
 const AuthContextProvider = (props) => {
+  const [userData, setUserData] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +28,7 @@ const AuthContextProvider = (props) => {
       storedData.token &&
       new Date(storedData.expiresIn) > new Date()
     ) {
+      setUserData(storedData.userData);
       setToken(storedData.token);
       setIsLoggedIn(true);
     } else {
@@ -50,11 +53,16 @@ const AuthContextProvider = (props) => {
       return;
     }
     setIsLoggedIn(true);
+    setUserData(responseData);
     setToken(responseData.token);
     const expirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
     localStorage.setItem(
       "userData",
-      JSON.stringify({ token: responseData.token, expiresIn: expirationDate })
+      JSON.stringify({
+        token: responseData.token,
+        expiresIn: expirationDate,
+        userData: responseData,
+      })
     );
   };
 
@@ -74,13 +82,6 @@ const AuthContextProvider = (props) => {
       setError(responseData.message);
       return;
     }
-    // setIsLoggedIn(true);
-    // setToken(responseData.token);
-    // const expirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
-    // localStorage.setItem(
-    //   "userData",
-    //   JSON.stringify({ token: responseData.token, expiresIn: expirationDate })
-    // );
   };
 
   const verifyEmail = async (token) => {
@@ -94,11 +95,16 @@ const AuthContextProvider = (props) => {
       return;
     }
     setIsLoggedIn(true);
+    setUserData(responseData);
     setToken(responseData.token);
     const expirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
     localStorage.setItem(
       "userData",
-      JSON.stringify({ token: responseData.token, expiresIn: expirationDate })
+      JSON.stringify({
+        token: responseData.token,
+        expiresIn: expirationDate,
+        userData: responseData,
+      })
     );
   };
 
@@ -111,6 +117,7 @@ const AuthContextProvider = (props) => {
   return (
     <AuthContext.Provider
       value={{
+        userData: userData,
         isLoggedIn: isLoggedIn,
         token: token,
         login: login,

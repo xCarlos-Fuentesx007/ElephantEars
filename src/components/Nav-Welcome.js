@@ -12,37 +12,64 @@ const NavWel = () => {
     authCtx.logout();
   };
   return (
-    <nav class="navbar navbar-expand-lg navbar-light mx-4">
-      <Link class="navbar-brand" to="/">
-        <img
-          src={Logo}
-          width="40"
-          height="40"
-          class="d-inline-block align-top mx-2"
-          alt=""
-        />
-        Elephant Ears
-      </Link>
-      <div class="navbar-collapse collapse justify-content-right">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item px-3">
-            <p class="navbar-text">Welcome!</p>
-          </li>
-          {!isLoggedIn && (
-            <li class="nav-item px-3">
-              <Link class="btn btn-outline-primary" to="/register">
-                Register
-              </Link>
+    <nav className="navbar navbar-expand-lg navbar-light mx-4">
+      <div className="container-fluid">
+        <Link className="navbar-brand" to="/">
+          <img
+            src={Logo}
+            width="40"
+            height="40"
+            className="d-inline-block align-top mx-2"
+            alt=""
+          />
+          Elephant Ears
+        </Link>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarMobile"
+          aria-controls="navbarMobile"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div
+          className="navbar-collapse collapse justify-content-right"
+          id="navbarMobile"
+        >
+          <ul className="navbar-nav ms-auto">
+            <li className="nav-item px-lg-3">
+              <p className="navbar-text mb-0">Welcome!</p>
             </li>
-          )}
-          {isLoggedIn && (
-            <li class="nav-item px-2">
-              <Link class="btn btn-primary" to="/login" onClick={logoutHandler}>
-                Sign Out
-              </Link>
-            </li>
-          )}
-        </ul>
+            {!isLoggedIn && (
+              <>
+                <li className="nav-item px-lg-3 my-2 my-lg-0">
+                  <Link className="btn btn-outline-primary" to="/register">
+                    Signup
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="btn btn-primary" to="/login">
+                    Login
+                  </Link>
+                </li>
+              </>
+            )}
+            {isLoggedIn && (
+              <li className="nav-item px-2">
+                <Link
+                  className="btn btn-primary"
+                  to="/login"
+                  onClick={logoutHandler}
+                >
+                  Sign Out
+                </Link>
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
     </nav>
   );

@@ -1,17 +1,13 @@
 import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth-context";
 
-//import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
 import Container from "@mui/material/Container";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Grid from "@mui/material/Grid";
 import Logo from "../img/Logo.PNG";
-import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -44,22 +40,39 @@ const Login = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          backgroundColor: "#E5E5E5",
+          borderRadius: "20px",
+          textAlign: "center",
         }}
       >
-        {/* <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-          <AccountCircleRoundedIcon />
-        </Avatar> */}
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{ marginTop: 2 }}
+          textAlign="center"
+        >
+          Welcome to Elephant Ears
+        </Typography>
+
+        <Typography
+          variant="body1"
+          component="h2"
+          sx={{ padding: 2 }}
+          textAlign="center"
+        >
+          Please login to your account
+        </Typography>
 
         <Avatar
           alt="Logo"
           src={Logo}
-          variant="rounded"
-          sx={{ width: 56, height: 56, bgcolor: "primary.main" }}
+          sx={{
+            width: 90,
+            height: 90,
+            objectFit: "contain",
+            borderRadius: "0",
+          }}
         />
-
-        <Typography component="h1" variant="h4">
-          Sign in
-        </Typography>
 
         <Box component="form" onSubmit={onFormSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
@@ -83,11 +96,6 @@ const Login = () => {
             autoComplete="current-password"
           />
 
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
-
           <Button
             type="submit"
             fullWidth
@@ -103,21 +111,17 @@ const Login = () => {
             </Typography>
           )}
 
-          <Grid container mt={1}>
-            <Grid item xs>
-              <Link href="/reset1" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Typography variant="body2">
-                {"New to Elephant Ears? "}
-                <Link href="/register" variant="body2">
-                  {"Sign Up"}
-                </Link>
-              </Typography>
-            </Grid>
-          </Grid>
+          <Typography variant="body2" textAlign="center" mt={2}>
+            <Link to="/reset1" variant="body2">
+              Forgot password?
+            </Link>
+          </Typography>
+          <Typography variant="body2" textAlign="center" mt={2}>
+            {"New to Elephant Ears? "}
+            <Link to="/register" variant="body2">
+              {"Sign Up"}
+            </Link>
+          </Typography>
         </Box>
       </Paper>
     </Container>

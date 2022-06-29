@@ -1,14 +1,11 @@
 import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth-context";
 
-//import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import Logo from "../img/Logo.PNG";
-import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -49,20 +46,12 @@ const Register = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          backgroundColor: "#E5E5E5",
+          borderRadius: "20px",
+          textAlign: "center",
         }}
       >
-        <Avatar
-          alt="Logo"
-          src={Logo}
-          variant="rounded"
-          sx={{ width: 56, height: 56, bgcolor: "primary.main" }}
-        />
-
-        {/* <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-          <AccountCircleRoundedIcon />
-        </Avatar> */}
-
-        <Typography component="h1" variant="h4">
+        <Typography component="h1" variant="h4" mt={2}>
           Create a new account
         </Typography>
 
@@ -168,7 +157,7 @@ const Register = () => {
           <Grid item xs={12} mt={1}>
             <Typography variant="body2" align="center">
               {"Already have an account? "}
-              <Link href="/login" variant="body2">
+              <Link to="/login" variant="body2">
                 {"Log in"}
               </Link>
             </Typography>
