@@ -20,13 +20,11 @@ import Register from "./pages/Register";
 import Exercise from "./pages/Exercise";
 
 //Components
-import NavAll from "./components/Nav-All";
 import VerifyEmail from "./pages/VerifyEmail";
 
 const App = () => (
   <Fragment>
     <Router>
-      <NavAll />
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="dashboard" element={<Dashboard />} />

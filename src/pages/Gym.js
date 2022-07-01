@@ -10,7 +10,7 @@ import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 
 const Gym = () => {
-  const [active, setActive] = useState("");
+  const [active, setActive] = useState([]);
 
   const ExerciseButtonGroup = () => {
     const exerciseType = [
@@ -38,9 +38,20 @@ const Gym = () => {
         {exerciseType.map((type) => (
           <Grid item xs={12} md={6} key={type}>
             <Button
-              variant={active === type ? "contained" : "outlined"}
-              onClick={() => setActive(type)}
-              sx={{ width: "90%", bgcolor: active === type ? "" : "white" }}
+              variant={active.includes(type) ? "contained" : "outlined"}
+              onClick={() =>
+                setActive((prevActive) => {
+                  if (prevActive.includes(type)) {
+                    return prevActive.filter((active) => active !== type);
+                  } else {
+                    return [...prevActive, type];
+                  }
+                })
+              }
+              sx={{
+                width: "90%",
+                bgcolor: active.includes(type) ? "" : "white",
+              }}
             >
               {type}
             </Button>
