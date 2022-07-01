@@ -34,6 +34,7 @@ Time spent: **x** hours spent in total
 - [ ] Add different musical instruments to play the Tone.js sounds
 - [ ] Add additional music theory exercises
 - [ ] React-Native mobile application
+- [ ] Social media integration
 
 ## GIFS
 ### Video Walkthrough
