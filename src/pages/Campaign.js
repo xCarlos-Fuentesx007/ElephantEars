@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -98,9 +99,11 @@ const Campaign = () => {
               alignItems: 'center',
             }}
           >
-            <Button type="submit" variant="contained" sx={{ my: 1 }}>
-              Lets Get Started!
-            </Button>
+            <Link to="/exercise">
+              <Button type="submit" variant="contained" sx={{ my: 1 }}>
+                Lets Get Started!
+              </Button>
+            </Link>
           </Container>
         </Paper>
       </Container>

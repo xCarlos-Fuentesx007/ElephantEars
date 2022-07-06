@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import Navbar from '../components/Navbar';
+import { Link } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -130,23 +131,25 @@ const Exercise = () => {
           <Typography component="h1" variant="h4">
             Interval
           </Typography>
-
-          <IconButton
-            size="large"
-            sx={{ position: 'absolute', top: '30px', right: '30px' }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="30"
-              height="30"
-              fill="red"
-              className="bi bi-stop-circle"
-              viewBox="0 0 16 16"
+          <Link to="/dashboard">
+            <IconButton
+              size="large"
+              sx={{ position: 'absolute', top: '30px', right: '30px' }}
             >
-              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-              <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
-            </svg>
-          </IconButton>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="30"
+                height="30"
+                fill="red"
+                className="bi bi-stop-circle"
+                viewBox="0 0 16 16"
+              >
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+              </svg>
+            </IconButton>
+          </Link>
+
           <IconButton size="large" onClick={Intervals} /*Hard Coded*/>
             <VolumeUpRoundedIcon sx={{ fontSize: '400%' }} />
           </IconButton>
