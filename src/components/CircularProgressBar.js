@@ -1,12 +1,12 @@
-import React from "react";
-import { Typography } from "@mui/material";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
+import React from 'react';
+import { Typography } from '@mui/material';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 const CircularProgressBar = ({ percentage, title, color }) => {
   return (
     <>
-      <div style={{ height: 90, width: 90, margin: "auto" }}>
+      <div style={{ height: 90, width: 90, margin: 'auto' }}>
         <CircularProgressbar
           value={percentage}
           text={`${percentage}%`}
