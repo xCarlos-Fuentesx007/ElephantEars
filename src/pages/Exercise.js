@@ -1,81 +1,42 @@
-import React, { Fragment, useState } from "react";
-import Navbar from "../components/Navbar";
+import React, { Fragment, useState } from 'react';
+import Navbar from '../components/Navbar';
 
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import LinearProgress from "@mui/material/LinearProgress";
-import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
-import { IconButton } from "@mui/material";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import LinearProgress from '@mui/material/LinearProgress';
+import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import { IconButton } from '@mui/material';
 
-import correctImg from "../img/correct.svg";
-import incorrectImg from "../img/incorrect.svg";
+import correctImg from '../img/correct.svg';
+import incorrectImg from '../img/incorrect.svg';
 
-import { Intervals } from "../exercises/toneFunctions";
-
-const DisplayErr = (errorCode) => {
-  switch (errorCode) {
-    case 0:
-      return;
-    case 1:
-      return (
-        <Grid container alignItems="center" gap={3}>
-          <img src={correctImg} alt="" />
-          <Typography
-            component="h1"
-            variant="body1"
-            style={{ color: "#00B227" }}
-          >
-            Nice job!
-          </Typography>
-        </Grid>
-      );
-    case 2:
-      return (
-        <Grid container alignItems="center" gap={3}>
-          <img src={incorrectImg} alt="" />
-          <Grid item>
-            <Typography component="h1" variant="body1" style={{ color: "red" }}>
-              Correct Answer: Minor 6th
-            </Typography>
-            <Typography component="h1" variant="body1">
-              Try listening again
-            </Typography>
-          </Grid>
-        </Grid>
-      );
-    default:
-      return (
-        <Typography component="h1" variant="body1">
-          Click to hear exercise again
-        </Typography>
-      );
-  }
-};
+import { Intervals } from '../exercises/toneFunctions';
 
 const Exercise = () => {
   const progress = 76;
+  const correctAnswer = 'Minor 6th'; //hard-coded
 
-  const [active, setActive] = useState("");
-  const [errorIdx, setErrorIdx] = useState(1);
+  const [active, setActive] = useState('');
+  const [errorIdx, setErrorIdx] = useState(0);
 
   const AnswerButtonGroup = () => {
     const answers = [
-      "Minor 2nd",
-      "Major 2nd",
-      "Minor 3rd",
-      "Major 3rd",
-      "Perfect 4th",
-      "Tritone",
-      "Perfect 5th",
-      "Minor 6th",
-      "Major 6th",
-      "Minor 7th",
-      "Major 7th",
-      "Octave",
+      'Minor 2nd',
+      'Major 2nd',
+      'Minor 3rd',
+      'Major 3rd',
+      'Perfect 4th',
+      'Tritone',
+      'Perfect 5th',
+      'Minor 6th',
+      'Major 6th',
+      'Minor 7th',
+      'Major 7th',
+      'Octave',
     ];
 
     return (
@@ -84,18 +45,18 @@ const Exercise = () => {
         spacing={3}
         sx={{
           padding: 3,
-          height: "50%",
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
+          height: '50%',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
         {answers.map((type) => (
           <Grid item xs={4} md={3}>
             <Button
-              variant={active === type ? "contained" : "outlined"}
+              variant={active === type ? 'contained' : 'outlined'}
               onClick={() => setActive(type)}
-              sx={{ width: "100%", bgcolor: active === type ? "" : "white" }}
+              sx={{ width: '100%', bgcolor: active === type ? '' : 'white' }}
             >
               {type}
             </Button>
@@ -103,6 +64,50 @@ const Exercise = () => {
         ))}
       </Grid>
     );
+  };
+
+  const DisplayErr = (errorCode) => {
+    switch (errorCode) {
+      case 0:
+        return;
+      case 1:
+        return (
+          <Grid container alignItems="center" gap={3}>
+            <img src={correctImg} alt="" />
+            <Typography
+              component="h1"
+              variant="body1"
+              style={{ color: '#00B227' }}
+            >
+              Nice job!
+            </Typography>
+          </Grid>
+        );
+      case 2:
+        return (
+          <Grid container alignItems="center" gap={3}>
+            <img src={incorrectImg} alt="" />
+            <Grid item>
+              <Typography
+                component="h1"
+                variant="body1"
+                style={{ color: 'red' }}
+              >
+                Correct Answer: {correctAnswer}
+              </Typography>
+              <Typography component="h1" variant="body1">
+                Try listening again
+              </Typography>
+            </Grid>
+          </Grid>
+        );
+      default:
+        return (
+          <Typography component="h1" variant="body1">
+            Click to hear exercise again
+          </Typography>
+        );
+    }
   };
 
   return (
@@ -114,12 +119,12 @@ const Exercise = () => {
           sx={{
             marginTop: 4,
             padding: 3,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            bgcolor: "#E5E5E5",
-            borderRadius: "25px",
-            position: "relative",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            bgcolor: '#E5E5E5',
+            borderRadius: '25px',
+            position: 'relative',
           }}
         >
           <Typography component="h1" variant="h4">
@@ -128,7 +133,7 @@ const Exercise = () => {
 
           <IconButton
             size="large"
-            sx={{ position: "absolute", top: "30px", right: "30px" }}
+            sx={{ position: 'absolute', top: '30px', right: '30px' }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +148,7 @@ const Exercise = () => {
             </svg>
           </IconButton>
           <IconButton size="large" onClick={Intervals} /*Hard Coded*/>
-            <VolumeUpRoundedIcon sx={{ fontSize: "400%" }} />
+            <VolumeUpRoundedIcon sx={{ fontSize: '400%' }} />
           </IconButton>
           <Typography component="h1" variant="body1">
             Click to hear exercise again
@@ -153,28 +158,28 @@ const Exercise = () => {
             container
             spacing={2}
             sx={{
-              width: "100%",
-              height: "40%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              width: '100%',
+              height: '40%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <Grid item xs={12}>
               <AnswerButtonGroup />
             </Grid>
             <Grid item xs={11}>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ width: "100%", mr: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Box sx={{ width: '100%', mr: 2 }}>
                   <LinearProgress
                     variant="determinate"
                     value={progress}
                     sx={{
                       height: 15,
                       borderRadius: 5,
-                      backgroundColor: "#C4C4C4 ",
-                      "& .MuiLinearProgress-barColorPrimary": {
-                        backgroundColor: "#00B227",
+                      backgroundColor: '#C4C4C4 ',
+                      '& .MuiLinearProgress-barColorPrimary': {
+                        backgroundColor: '#00B227',
                       },
                     }}
                   />
@@ -203,10 +208,10 @@ const Exercise = () => {
                       size="large"
                       variant="contained"
                       onClick={() => {
-                        if (errorIdx === 1) {
-                          setErrorIdx(2);
-                        } else {
+                        if (active === correctAnswer) {
                           setErrorIdx(1);
+                        } else {
+                          setErrorIdx(2);
                         }
                       }}
                     >
