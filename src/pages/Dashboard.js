@@ -1,10 +1,10 @@
-import React, { Fragment, useContext } from "react";
-import { Link } from "react-router-dom";
-import { AuthContext } from "../context/auth-context";
-import { Container, Paper, Typography, Button, Grid } from "@mui/material";
+import React, { Fragment, useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/auth-context';
+import { Container, Paper, Typography, Button, Grid } from '@mui/material';
 
-import Navbar from "../components/Navbar";
-import CircularProgressBar from "../components/CircularProgressBar";
+import Navbar from '../components/Navbar';
+import CircularProgressBar from '../components/CircularProgressBar';
 
 const Dashboard = () => {
   const authCtx = useContext(AuthContext);
@@ -26,17 +26,17 @@ const Dashboard = () => {
           sx={{
             marginTop: 4,
             padding: 3,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            bgcolor: "#E5E5E5",
-            borderRadius: "25px",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            bgcolor: '#E5E5E5',
+            borderRadius: '25px',
           }}
         >
           <Typography
             variant="h4"
             component="h3"
-            sx={{ marginY: 4 }}
+            sx={{ marginTop: 4, marginBottom: 8 }}
             textAlign="center"
           >
             An overview of your progress
@@ -55,26 +55,42 @@ const Dashboard = () => {
               md={6}
               paddingY={8}
               sx={{
-                bgcolor: "#565656",
-                borderRadius: "25px",
-                color: "#fff",
+                bgcolor: '#fff',
+                opacity: '.8',
+                borderRadius: '25px',
+                boxShadow: '2px 2px 10px grey',
               }}
             >
-              <h3 style={{ margin: "20px 0" }}>Lifetime Stats</h3>
-              <div style={{ margin: "10px 0" }}>
-                <h5>Sessions completed:</h5>
+              <h3
+                style={{
+                  marginTop: '20px',
+                  marginBottom: '40px',
+                  fontSize: '40px',
+                }}
+              >
+                Lifetime Stats
+              </h3>
+              <div style={{ margin: '10px 0' }}>
+                <h5 style={{ fontWeight: 'bold', fontSize: '25px' }}>
+                  Sessions completed:
+                </h5>
                 <h6>24</h6>
               </div>
-              <div style={{ margin: "10px 0" }}>
-                <h5>Overall accuracy:</h5>
-                <h6>89%</h6>
+              <div style={{ margin: '10px 0' }}>
+                <h5 style={{ fontWeight: 'bold', fontSize: '25px' }}>
+                  Overall accuracy:
+                </h5>
               </div>
-              <div style={{ margin: "10px 0" }}>
-                <h5>Total time:</h5>
+              <div style={{ margin: '10px 0' }}>
+                <h5 style={{ fontWeight: 'bold', fontSize: '25px' }}>
+                  Total time:
+                </h5>
                 <h6>4hr 34m 22s</h6>
               </div>
-              <div style={{ margin: "10px 0" }}>
-                <h5>Average time/question:</h5>
+              <div style={{ margin: '10px 0' }}>
+                <h5 style={{ fontWeight: 'bold', fontSize: '25px' }}>
+                  Average time/question:
+                </h5>
                 <h6>10.02s</h6>
               </div>
             </Grid>
@@ -98,7 +114,7 @@ const Dashboard = () => {
                   <CircularProgressBar
                     percentage="85"
                     title="Scales"
-                    color="#3DDC97"
+                    color="#006937"
                   />
                 </Grid>
                 <Grid item xs={4}>
@@ -119,27 +135,28 @@ const Dashboard = () => {
                   <CircularProgressBar
                     percentage="42"
                     title="Chords Progression"
-                    color="#FCA17D"
+                    color="#FF6D33"
                   />
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
                     percentage="25"
                     title="Scale Degrees"
-                    color="#00B2A8"
+                    color="#00867E"
                   />
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
                     percentage="37"
                     title="Intervals in Context"
-                    color="#EAD637"
+                    color="#FF004D"
                   />
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
                     percentage="13"
                     title="Melodic Dictation"
+                    color="#9D70FF"
                   />
                 </Grid>
               </Grid>
