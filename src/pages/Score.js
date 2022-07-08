@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+
+import { AuthContext } from "../context/auth-context";
+
 import {
   Container,
   Paper,
@@ -24,33 +27,61 @@ const data = [
     icon: <StarIcon sx={{ color: "#FFCE31" }} />,
     message: "Perfection!",
   },
+
   {
     id: 2,
-    color: "#3479FF",
-    icon: <ThumbUpIcon sx={{ color: "#00B227" }} />,
-    message: "Keep practicing!",
-  },
-  {
-    id: 1,
     color: "#00B227",
     icon: <CheckCircleIcon sx={{ color: "#00B227" }} />,
     message: "Good job!",
   },
+  {
+    id: 3,
+    color: "#3479FF",
+    icon: <ThumbUpIcon sx={{ color: "#00B227" }} />,
+    message: "Keep practicing!",
+  },
 ];
 
 const ScoreContainer = ({ onExit }) => {
-  const [percentage, setPercentage] = useState(100);
+  const authCtx = useContext(AuthContext);
+
+  const { percentage, correctAnswers, incorrectAnswers, startedDate } = authCtx;
+
   const [activeData, setActiveData] = useState(data[0]);
+  const [timeSpent, setTimeSpent] = useState();
+  const [timeSpentPerQuestion, setTimeSpentPerQuestion] = useState();
+
+  function msToTime(ms) {
+    let seconds = (ms / 1000).toFixed(1);
+    let minutes = (ms / (1000 * 60)).toFixed(1);
+    let hours = (ms / (1000 * 60 * 60)).toFixed(1);
+    let days = (ms / (1000 * 60 * 60 * 24)).toFixed(1);
+    if (seconds < 60) return seconds + " Sec";
+    else if (minutes < 60) return minutes + " Min";
+    else if (hours < 24) return hours + " Hrs";
+    else return days + " Days";
+  }
 
   useEffect(() => {
+    const date = new Date();
+    const totalTime = date.getTime() - startedDate.getTime();
+    setTimeSpent(msToTime(totalTime));
+    if (correctAnswers === 0 && incorrectAnswers === 0) {
+      setTimeSpentPerQuestion(msToTime(totalTime));
+    } else {
+      setTimeSpentPerQuestion(
+        msToTime(totalTime / (correctAnswers + incorrectAnswers))
+      );
+    }
+
     if (percentage === 100) {
       setActiveData(data[0]);
-    } else if (percentage < 60) {
+    } else if (percentage >= 80) {
       setActiveData(data[1]);
     } else {
       setActiveData(data[2]);
     }
-  }, [percentage]);
+  }, [percentage, startedDate, correctAnswers, incorrectAnswers]);
   return (
     <Container maxWidth="sm">
       <Paper
@@ -74,7 +105,7 @@ const ScoreContainer = ({ onExit }) => {
         >
           <CircularProgressbar
             value={percentage}
-            text={`${percentage}%`}
+            text={`${percentage.toFixed(1)}%`}
             strokeWidth={12}
             styles={buildStyles({
               textColor: "#111",
@@ -90,13 +121,13 @@ const ScoreContainer = ({ onExit }) => {
         </Grid>
 
         <Typography variant="b1" sx={{ padding: 1 }}>
-          Total Correct: 14/14
+          Total Correct: {correctAnswers}/{correctAnswers + incorrectAnswers}
         </Typography>
         <Typography variant="b1" sx={{ padding: 1 }}>
-          Time Spent: 1m 47s
+          Time Spent: {timeSpent}
         </Typography>
         <Typography variant="b1" sx={{ padding: 1 }}>
-          Avg Time/Question: 7.64s
+          Avg Time/Question: {timeSpentPerQuestion}
         </Typography>
 
         <Button
@@ -177,7 +208,7 @@ const ExitContainer = ({ onCancel }) => {
             </Button>
           </Grid>
           <Grid item xs={5}>
-            <Link to="/">
+            <Link to="/gym">
               <Button variant="contained" fullWidth>
                 Yes
               </Button>

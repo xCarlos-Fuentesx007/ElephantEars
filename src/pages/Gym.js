@@ -1,4 +1,6 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useContext } from "react";
+
+import { AuthContext } from "../context/auth-context";
 
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
@@ -10,6 +12,10 @@ import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 
 const Gym = () => {
+  const authCtx = useContext(AuthContext);
+
+  const { exerciseHandler } = authCtx;
+
   const [active, setActive] = useState([]);
 
   const ExerciseButtonGroup = () => {
@@ -18,7 +24,7 @@ const Gym = () => {
       "Chords",
       "Scales",
       "Chord Progressions",
-      "Pitch",
+      "Perfect Pitch",
       "Scale Degrees",
       "Intervals in Context",
       "Melodic Dictation",
@@ -39,15 +45,16 @@ const Gym = () => {
           <Grid item xs={12} md={6} key={type}>
             <Button
               variant={active.includes(type) ? "contained" : "outlined"}
-              onClick={() =>
+              onClick={() => {
+                exerciseHandler(type);
                 setActive((prevActive) => {
                   if (prevActive.includes(type)) {
                     return prevActive.filter((active) => active !== type);
                   } else {
                     return [...prevActive, type];
                   }
-                })
-              }
+                });
+              }}
               sx={{
                 width: "90%",
                 bgcolor: active.includes(type) ? "" : "white",
@@ -87,15 +94,18 @@ const Gym = () => {
             Select an exercise type to practice at your own pace
           </Typography>
           <ExerciseButtonGroup />
-          <Link to="/exercise">
-            <Button
-              size="large"
-              variant="contained"
-              onClick={() => console.log(active)}
-            >
+          {active.length < 1 && (
+            <Button size="large" variant="contained" disabled>
               Hit the Gym
             </Button>
-          </Link>
+          )}
+          {active.length > 0 && (
+            <Link to="/exercise">
+              <Button size="large" variant="contained">
+                Hit the Gym
+              </Button>
+            </Link>
+          )}
         </Paper>
       </Container>
     </Fragment>
