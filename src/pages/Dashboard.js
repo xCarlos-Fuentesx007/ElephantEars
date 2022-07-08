@@ -80,6 +80,7 @@ const Dashboard = () => {
                 <h5 style={{ fontWeight: 'bold', fontSize: '25px' }}>
                   Overall accuracy:
                 </h5>
+                <h6>89%</h6>
               </div>
               <div style={{ margin: '10px 0' }}>
                 <h5 style={{ fontWeight: 'bold', fontSize: '25px' }}>
