@@ -127,6 +127,9 @@ const Exercise = () => {
 
   const [active, setActive] = useState("");
   const [errorIdx, setErrorIdx] = useState(0);
+  const [isAnswerTrue, setIsAnswerTrue] = useState(false);
+  const [isAnswerFalse, setIsAnswerFalse] = useState(false);
+  const [isSoundPlayed, setIsSoundPlayed] = useState(false);
 
   useEffect(() => {
     if (correctAnswers === 0 && incorrectAnswers === 0) {
@@ -139,6 +142,9 @@ const Exercise = () => {
   }, [correctAnswers, incorrectAnswers, percentageHandler]);
 
   const exerciseHandler = () => {
+    setIsAnswerFalse(false);
+    setIsAnswerTrue(false);
+    setActive(undefined);
     setErrorIdx(0);
     if (answerData.name === "Intervals") {
       const answerValue = Intervals();
@@ -146,13 +152,12 @@ const Exercise = () => {
       setAnswer(answerValue);
     } else if (answerData.name === "Perfect Pitch") {
       const answerValue = Perfect_Pitch();
-      console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Chords") {
       const answerValue = Chords();
-      console.log(answerValue);
       setAnswer(answerValue);
     }
+    setIsSoundPlayed(true);
   };
 
   const AnswerButtonGroup = () => {
@@ -174,8 +179,24 @@ const Exercise = () => {
           <Grid item xs={4} md={3} key={type}>
             <Button
               variant={active === type ? "contained" : "outlined"}
-              onClick={() => setActive(type)}
-              sx={{ width: "100%", bgcolor: active === type ? "" : "white" }}
+              onClick={() => {
+                if (isSoundPlayed) {
+                  setActive(type);
+                  setIsAnswerFalse(false);
+                  setIsAnswerTrue(false);
+                }
+              }}
+              sx={{
+                width: "100%",
+                bgcolor:
+                  active === type
+                    ? isAnswerTrue
+                      ? "green"
+                      : "" || isAnswerFalse
+                      ? "red"
+                      : ""
+                    : "white",
+              }}
             >
               {type}
             </Button>
@@ -210,6 +231,9 @@ const Exercise = () => {
             <IconButton
               size="large"
               sx={{ position: "absolute", top: "30px", right: "30px" }}
+              onClick={() => {
+                setIsExitVisible(true);
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -223,7 +247,7 @@ const Exercise = () => {
                 <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
               </svg>
             </IconButton>
-            <IconButton size="large" onClick={exerciseHandler} /*Hard Coded*/>
+            <IconButton size="large" onClick={exerciseHandler}>
               <VolumeUpRoundedIcon sx={{ fontSize: "400%" }} />
             </IconButton>
             <Typography component="h1" variant="body1">
@@ -293,6 +317,7 @@ const Exercise = () => {
                       <Button
                         size="large"
                         variant="contained"
+                        disabled={!isSoundPlayed ? true : false}
                         onClick={() => {
                           if (answer === active) {
                             answersHandler(
@@ -300,13 +325,16 @@ const Exercise = () => {
                               incorrectAnswers
                             );
                             setErrorIdx(1);
+                            setIsAnswerTrue(true);
                           } else {
                             answersHandler(
                               correctAnswers,
                               incorrectAnswers + 1
                             );
                             setErrorIdx(2);
+                            setIsAnswerFalse(true);
                           }
+                          setIsSoundPlayed(false);
                         }}
                       >
                         Continue

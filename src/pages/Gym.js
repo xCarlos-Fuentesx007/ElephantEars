@@ -16,7 +16,7 @@ const Gym = () => {
 
   const { exerciseHandler } = authCtx;
 
-  const [active, setActive] = useState([]);
+  const [active, setActive] = useState();
 
   const ExerciseButtonGroup = () => {
     const exerciseType = [
@@ -44,20 +44,14 @@ const Gym = () => {
         {exerciseType.map((type) => (
           <Grid item xs={12} md={6} key={type}>
             <Button
-              variant={active.includes(type) ? "contained" : "outlined"}
+              variant={active === type ? "contained" : "outlined"}
               onClick={() => {
                 exerciseHandler(type);
-                setActive((prevActive) => {
-                  if (prevActive.includes(type)) {
-                    return prevActive.filter((active) => active !== type);
-                  } else {
-                    return [...prevActive, type];
-                  }
-                });
+                setActive(type);
               }}
               sx={{
                 width: "90%",
-                bgcolor: active.includes(type) ? "" : "white",
+                bgcolor: active === type ? "" : "white",
               }}
             >
               {type}
@@ -94,12 +88,12 @@ const Gym = () => {
             Select an exercise type to practice at your own pace
           </Typography>
           <ExerciseButtonGroup />
-          {active.length < 1 && (
+          {!active && (
             <Button size="large" variant="contained" disabled>
               Hit the Gym
             </Button>
           )}
-          {active.length > 0 && (
+          {active && (
             <Link to="/exercise">
               <Button size="large" variant="contained">
                 Hit the Gym
