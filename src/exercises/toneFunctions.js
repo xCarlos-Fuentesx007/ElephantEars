@@ -1,113 +1,77 @@
 import * as Tone from "tone";
 
-function Intervals() {
+function Intervals(first_note, interval) {
+
   const synth = new Tone.Synth().toDestination();
 
-  var interval = Math.floor(Math.random() * 12) + 1;
-  var first_note = Math.floor(Math.random() * 24);
   var second_note = first_note + interval;
 
   synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
   synth.triggerAttackRelease(find_note(second_note), "4n", Tone.now() + 0.8);
+
   return find_interval(interval);
 }
 export { Intervals };
 
-function Chords() {
+function Chords(first_note, chord_type) {
+
   const synth = new Tone.PolySynth().toDestination();
 
-  var is_seventh = Math.floor(Math.random() * 2); //0 if triad, 1 if seventh
-  var chordType; //Triad:   0 = Major, 1 = Minor, 2 = Diminished, 3 = Augmented
-  //Seventh: 0 = Dominant Seventh, 1 = Major Seventh, 2 = Minor Seventh
+  var second_note, third_note, fourth_note = first_note;
 
-  var first_note = Math.floor(Math.random() * 24);
-  var second_note, third_note, fourth_note;
-
-  let value;
-
-  //Triad
-  if (is_seventh === 0) {
-    chordType = Math.floor(Math.random() * 4);
-    switch (chordType) {
-      //Major
-      case 0:
-        second_note = first_note + 4;
-        third_note = first_note + 7;
-        value = "Major";
-        break;
-      //Minor
-      case 1:
-        second_note = first_note + 3;
-        third_note = first_note + 7;
-        value = "Minor";
-        break;
-      //Diminished
-      case 2:
-        second_note = first_note + 3;
-        third_note = first_note + 6;
-        value = "Diminished";
-        break;
-      //Augmented
-      case 3:
-        second_note = first_note + 4;
-        third_note = first_note + 8;
-        value = "Augmented";
-        break;
-      //Error
-      default:
-        second_note = first_note;
-        third_note = first_note;
-        break;
-    }
-    synth.triggerAttackRelease(
-      [find_note(first_note), find_note(second_note), find_note(third_note)],
-      "4n"
-    );
+  switch (chord_type) {
+    //Major (Triad)
+    case 0:
+      second_note = first_note + 4;
+      third_note = first_note + 7;
+      break;
+    //Minor (Triad)
+    case 1:
+      second_note = first_note + 3;
+      third_note = first_note + 7;
+      break;
+    //Diminished (Triad)
+    case 2:
+      second_note = first_note + 3;
+      third_note = first_note + 6;
+      break;
+    //Augmented (Triad)
+    case 3:
+      second_note = first_note + 4;
+      third_note = first_note + 8;
+      break;
+    //Dominant Seventh
+    case 4:
+      second_note = first_note + 4;
+      third_note = first_note + 7;
+      fourth_note = first_note + 10;
+      break;
+    //Major Seventh
+    case 5:
+      second_note = first_note + 4;
+      third_note = first_note + 7;
+      fourth_note = first_note + 11;
+      break;
+    //Minor Seventh
+    case 6:
+      second_note = first_note + 3;
+      third_note = first_note + 7;
+      fourth_note = first_note + 10;
+      break;
+    default:
+      second_note = first_note;
+      third_note = first_note;
   }
+  synth.triggerAttackRelease(
+    [
+      find_note(first_note),
+      find_note(second_note),
+      find_note(third_note),
+      find_note(fourth_note),
+    ], "4n"
+  );
 
-  //Seventh
-  if (is_seventh === 1) {
-    chordType = Math.floor(Math.random() * 3);
-    switch (chordType) {
-      //Dominant Seventh
-      case 0:
-        second_note = first_note + 4;
-        third_note = first_note + 7;
-        fourth_note = first_note + 10;
-        value = "Dominant Seventh";
-        break;
-      //Major Seventh
-      case 1:
-        second_note = first_note + 4;
-        third_note = first_note + 7;
-        fourth_note = first_note + 11;
-        value = "Major Seventh";
-        break;
-      //Minor Seventh
-      case 2:
-        second_note = first_note + 3;
-        third_note = first_note + 7;
-        fourth_note = first_note + 10;
-        value = "Minor Seventh";
-        break;
-      //Error
-      default:
-        second_note = first_note;
-        third_note = first_note;
-        fourth_note = first_note;
-        break;
-    }
-    synth.triggerAttackRelease(
-      [
-        find_note(first_note),
-        find_note(second_note),
-        find_note(third_note),
-        find_note(fourth_note),
-      ],
-      "4n"
-    );
-  }
-  return value;
+  return find_chord_type(chord_type);
 }
 export { Chords };
 
@@ -115,9 +79,8 @@ export { Chords };
 
 ///////////////////////////Chord Progressions
 
-function Perfect_Pitch() {
+function Perfect_Pitch(first_note) {
   const synth = new Tone.Synth().toDestination();
-  var first_note = Math.floor(Math.random() * 36);
   synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
   return find_note(first_note);
 }
@@ -199,4 +162,18 @@ function find_interval(interval) {
   ];
 
   return values[interval - 1];
+}
+
+function find_chord_type(num) {
+  const values = [
+    "Major",
+    "Minor",
+    "Diminished",
+    "Augmented",
+    "Dominant Seventh",
+    "Major Seventh",
+    "Minor Seventh",
+  ];
+
+  return values[num];
 }

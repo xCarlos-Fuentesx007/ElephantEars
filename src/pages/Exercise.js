@@ -131,6 +131,10 @@ const Exercise = () => {
   const [isAnswerFalse, setIsAnswerFalse] = useState(false);
   const [isSoundPlayed, setIsSoundPlayed] = useState(false);
 
+  const [first_note, setFirst_note] = useState(Math.floor(Math.random() * 24));
+  const [interval, setInterval] = useState(Math.floor(Math.random() * 12) + 1);
+  const [chord_type, set_chord_type] = useState(Math.floor(Math.random() * 7));
+
   useEffect(() => {
     if (correctAnswers === 0 && incorrectAnswers === 0) {
       percentageHandler(0);
@@ -141,20 +145,35 @@ const Exercise = () => {
     }
   }, [correctAnswers, incorrectAnswers, percentageHandler]);
 
+  const exerciseMaker = () => {
+    if (answerData.name === "Intervals") {
+      setFirst_note(Math.floor(Math.random() * 24));
+      setInterval(Math.floor(Math.random() * 12) + 1);
+      return;
+    } else if (answerData.name === "Chords") {
+      setFirst_note(Math.floor(Math.random() * 24));
+      set_chord_type(Math.floor(Math.random() * 7));
+      return;
+    } else if (answerData.name === "Perfect Pitch") {
+      setFirst_note(Math.floor(Math.random() * 36));
+      return;
+    }
+  }
+
   const exerciseHandler = () => {
     setIsAnswerFalse(false);
     setIsAnswerTrue(false);
     setActive(undefined);
     setErrorIdx(0);
     if (answerData.name === "Intervals") {
-      const answerValue = Intervals();
+      const answerValue = Intervals(first_note, interval);
       console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Perfect Pitch") {
-      const answerValue = Perfect_Pitch();
+      const answerValue = Perfect_Pitch(first_note);
       setAnswer(answerValue);
     } else if (answerData.name === "Chords") {
-      const answerValue = Chords();
+      const answerValue = Chords(first_note, chord_type);
       setAnswer(answerValue);
     }
     setIsSoundPlayed(true);
@@ -224,6 +243,7 @@ const Exercise = () => {
               position: "relative",
             }}
           >
+
             <Typography component="h1" variant="h4">
               {answerData.name}
             </Typography>
@@ -247,7 +267,9 @@ const Exercise = () => {
                 <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
               </svg>
             </IconButton>
-            <IconButton size="large" onClick={exerciseHandler}>
+            <IconButton 
+              size="large" 
+              onClick={exerciseHandler}>
               <VolumeUpRoundedIcon sx={{ fontSize: "400%" }} />
             </IconButton>
             <Typography component="h1" variant="body1">
@@ -335,6 +357,7 @@ const Exercise = () => {
                             setIsAnswerFalse(true);
                           }
                           setIsSoundPlayed(false);
+                          exerciseMaker();
                         }}
                       >
                         Continue
