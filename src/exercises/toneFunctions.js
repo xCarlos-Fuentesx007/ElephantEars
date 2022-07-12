@@ -14,63 +14,9 @@ function Intervals(first_note, interval) {
 export { Intervals };
 
 function Chords(first_note, chord_type) {
-
   const synth = new Tone.PolySynth().toDestination();
-
-  var second_note, third_note, fourth_note = first_note;
-
-  switch (chord_type) {
-    //Major (Triad)
-    case 0:
-      second_note = first_note + 4;
-      third_note = first_note + 7;
-      break;
-    //Minor (Triad)
-    case 1:
-      second_note = first_note + 3;
-      third_note = first_note + 7;
-      break;
-    //Diminished (Triad)
-    case 2:
-      second_note = first_note + 3;
-      third_note = first_note + 6;
-      break;
-    //Augmented (Triad)
-    case 3:
-      second_note = first_note + 4;
-      third_note = first_note + 8;
-      break;
-    //Dominant Seventh
-    case 4:
-      second_note = first_note + 4;
-      third_note = first_note + 7;
-      fourth_note = first_note + 10;
-      break;
-    //Major Seventh
-    case 5:
-      second_note = first_note + 4;
-      third_note = first_note + 7;
-      fourth_note = first_note + 11;
-      break;
-    //Minor Seventh
-    case 6:
-      second_note = first_note + 3;
-      third_note = first_note + 7;
-      fourth_note = first_note + 10;
-      break;
-    default:
-      second_note = first_note;
-      third_note = first_note;
-  }
-  synth.triggerAttackRelease(
-    [
-      find_note(first_note),
-      find_note(second_note),
-      find_note(third_note),
-      find_note(fourth_note),
-    ], "4n"
-  );
-
+  var chord = make_chord(first_note, chord_type);
+  synth.triggerAttackRelease(chord, "4n", Tone.now());
   return find_chord_type(chord_type);
 }
 export { Chords };
@@ -137,7 +83,7 @@ export { Scales };
 function Perfect_Pitch(first_note) {
   const synth = new Tone.Synth().toDestination();
   synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
-  return find_note(first_note);
+  return find_pitch(first_note);
 }
 export { Perfect_Pitch };
 
@@ -199,6 +145,26 @@ function find_note(num) {
   return str;
 }
 
+function find_pitch(num) {
+  const notes = [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B",
+  ];
+
+  return notes[num % 12];
+
+}
+
 //Finds interval name using number of semitones
 function find_interval(interval) {
   const values = [
@@ -246,4 +212,33 @@ function find_scale_type(num) {
   ];
 
   return vals[num];
+}
+
+function make_chord(first_note, chord_type) {
+
+  switch (chord_type) {
+    //Major (Triad)
+    case 0:
+      return [find_note(first_note), find_note(first_note+4), find_note(first_note+7), find_note(first_note)];
+    //Minor (Triad)
+    case 1:
+      return [find_note(first_note), find_note(first_note+3), find_note(first_note+7), find_note(first_note)];
+    //Diminished (Triad)
+    case 2:
+      return [find_note(first_note), find_note(first_note+3), find_note(first_note+6), find_note(first_note)];
+    //Augmented (Triad)
+    case 3:
+      return [find_note(first_note), find_note(first_note+4), find_note(first_note+8), find_note(first_note)];
+    //Dominant Seventh
+    case 4:
+      return [find_note(first_note), find_note(first_note+4), find_note(first_note+7), find_note(first_note+10)];
+    //Major Seventh
+    case 5:
+      return [find_note(first_note), find_note(first_note+4), find_note(first_note+7), find_note(first_note+11)];
+    //Minor Seventh
+    case 6:
+      return [find_note(first_note), find_note(first_note+3), find_note(first_note+7), find_note(first_note+10)];
+    default:
+      return [find_note(first_note), find_note(first_note), find_note(first_note), find_note(first_note)];
+  }
 }
