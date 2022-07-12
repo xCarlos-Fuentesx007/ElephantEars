@@ -208,7 +208,7 @@ const ExitContainer = ({ onCancel }) => {
             </Button>
           </Grid>
           <Grid item xs={5}>
-            <Link to="/gym">
+            <Link to="/dashboard">
               <Button variant="contained" fullWidth>
                 Yes
               </Button>
