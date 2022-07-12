@@ -131,6 +131,8 @@ const Exercise = () => {
   const [isAnswerFalse, setIsAnswerFalse] = useState(false);
   const [isSoundPlayed, setIsSoundPlayed] = useState(false);
 
+  const [cCount, set_continue] = useState(false);
+
   const [first_note, setFirst_note] = useState(Math.floor(Math.random() * 24));
   const [interval, setInterval] = useState(Math.floor(Math.random() * 12) + 1);
   const [chord_type, set_chord_type] = useState(Math.floor(Math.random() * 7));
@@ -166,10 +168,6 @@ const Exercise = () => {
   }
 
   const exerciseHandler = () => {
-    setIsAnswerFalse(false);
-    setIsAnswerTrue(false);
-    setActive(undefined);
-    setErrorIdx(0);
     if (answerData.name === "Intervals") {
       const answerValue = Intervals(first_note, interval);
       console.log(answerValue);
@@ -208,6 +206,7 @@ const Exercise = () => {
           <Grid item xs={4} md={3} key={type}>
             <Button
               variant={active === type ? "contained" : "outlined"}
+              disabled={cCount ? true : false}
               onClick={() => {
                 if (isSoundPlayed) {
                   setActive(type);
@@ -349,25 +348,34 @@ const Exercise = () => {
                       <Button
                         size="large"
                         variant="contained"
-                        disabled={!isSoundPlayed ? true : false}
+                        // disabled={!isSoundPlayed ? true : false}
                         onClick={() => {
-                          if (answer === active) {
-                            answersHandler(
-                              correctAnswers + 1,
-                              incorrectAnswers
-                            );
-                            setErrorIdx(1);
-                            setIsAnswerTrue(true);
+                          if (cCount === false) {
+                            if (answer === active) {
+                              answersHandler(
+                                correctAnswers + 1,
+                                incorrectAnswers
+                              );
+                              setErrorIdx(1);
+                              setIsAnswerTrue(true);
+                            } else {
+                              answersHandler(
+                                correctAnswers,
+                                incorrectAnswers + 1
+                              );
+                              setErrorIdx(2);
+                              setIsAnswerFalse(true);
+                            }
+                            setIsSoundPlayed(false);
+                            set_continue(true);
                           } else {
-                            answersHandler(
-                              correctAnswers,
-                              incorrectAnswers + 1
-                            );
-                            setErrorIdx(2);
-                            setIsAnswerFalse(true);
+                            exerciseMaker();
+                            set_continue(false);
+                            setIsAnswerFalse(false);
+                            setIsAnswerTrue(false);
+                            setActive(undefined);
+                            setErrorIdx(0);
                           }
-                          setIsSoundPlayed(false);
-                          exerciseMaker();
                         }}
                       >
                         Continue

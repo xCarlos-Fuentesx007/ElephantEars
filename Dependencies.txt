@@ -15,3 +15,6 @@ npm install @mui/material @emotion/react @emotion/styled
 
 MUI icons
 npm install @mui/icons-material
+
+React Circular Progressbar
+npm install --save react-circular-progressbar
