@@ -18,7 +18,7 @@ import { IconButton } from "@mui/material";
 import correctImg from "../img/correct.svg";
 import incorrectImg from "../img/incorrect.svg";
 
-import { Intervals, Perfect_Pitch, Chords } from "../exercises/toneFunctions";
+import { Intervals, Perfect_Pitch, Chords, Scales } from "../exercises/toneFunctions";
 
 const DisplayErr = (errorCode, correctOption) => {
   switch (errorCode) {
@@ -134,6 +134,7 @@ const Exercise = () => {
   const [first_note, setFirst_note] = useState(Math.floor(Math.random() * 24));
   const [interval, setInterval] = useState(Math.floor(Math.random() * 12) + 1);
   const [chord_type, set_chord_type] = useState(Math.floor(Math.random() * 7));
+  const [scale_type, set_scale_type] = useState(Math.floor(Math.random() * 8));
 
   useEffect(() => {
     if (correctAnswers === 0 && incorrectAnswers === 0) {
@@ -157,6 +158,10 @@ const Exercise = () => {
     } else if (answerData.name === "Perfect Pitch") {
       setFirst_note(Math.floor(Math.random() * 36));
       return;
+    } else if (answerData.name === "Scales") {
+      setFirst_note(Math.floor(Math.random() * 24));
+      set_scale_type(Math.floor(Math.random() * 8));
+      return;
     }
   }
 
@@ -174,6 +179,11 @@ const Exercise = () => {
       setAnswer(answerValue);
     } else if (answerData.name === "Chords") {
       const answerValue = Chords(first_note, chord_type);
+      setAnswer(answerValue);
+    } else if (answerData.name === "Scales") {
+      const answerValue = Scales(first_note, scale_type);
+      console.log(first_note);
+      console.log(answerValue);
       setAnswer(answerValue);
     }
     setIsSoundPlayed(true);

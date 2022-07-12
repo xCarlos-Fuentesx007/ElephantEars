@@ -75,7 +75,62 @@ function Chords(first_note, chord_type) {
 }
 export { Chords };
 
-//////////////////////////Scales
+function Scales(first_note, scale_type) {
+
+  const synth = new Tone.Synth().toDestination();
+  var scale = [0, 0, 0, 0, 0, 0, 0, 0];
+  var i;
+
+  switch (scale_type) {
+    //Major (Ionian)
+    case 0:
+      scale = [0,2,2,1,2,2,2,1]; // W W H W W W H
+      break;
+    //Natural Minor (Aeolian)
+    case 1:
+      scale = [0,2,1,2,2,1,2,2]; //W H W W H W W
+      break;
+    //Harmonic Minor
+    case 2:
+      scale = [0,2,1,2,2,1,3,1]; //W H W W H W+1/2 H
+      break;
+    //Dorian
+    case 3:
+      scale = [0,2,1,2,2,2,1,2]; //W H W W W H W
+      break;
+    //Phygian
+    case 4:
+      scale = [0,1,2,2,2,1,2,2]; //H W W W H W W
+      break;
+    //Lydian
+    case 5:
+      scale = [0,2,2,2,1,2,2,1]; //W W W H W W H
+      break;
+    //Mixolydian
+    case 6:
+      scale = [0,2,2,1,2,2,1,2]; //W W H W W H W
+      break;
+    //Locrian
+    case 7:
+      scale = [0,1,2,2,1,2,2,2]; //H W W H W W W
+      break;
+    //Error
+    default:
+      break;
+  }
+
+  for (i=1; i<8; i++) {
+    scale[i] = scale[i-1] + scale[i];
+  }
+
+  for (i=0; i<8; i++) {
+    synth.triggerAttackRelease(find_note(scale[i] + first_note), "4n", Tone.now() + (.8 * i));
+  }
+
+  return find_scale_type(scale_type);
+
+}
+export { Scales };
 
 ///////////////////////////Chord Progressions
 
@@ -176,4 +231,19 @@ function find_chord_type(num) {
   ];
 
   return values[num];
+}
+
+function find_scale_type(num) {
+  const vals = [
+    "Major (Ionian)",
+    "Natural Minor (Aeolian)",
+    "Harmonic Minor",
+    "Dorian",
+    "Phygian",
+    "Lydian",
+    "Mixolydian",
+    "Locrian",
+  ];
+
+  return vals[num];
 }

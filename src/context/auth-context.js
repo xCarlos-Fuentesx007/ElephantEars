@@ -74,6 +74,21 @@ const ANSWER_DATA = [
       "Minor Seventh",
     ],
   },
+  
+  {
+    name: "Scales",
+    answers: [
+      "Major (Ionian)",
+      "Natural Minor (Aeolian)",
+      "Harmonic Minor",
+      "Dorian",
+      "Phygian",
+      "Lydian",
+      "Mixolydian",
+      "Locrian",
+    ],
+  },
+    
 ];
 
 export const AuthContext = React.createContext({
