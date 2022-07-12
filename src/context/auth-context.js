@@ -74,7 +74,7 @@ const ANSWER_DATA = [
       "Minor Seventh",
     ],
   },
-  
+
   {
     name: "Scales",
     answers: [
@@ -88,7 +88,6 @@ const ANSWER_DATA = [
       "Locrian",
     ],
   },
-    
 ];
 
 export const AuthContext = React.createContext({
@@ -107,6 +106,7 @@ export const AuthContext = React.createContext({
   percentageHandler: (percentageValue) => {},
   answersHandler: (correctAnswersValue, incorrectAnswersValue) => {},
   login: (userData) => {},
+  updateUser: (userData) => {},
   signup: (userData) => {},
   verifyEmail: (token) => {},
   logout: () => {},
@@ -168,6 +168,32 @@ const AuthContextProvider = (props) => {
         userData: responseData,
       })
     );
+  };
+
+  const updateUser = async (userData) => {
+    setIsLoading(true);
+    setError(undefined);
+    const response = await fetch(`${url}/update`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${userData.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
+    const responseData = await response.json();
+    setIsLoading(false);
+    const storedData = JSON.parse(localStorage.getItem("userData"));
+    storedData.userData = {
+      id: userData.id,
+      firstname: userData.firstname,
+      lastname: userData.lastname,
+      username: userData.username,
+      email: userData.email,
+      token: userData.token,
+    };
+    localStorage.setItem("userData", JSON.stringify(storedData));
+    setUserData(storedData.userData);
   };
 
   const signup = async (userData) => {
@@ -257,6 +283,7 @@ const AuthContextProvider = (props) => {
         percentageHandler: percentageHandler,
         exerciseHandler: exerciseHandler,
         login: login,
+        updateUser: updateUser,
         signup: signup,
         logout: logout,
         verifyEmail: verifyEmail,
