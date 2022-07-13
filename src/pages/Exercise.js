@@ -132,6 +132,7 @@ const Exercise = () => {
   const [isSoundPlayed, setIsSoundPlayed] = useState(false);
 
   const [cCount, set_continue] = useState(false);
+  const [correct, set_correct] = useState(0);
 
   const [first_note, setFirst_note] = useState(Math.floor(Math.random() * 24));
   const [interval, setInterval] = useState(Math.floor(Math.random() * 12) + 1);
@@ -358,6 +359,7 @@ const Exercise = () => {
                               );
                               setErrorIdx(1);
                               setIsAnswerTrue(true);
+                              set_correct(1);
                             } else {
                               answersHandler(
                                 correctAnswers,
@@ -365,6 +367,7 @@ const Exercise = () => {
                               );
                               setErrorIdx(2);
                               setIsAnswerFalse(true);
+                              set_correct(0);
                             }
                             setIsSoundPlayed(false);
                             set_continue(true);
