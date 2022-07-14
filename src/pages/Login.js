@@ -104,17 +104,15 @@ const Login = () => {
               autoComplete="current-password"
             />
 
-            <Link to="/dashboard">
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 3 }}
-                disabled={isLoading ? true : false}
-              >
-                Sign In
-              </Button>
-            </Link>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 3 }}
+              disabled={isLoading ? true : false}
+            >
+              Sign In
+            </Button>
             {error && (
               <Typography variant="body2" color="red">
                 {error}
