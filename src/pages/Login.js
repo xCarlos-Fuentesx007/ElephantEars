@@ -27,7 +27,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isLoggedIn && !isLoading) {
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [isLoggedIn, isLoading, navigate]);
 
