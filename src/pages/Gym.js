@@ -23,11 +23,11 @@ const Gym = () => {
       "Intervals",
       "Chords",
       "Scales",
-      "Chord Progressions",
+      "Chord Progressions (WIP)",
       "Perfect Pitch",
-      "Scale Degrees",
-      "Intervals in Context",
-      "Melodic Dictation",
+      "Scale Degrees (WIP)",
+      "Intervals in Context (WIP)",
+      "Melodic Dictation (WIP)",
     ];
 
     return (

@@ -181,7 +181,6 @@ const Exercise = () => {
       setAnswer(answerValue);
     } else if (answerData.name === "Scales") {
       const answerValue = Scales(first_note, scale_type);
-      console.log(first_note);
       console.log(answerValue);
       setAnswer(answerValue);
     }
@@ -207,7 +206,7 @@ const Exercise = () => {
           <Grid item xs={4} md={3} key={type}>
             <Button
               variant={active === type ? "contained" : "outlined"}
-              disabled={cCount ? true : false}
+              disabled={ (cCount ? true : false) && !(type === active)}
               onClick={() => {
                 if (isSoundPlayed) {
                   setActive(type);
