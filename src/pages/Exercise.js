@@ -18,7 +18,7 @@ import { IconButton } from "@mui/material";
 import correctImg from "../img/correct.svg";
 import incorrectImg from "../img/incorrect.svg";
 
-import { Intervals, Perfect_Pitch, Chords, Scales } from "../exercises/toneFunctions";
+import { Intervals, Perfect_Pitch, Chords, Scales, Scale_Degrees } from "../exercises/toneFunctions";
 
 const DisplayErr = (errorCode, correctOption) => {
   switch (errorCode) {
@@ -138,6 +138,7 @@ const Exercise = () => {
   const [interval, setInterval] = useState(Math.floor(Math.random() * 12) + 1);
   const [chord_type, set_chord_type] = useState(Math.floor(Math.random() * 7));
   const [scale_type, set_scale_type] = useState(Math.floor(Math.random() * 8));
+  var [answer_note, set_answer_note] = useState(Math.floor(Math.random() * 36));
 
   useEffect(() => {
     if (correctAnswers === 0 && incorrectAnswers === 0) {
@@ -165,6 +166,10 @@ const Exercise = () => {
       setFirst_note(Math.floor(Math.random() * 24));
       set_scale_type(Math.floor(Math.random() * 8));
       return;
+    } else if (answerData.name === "Scale Degrees") {
+      setFirst_note(Math.floor(Math.random() * 24));
+      set_answer_note(Math.floor(Math.random() * 36));
+      return;
     }
   }
 
@@ -181,6 +186,18 @@ const Exercise = () => {
       setAnswer(answerValue);
     } else if (answerData.name === "Scales") {
       const answerValue = Scales(first_note, scale_type);
+      console.log(answerValue);
+      setAnswer(answerValue);
+    } else if (answerData.name === "Scale Degrees") {
+      while (answer_note - first_note >= 12 || answer_note - first_note <= -12) { //ensures the answer is within an octave of the starting note
+        if (answer_note > first_note) {
+          answer_note = answer_note - 12;
+        }
+        else {
+          answer_note = answer_note + 12;
+        }
+      }
+      const answerValue = Scale_Degrees(first_note, answer_note);
       console.log(answerValue);
       setAnswer(answerValue);
     }

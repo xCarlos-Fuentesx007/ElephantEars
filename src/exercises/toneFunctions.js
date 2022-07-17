@@ -87,7 +87,20 @@ function Perfect_Pitch(first_note) {
 }
 export { Perfect_Pitch };
 
-////////////////////////////Scale Degrees
+function Scale_Degrees(first_note, answer_note) {
+  var chords1 = make_chord(first_note, 0);
+  var chords2 = make_chord(first_note + 4, 0);
+  var chords3 = make_chord(first_note + 7, 0);
+
+  const synth = new Tone.PolySynth().toDestination();
+  synth.triggerAttackRelease(chords1, "4n", Tone.now());
+  synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
+  synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
+  synth.triggerAttackRelease(chords1, "4n", Tone.now() + 2.4);
+  synth.triggerAttackRelease(find_note(answer_note), "4n", Tone.now() + 4);
+  return find_scale_degree(first_note, answer_note);
+}
+export { Scale_Degrees };
 
 ////////////////////////////Intervals in Context
 
@@ -241,4 +254,26 @@ function make_chord(first_note, chord_type) {
     default:
       return [find_note(first_note), find_note(first_note), find_note(first_note), find_note(first_note)];
   }
+}
+
+function find_scale_degree(first_note, answer_note) {
+  var interval = answer_note - first_note;
+  while (interval < 0) {
+    interval = interval + 12;
+  }
+  const values = [
+    "1 (do)",
+    "Raised 1 (di)",
+    "2 (re)",
+    "Raised 2 (ri)",
+    "3 (mi)", 
+    "4 (fa)",
+    "Raised 4 (fi)",
+    "5 (so)",
+    "Raised 5 (si)",
+    "6 (la)",
+    "Raised 6 (li)",
+    "7 (ti)"
+  ];
+  return values[interval];
 }

@@ -64,6 +64,24 @@ const ANSWER_DATA = [
       "Locrian",
     ],
   },
+
+  {
+    name: "Scale Degrees",
+    answers: [
+      "1 (do)",
+      "Raised 1 (di)",
+      "2 (re)",
+      "Raised 2 (ri)",
+      "3 (mi)", 
+      "4 (fa)",
+      "Raised 4 (fi)",
+      "5 (so)",
+      "Raised 5 (si)",
+      "6 (la)",
+      "Raised 6 (li)",
+      "7 (ti)"
+    ],
+  },
 ];
 
 export const AuthContext = React.createContext({
