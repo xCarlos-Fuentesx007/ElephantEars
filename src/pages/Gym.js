@@ -1,15 +1,15 @@
-import React, { Fragment, useState, useContext } from "react";
+import React, { Fragment, useState, useContext } from 'react';
 
-import { AuthContext } from "../context/auth-context";
+import { AuthContext } from '../context/auth-context';
 
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 
-import Navbar from "../components/Navbar";
-import { Link } from "react-router-dom";
+import Navbar from '../components/Navbar';
+import { Link } from 'react-router-dom';
 
 const Gym = () => {
   const authCtx = useContext(AuthContext);
@@ -20,14 +20,14 @@ const Gym = () => {
 
   const ExerciseButtonGroup = () => {
     const exerciseType = [
-      "Intervals",
-      "Chords",
-      "Scales",
-      "Chord Progressions (WIP)",
-      "Perfect Pitch",
-      "Scale Degrees",
-      "Intervals in Context (WIP)",
-      "Melodic Dictation (WIP)",
+      'Intervals',
+      'Chords',
+      'Scales',
+      'Chord Progressions',
+      'Perfect Pitch',
+      'Scale Degrees',
+      'Intervals in Context (WIP)',
+      'Melodic Dictation (WIP)',
     ];
 
     return (
@@ -38,20 +38,20 @@ const Gym = () => {
           marginTop: 4,
           marginBottom: 4,
           padding: 3,
-          marginX: "auto",
+          marginX: 'auto',
         }}
       >
         {exerciseType.map((type) => (
           <Grid item xs={12} md={6} key={type}>
             <Button
-              variant={active === type ? "contained" : "outlined"}
+              variant={active === type ? 'contained' : 'outlined'}
               onClick={() => {
                 exerciseHandler(type);
                 setActive(type);
               }}
               sx={{
-                width: "90%",
-                bgcolor: active === type ? "" : "white",
+                width: '90%',
+                bgcolor: active === type ? '' : 'white',
               }}
             >
               {type}
@@ -71,19 +71,19 @@ const Gym = () => {
           sx={{
             padding: 5,
             marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            bgcolor: "#E5E5E5",
-            borderRadius: "25px",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: '#E5E5E5',
+            borderRadius: '25px',
           }}
         >
           <Typography
             component="h1"
             variant="h4"
             align="center"
-            sx={{ width: "70%" }}
+            sx={{ width: '70%' }}
           >
             Select an exercise type to practice at your own pace
           </Typography>

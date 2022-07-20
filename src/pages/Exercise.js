@@ -1,24 +1,30 @@
-import React, { Fragment, useState, useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { Fragment, useState, useContext, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
-import { AuthContext } from "../context/auth-context";
+import { AuthContext } from '../context/auth-context';
 
-import Navbar from "../components/Navbar";
+import Navbar from '../components/Navbar';
 
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import LinearProgress from "@mui/material/LinearProgress";
-import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
-import { IconButton } from "@mui/material";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import LinearProgress from '@mui/material/LinearProgress';
+import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import { IconButton } from '@mui/material';
 
-import correctImg from "../img/correct.svg";
-import incorrectImg from "../img/incorrect.svg";
+import correctImg from '../img/correct.svg';
+import incorrectImg from '../img/incorrect.svg';
 
-import { Intervals, Perfect_Pitch, Chords, Scales, Scale_Degrees } from "../exercises/toneFunctions";
+import {
+  Intervals,
+  Perfect_Pitch,
+  Chords,
+  Scales,
+  Scale_Degrees,
+} from '../exercises/toneFunctions';
 
 const DisplayErr = (errorCode, correctOption) => {
   switch (errorCode) {
@@ -31,7 +37,7 @@ const DisplayErr = (errorCode, correctOption) => {
           <Typography
             component="h1"
             variant="body1"
-            style={{ color: "#00B227" }}
+            style={{ color: '#00B227' }}
           >
             Nice job!
           </Typography>
@@ -42,7 +48,7 @@ const DisplayErr = (errorCode, correctOption) => {
         <Grid container alignItems="center" gap={3}>
           <img src={incorrectImg} alt="" />
           <Grid item>
-            <Typography component="h1" variant="body1" style={{ color: "red" }}>
+            <Typography component="h1" variant="body1" style={{ color: 'red' }}>
               Correct Answer: {correctOption}
             </Typography>
             <Typography component="h1" variant="body1">
@@ -68,11 +74,11 @@ const ExitContainer = ({ onCancel }) => {
         sx={{
           marginTop: 8,
           padding: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          bgcolor: "#E5E5E5",
-          borderRadius: "25px",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          bgcolor: '#E5E5E5',
+          borderRadius: '25px',
         }}
       >
         <Typography variant="h3" textAlign="center">
@@ -90,7 +96,7 @@ const ExitContainer = ({ onCancel }) => {
             <Button
               variant="contained"
               color="inherit"
-              sx={{ backgroundColor: "#fff" }}
+              sx={{ backgroundColor: '#fff' }}
               fullWidth
               onClick={onCancel}
             >
@@ -125,7 +131,8 @@ const Exercise = () => {
     answersHandler,
   } = authCtx;
 
-  const [active, setActive] = useState("");
+  const [active, setActive] = useState('');
+  const [multiActive, setMultiActive] = useState(['', '', '']);
   const [errorIdx, setErrorIdx] = useState(0);
   const [isAnswerTrue, setIsAnswerTrue] = useState(false);
   const [isAnswerFalse, setIsAnswerFalse] = useState(false);
@@ -151,49 +158,52 @@ const Exercise = () => {
   }, [correctAnswers, incorrectAnswers, percentageHandler]);
 
   const exerciseMaker = () => {
-    if (answerData.name === "Intervals") {
+    if (answerData.name === 'Intervals') {
       setFirst_note(Math.floor(Math.random() * 24));
       setInterval(Math.floor(Math.random() * 12) + 1);
       return;
-    } else if (answerData.name === "Chords") {
+    } else if (answerData.name === 'Chords') {
       setFirst_note(Math.floor(Math.random() * 24));
       set_chord_type(Math.floor(Math.random() * 7));
       return;
-    } else if (answerData.name === "Perfect Pitch") {
+    } else if (answerData.name === 'Perfect Pitch') {
       setFirst_note(Math.floor(Math.random() * 36));
       return;
-    } else if (answerData.name === "Scales") {
+    } else if (answerData.name === 'Scales') {
       setFirst_note(Math.floor(Math.random() * 24));
       set_scale_type(Math.floor(Math.random() * 8));
       return;
-    } else if (answerData.name === "Scale Degrees") {
+    } else if (answerData.name === 'Scale Degrees') {
       setFirst_note(Math.floor(Math.random() * 24));
       set_answer_note(Math.floor(Math.random() * 36));
       return;
     }
-  }
+  };
 
   const exerciseHandler = () => {
-    if (answerData.name === "Intervals") {
+    if (answerData.name === 'Intervals') {
       const answerValue = Intervals(first_note, interval);
       console.log(answerValue);
       setAnswer(answerValue);
-    } else if (answerData.name === "Perfect Pitch") {
+    } else if (answerData.name === 'Perfect Pitch') {
       const answerValue = Perfect_Pitch(first_note);
       setAnswer(answerValue);
-    } else if (answerData.name === "Chords") {
+    } else if (answerData.name === 'Chords') {
       const answerValue = Chords(first_note, chord_type);
       setAnswer(answerValue);
-    } else if (answerData.name === "Scales") {
+    } else if (answerData.name === 'Scales') {
       const answerValue = Scales(first_note, scale_type);
       console.log(answerValue);
       setAnswer(answerValue);
-    } else if (answerData.name === "Scale Degrees") {
-      while (answer_note - first_note >= 12 || answer_note - first_note <= -12) { //ensures the answer is within an octave of the starting note
+    } else if (answerData.name === 'Scale Degrees') {
+      while (
+        answer_note - first_note >= 12 ||
+        answer_note - first_note <= -12
+      ) {
+        //ensures the answer is within an octave of the starting note
         if (answer_note > first_note) {
           answer_note = answer_note - 12;
-        }
-        else {
+        } else {
           answer_note = answer_note + 12;
         }
       }
@@ -213,17 +223,17 @@ const Exercise = () => {
         spacing={3}
         sx={{
           padding: 3,
-          height: "50%",
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
+          height: '50%',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
         {answers.map((type) => (
           <Grid item xs={4} md={3} key={type}>
             <Button
-              variant={active === type ? "contained" : "outlined"}
-              disabled={ (cCount ? true : false) && !(type === active)}
+              variant={active === type ? 'contained' : 'outlined'}
+              disabled={(cCount ? true : false) && !(type === active)}
               onClick={() => {
                 if (isSoundPlayed) {
                   setActive(type);
@@ -232,15 +242,147 @@ const Exercise = () => {
                 }
               }}
               sx={{
-                width: "100%",
+                width: '100%',
                 bgcolor:
                   active === type
                     ? isAnswerTrue
-                      ? "green"
-                      : "" || isAnswerFalse
-                      ? "red"
-                      : ""
-                    : "white",
+                      ? 'green'
+                      : '' || isAnswerFalse
+                      ? 'red'
+                      : ''
+                    : 'white',
+              }}
+            >
+              {type}
+            </Button>
+          </Grid>
+        ))}
+      </Grid>
+    );
+  };
+
+  const updateMultiAnswers = (index, answer) => {
+    const newAnswers = [...multiActive];
+    newAnswers[index] = answer;
+    setMultiActive(newAnswers);
+  };
+
+  const ChordProgAnswerButtonGroup = () => {
+    const answers = answerData.answers;
+    return (
+      <Grid
+        container
+        columns={14}
+        spacing={3}
+        sx={{
+          padding: 3,
+          height: '50%',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <Grid item xs={2}>
+          <Typography component="body1">Chord 1:</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Button variant="contained" sx={{ width: '100%' }}>
+            I
+          </Button>
+        </Grid>
+        <Grid item xs={10}>
+          <Typography component="body1">
+            This is the first chord you heard and will always be the tonic
+            chord.
+          </Typography>
+        </Grid>
+
+        <Grid item xs={2}>
+          <Typography component="body1">Chord 2:</Typography>
+        </Grid>
+        {answers.map((type) => (
+          <Grid item xs={2} key={type}>
+            <Button
+              variant={multiActive[0] === type ? 'contained' : 'outlined'}
+              disabled={(cCount ? true : false) && !(type === active)}
+              onClick={() => {
+                if (isSoundPlayed) {
+                  updateMultiAnswers(0, type);
+                }
+              }}
+              sx={{
+                textTransform: 'none',
+                width: '100%',
+                bgcolor:
+                  multiActive[0] === type
+                    ? isAnswerTrue
+                      ? 'green'
+                      : '' || isAnswerFalse
+                      ? 'red'
+                      : ''
+                    : 'white',
+              }}
+            >
+              {type}
+            </Button>
+          </Grid>
+        ))}
+
+        <Grid item xs={2}>
+          <Typography component="body1">Chord 3:</Typography>
+        </Grid>
+        {answers.map((type) => (
+          <Grid item xs={2} key={type}>
+            <Button
+              variant={multiActive[1] === type ? 'contained' : 'outlined'}
+              disabled={(cCount ? true : false) && !(type === active)}
+              onClick={() => {
+                if (isSoundPlayed) {
+                  updateMultiAnswers(1, type);
+                }
+              }}
+              sx={{
+                textTransform: 'none',
+                width: '100%',
+                bgcolor:
+                  multiActive[1] === type
+                    ? isAnswerTrue
+                      ? 'green'
+                      : '' || isAnswerFalse
+                      ? 'red'
+                      : ''
+                    : 'white',
+              }}
+            >
+              {type}
+            </Button>
+          </Grid>
+        ))}
+
+        <Grid item xs={2}>
+          <Typography component="body1">Chord 4:</Typography>
+        </Grid>
+        {answers.map((type) => (
+          <Grid item xs={2} key={type}>
+            <Button
+              variant={multiActive[2] === type ? 'contained' : 'outlined'}
+              disabled={(cCount ? true : false) && !(type === active)}
+              onClick={() => {
+                if (isSoundPlayed) {
+                  updateMultiAnswers(2, type);
+                }
+              }}
+              sx={{
+                textTransform: 'none',
+                width: '100%',
+                bgcolor:
+                  multiActive[2] === type
+                    ? isAnswerTrue
+                      ? 'green'
+                      : '' || isAnswerFalse
+                      ? 'red'
+                      : ''
+                    : 'white',
               }}
             >
               {type}
@@ -261,22 +403,21 @@ const Exercise = () => {
             sx={{
               marginTop: 4,
               padding: 3,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              bgcolor: "#E5E5E5",
-              borderRadius: "25px",
-              position: "relative",
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              bgcolor: '#E5E5E5',
+              borderRadius: '25px',
+              position: 'relative',
             }}
           >
-
             <Typography component="h1" variant="h4">
               {answerData.name}
             </Typography>
 
             <IconButton
               size="large"
-              sx={{ position: "absolute", top: "30px", right: "30px" }}
+              sx={{ position: 'absolute', top: '30px', right: '30px' }}
               onClick={() => {
                 setIsExitVisible(true);
               }}
@@ -293,10 +434,8 @@ const Exercise = () => {
                 <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
               </svg>
             </IconButton>
-            <IconButton 
-              size="large" 
-              onClick={exerciseHandler}>
-              <VolumeUpRoundedIcon sx={{ fontSize: "400%" }} />
+            <IconButton size="large" onClick={exerciseHandler}>
+              <VolumeUpRoundedIcon sx={{ fontSize: '400%' }} />
             </IconButton>
             <Typography component="h1" variant="body1">
               Click to hear exercise again
@@ -306,28 +445,32 @@ const Exercise = () => {
               container
               spacing={2}
               sx={{
-                width: "100%",
-                height: "40%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                width: '100%',
+                height: '40%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Grid item xs={12}>
-                <AnswerButtonGroup />
+                {answerData.name === 'Chord Progressions' ? (
+                  <ChordProgAnswerButtonGroup />
+                ) : (
+                  <AnswerButtonGroup />
+                )}
               </Grid>
               <Grid item xs={11}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Box sx={{ width: "100%", mr: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ width: '100%', mr: 2 }}>
                     <LinearProgress
                       variant="determinate"
                       value={percentage}
                       sx={{
                         height: 15,
                         borderRadius: 5,
-                        backgroundColor: "#C4C4C4 ",
-                        "& .MuiLinearProgress-barColorPrimary": {
-                          backgroundColor: "#00B227",
+                        backgroundColor: '#C4C4C4 ',
+                        '& .MuiLinearProgress-barColorPrimary': {
+                          backgroundColor: '#00B227',
                         },
                       }}
                     />
@@ -353,7 +496,7 @@ const Exercise = () => {
                       sx={{ paddingX: 2 }}
                     >
                       <Button
-                        sx={{ margin: "0 16px" }}
+                        sx={{ margin: '0 16px' }}
                         size="large"
                         variant="contained"
                         onClick={() => {
