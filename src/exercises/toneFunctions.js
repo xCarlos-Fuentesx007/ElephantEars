@@ -78,7 +78,20 @@ function Scales(first_note, scale_type) {
 }
 export { Scales };
 
-///////////////////////////Chord Progressions
+function Chord_Progressions(first_note, progression_types) {
+  var chords1 = make_chord(first_note, 0);
+  var chords2 = make_chord(first_note + progression_types[0], 0);
+  var chords3 = make_chord(first_note + progression_types[1], 0);
+  var chords4 = make_chord(first_note + progression_types[2], 0);
+
+  const synth = new Tone.PolySynth().toDestination();
+  synth.triggerAttackRelease(chords1, "4n", Tone.now());
+  synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
+  synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
+  synth.triggerAttackRelease(chords4, "4n", Tone.now() + 2.4);
+  return find_chord_progressions(progression_types);
+}
+export {Chord_Progressions}
 
 function Perfect_Pitch(first_note) {
   const synth = new Tone.Synth().toDestination();
@@ -276,4 +289,22 @@ function find_scale_degree(first_note, answer_note) {
     "7 (ti)"
   ];
   return values[interval];
+}
+
+function find_chord_progressions(progression_types) {
+  var types = ["", "", ""];
+  const values = [
+    "I",
+    "ii",
+    "iii",
+    "IV",
+    "V", 
+    "vi"
+  ];
+
+  for (var i=0; i<3; i++) {
+    types[i] = values[progression_types[i]];
+  }
+
+  return types;
 }

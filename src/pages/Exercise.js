@@ -24,6 +24,7 @@ import {
   Chords,
   Scales,
   Scale_Degrees,
+  Chord_Progressions,
 } from '../exercises/toneFunctions';
 
 const DisplayErr = (errorCode, correctOption) => {
@@ -119,6 +120,7 @@ const ExitContainer = ({ onCancel }) => {
 const Exercise = () => {
   const authCtx = useContext(AuthContext);
   const [answer, setAnswer] = useState();
+  const [answers, setAnswers] = useState([]);
 
   const [isExitVisible, setIsExitVisible] = useState(false);
 
@@ -138,14 +140,16 @@ const Exercise = () => {
   const [isAnswerFalse, setIsAnswerFalse] = useState(false);
   const [isSoundPlayed, setIsSoundPlayed] = useState(false);
 
-  const [cCount, set_continue] = useState(false);
+  const [clickCount, set_continue] = useState(false);
   const [correct, set_correct] = useState(0);
 
   const [first_note, setFirst_note] = useState(Math.floor(Math.random() * 24));
+  const [first_noteV2, setFirst_noteV2] = useState(Math.floor(Math.random() * 12));
   const [interval, setInterval] = useState(Math.floor(Math.random() * 12) + 1);
   const [chord_type, set_chord_type] = useState(Math.floor(Math.random() * 7));
   const [scale_type, set_scale_type] = useState(Math.floor(Math.random() * 8));
   var [answer_note, set_answer_note] = useState(Math.floor(Math.random() * 36));
+  const [progression_types, set_progression_types] = useState([Math.floor(Math.random() * 6), Math.floor(Math.random() * 6), Math.floor(Math.random() * 6)]);
 
   useEffect(() => {
     if (correctAnswers === 0 && incorrectAnswers === 0) {
@@ -176,6 +180,10 @@ const Exercise = () => {
     } else if (answerData.name === 'Scale Degrees') {
       setFirst_note(Math.floor(Math.random() * 24));
       set_answer_note(Math.floor(Math.random() * 36));
+      return;
+    } else if (answerData.name === 'Chord Progressions') {
+      setFirst_noteV2(Math.floor(Math.random() * 12));
+      set_progression_types([Math.floor(Math.random() * 6), Math.floor(Math.random() * 6), Math.floor(Math.random() * 6)]);
       return;
     }
   };
@@ -210,6 +218,10 @@ const Exercise = () => {
       const answerValue = Scale_Degrees(first_note, answer_note);
       console.log(answerValue);
       setAnswer(answerValue);
+    } else if (answerData.name === 'Chord Progressions') {
+      const answerValue = Chord_Progressions(first_noteV2, progression_types);
+      console.log(answerValue);
+      setAnswers(answerValue);
     }
     setIsSoundPlayed(true);
   };
@@ -233,7 +245,7 @@ const Exercise = () => {
           <Grid item xs={4} md={3} key={type}>
             <Button
               variant={active === type ? 'contained' : 'outlined'}
-              disabled={(cCount ? true : false) && !(type === active)}
+              disabled={(clickCount ? true : false) && !(type === active)}
               onClick={() => {
                 if (isSoundPlayed) {
                   setActive(type);
@@ -304,7 +316,7 @@ const Exercise = () => {
           <Grid item xs={2} key={type}>
             <Button
               variant={multiActive[0] === type ? 'contained' : 'outlined'}
-              disabled={(cCount ? true : false) && !(type === active)}
+              disabled={(clickCount ? true : false) && !(type === active)}
               onClick={() => {
                 if (isSoundPlayed) {
                   updateMultiAnswers(0, type);
@@ -335,7 +347,7 @@ const Exercise = () => {
           <Grid item xs={2} key={type}>
             <Button
               variant={multiActive[1] === type ? 'contained' : 'outlined'}
-              disabled={(cCount ? true : false) && !(type === active)}
+              disabled={(clickCount ? true : false) && !(type === active)}
               onClick={() => {
                 if (isSoundPlayed) {
                   updateMultiAnswers(1, type);
@@ -366,7 +378,7 @@ const Exercise = () => {
           <Grid item xs={2} key={type}>
             <Button
               variant={multiActive[2] === type ? 'contained' : 'outlined'}
-              disabled={(cCount ? true : false) && !(type === active)}
+              disabled={(clickCount ? true : false) && !(type === active)}
               onClick={() => {
                 if (isSoundPlayed) {
                   updateMultiAnswers(2, type);
@@ -486,7 +498,11 @@ const Exercise = () => {
                 <Container>
                   <Grid container alignItems="center">
                     <Grid item xs={6}>
-                      {DisplayErr(errorIdx, answer)}
+                      {answerData.name === 'Chord Progressions' ? (
+                        DisplayErr(errorIdx, answers.join(", "))
+                      ) : (
+                        DisplayErr(errorIdx, answer)
+                      )}
                     </Grid>
                     <Grid
                       item
@@ -510,33 +526,64 @@ const Exercise = () => {
                         variant="contained"
                         // disabled={!isSoundPlayed ? true : false}
                         onClick={() => {
-                          if (cCount === false) {
-                            if (answer === active) {
-                              answersHandler(
-                                correctAnswers + 1,
-                                incorrectAnswers
-                              );
-                              setErrorIdx(1);
-                              setIsAnswerTrue(true);
-                              set_correct(1);
+                          if (answerData.name === 'Chord Progressions') {
+                            if (clickCount === false) {
+                              if (answers[0] === multiActive[0] && answers[1] === multiActive[1] && answers[2] === multiActive[2]) {
+                                answersHandler(
+                                  correctAnswers + 1,
+                                  incorrectAnswers
+                                );
+                                setErrorIdx(1);
+                                setIsAnswerTrue(true);
+                                set_correct(1);
+                              } else {
+                                answersHandler(
+                                  correctAnswers,
+                                  incorrectAnswers + 1
+                                );
+                                setErrorIdx(2);
+                                setIsAnswerFalse(true);
+                                set_correct(0);
+                              }
+                              setIsSoundPlayed(false);
+                              set_continue(true);
                             } else {
-                              answersHandler(
-                                correctAnswers,
-                                incorrectAnswers + 1
-                              );
-                              setErrorIdx(2);
-                              setIsAnswerFalse(true);
-                              set_correct(0);
+                              exerciseMaker();
+                              set_continue(false);
+                              setIsAnswerFalse(false);
+                              setIsAnswerTrue(false);
+                              setActive(undefined);
+                              setErrorIdx(0);
                             }
-                            setIsSoundPlayed(false);
-                            set_continue(true);
                           } else {
-                            exerciseMaker();
-                            set_continue(false);
-                            setIsAnswerFalse(false);
-                            setIsAnswerTrue(false);
-                            setActive(undefined);
-                            setErrorIdx(0);
+                            if (clickCount === false) {
+                              if (answer === active) {
+                                answersHandler(
+                                  correctAnswers + 1,
+                                  incorrectAnswers
+                                );
+                                setErrorIdx(1);
+                                setIsAnswerTrue(true);
+                                set_correct(1);
+                              } else {
+                                answersHandler(
+                                  correctAnswers,
+                                  incorrectAnswers + 1
+                                );
+                                setErrorIdx(2);
+                                setIsAnswerFalse(true);
+                                set_correct(0);
+                              }
+                              setIsSoundPlayed(false);
+                              set_continue(true);
+                            } else {
+                              exerciseMaker();
+                              set_continue(false);
+                              setIsAnswerFalse(false);
+                              setIsAnswerTrue(false);
+                              setActive(undefined);
+                              setErrorIdx(0);
+                            }
                           }
                         }}
                       >
