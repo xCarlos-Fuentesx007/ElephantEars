@@ -18,6 +18,10 @@ import { IconButton } from "@mui/material";
 import correctImg from "../img/correct.svg";
 import incorrectImg from "../img/incorrect.svg";
 
+import { Howl } from "howler";
+import Correct from "../audio/correct.mp3";
+import Wrong from "../audio/wrong.mp3";
+
 import {
   Intervals,
   Perfect_Pitch,
@@ -26,6 +30,15 @@ import {
   Scale_Degrees,
   Chord_Progressions,
 } from "../exercises/toneFunctions";
+
+const sfx = {
+  correct: new Howl({
+    src: Correct,
+  }),
+  wrong: new Howl({
+    src: Wrong,
+  }),
+};
 
 const DisplayErr = (errorCode, correctOption) => {
   switch (errorCode) {
@@ -563,6 +576,7 @@ const Exercise = () => {
                                 answers[1] === multiActive[1] &&
                                 answers[2] === multiActive[2]
                               ) {
+                                sfx.correct.play();
                                 answersHandler(
                                   correctAnswers + 1,
                                   incorrectAnswers
@@ -571,6 +585,7 @@ const Exercise = () => {
                                 setIsMultiAnswerTrue([true, true, true]);
                                 set_correct(1);
                               } else {
+                                sfx.wrong.play();
                                 answersHandler(
                                   correctAnswers,
                                   incorrectAnswers + 1
@@ -601,6 +616,7 @@ const Exercise = () => {
                           } else {
                             if (clickCount === false) {
                               if (answer === active) {
+                                sfx.correct.play();
                                 answersHandler(
                                   correctAnswers + 1,
                                   incorrectAnswers
@@ -609,6 +625,7 @@ const Exercise = () => {
                                 setIsAnswerTrue(true);
                                 set_correct(1);
                               } else {
+                                sfx.wrong.play();
                                 answersHandler(
                                   correctAnswers,
                                   incorrectAnswers + 1
