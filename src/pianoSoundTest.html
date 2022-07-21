@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="pianoSoundTest.js" type="text/javascript" defer></script>
+</head>
+<body>
+  <!-- <audio id="audio" src="http://carolinegabriel.com/demo/js-keyboard/sounds/056.wav"></audio>
+
+<audio id="myAudio">
+  <source src="http://carolinegabriel.com/demo/js-keyboard/sounds/056.wav" type="audio/wav">
+  Your browser does not support the audio element.
+</audio>
+
+<p>Click the buttons to play or pause the audio.</p>
+
+<button onclick="playAudio()" type="button">Play Audio</button>
+<button onclick="pauseAudio()" type="button">Pause Audio</button> 
+
+<input type="button" value="PLAY" onclick="play()"> -->
+
+<!-- <button id="play" onclick="playLocal('A6')">Play Local</button> -->
+<!-- <audio id="A6" src="/Users/ethankaplan/Downloads/tonejs-instruments-master/samples/piano/A6.wav"></audio> -->
+
+<br><br><br>
+<button id='C5' onclick="playSound('C5')">Play C5</button>
+<button id='D5' onclick="playSound('D5')">Play D5</button>
+<button id='E5' onclick="playSound('E5')">Play E5</button>
+<button id='F5' onclick="playSound('F5')">Play F5</button>
+<button id='G5' onclick="playSound('G5')">Play G5</button>
+<button id='A5' onclick="playSound('A5')">Play A5</button>
+<button id='B5' onclick="playSound('B5')">Play B5</button>
+<button id='C6' onclick="playSound('C6')">Play C6</button>
+
+<br><br><br>
+
+<button id='randomNote' onclick="playRandomNote()" accesskey="e">Play Random Note</button>
+
+<br>
+
+<button id='randomNote' onclick="playChord(getRandomRootArray(), getRandomChordMap())" accesskey="r">Play Random Chord</button>
+
+<br>
+
+<button id='randomNote' onclick="playChord(getRandomRootArray(), getRandomIntervalMap())" accesskey="r">Play Random Interval</button>
+
+<br>
+
+<button id="stopButton">Stop All Audio</button><button id="repeat" onclick="repeat()">Repeat Last Played</button>
+
+<br>
+
+<button id='randomNote' onclick="playChord(getRandomRootArray(), getRandomIntervalMap(), true)" accesskey="r">Play Random Interval Arpeggio Ascending</button>
+
+<br>
+
+<button id='randomNote' onclick="playChord(getRandomRootArray(), getRandomChordMap(), true)" accesskey="r">Play Random Chord Arpeggio Ascending</button>
+
+<br>
+
+<button id='randomNote' onclick="playChord(getRandomRootArray(), getRandomIntervalMap(), true, false)" accesskey="r">Play Random Interval Arpeggio Descending</button>
+
+<br>
+
+<button id='randomNote' onclick="playChord(getRandomRootArray(), getRandomChordMap(), true, false)" accesskey="r">Play Random Chord Arpeggio Descending</button>
+
+
+</body>
+</html>
