@@ -115,9 +115,45 @@ function Scale_Degrees(first_note, answer_note) {
 }
 export { Scale_Degrees };
 
-////////////////////////////Intervals in Context
+function Intervals_In_Context(start_note, first_note, second_note) {
+  var chords1 = make_chord(start_note, 0);
+  var chords2 = make_chord(start_note + 4, 0);
+  var chords3 = make_chord(start_note + 7, 0);
+  var interval = first_note - second_note;
+  if (interval < 0) {
+    interval = -1 * interval;
+  }
+
+  const synth = new Tone.PolySynth().toDestination();
+  synth.triggerAttackRelease(chords1, "4n", Tone.now());
+  synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
+  synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
+  synth.triggerAttackRelease(chords1, "4n", Tone.now() + 2.4);
+  synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now() + 4);
+  synth.triggerAttackRelease(find_note(second_note), "4n", Tone.now() + 4.8);
+
+  return find_intervals_in_context(start_note, first_note, second_note, interval);
+}
+export {Intervals_In_Context};
 
 /////////////////////////////Melotic Dictation
+function Melodic_Dictation(start_note, first_note, second_note, third_note) {
+  var chords1 = make_chord(start_note, 0);
+  var chords2 = make_chord(start_note + 4, 0);
+  var chords3 = make_chord(start_note + 7, 0);
+
+  const synth = new Tone.PolySynth().toDestination();
+  synth.triggerAttackRelease(chords1, "4n", Tone.now());
+  synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
+  synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
+  synth.triggerAttackRelease(chords1, "4n", Tone.now() + 2.4);
+  synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now() + 4);
+  synth.triggerAttackRelease(find_note(second_note), "4n", Tone.now() + 4.8);
+  synth.triggerAttackRelease(find_note(third_note), "4n", Tone.now() + 5.6);
+
+  return find_melodic_dictation(start_note, first_note, second_note, third_note);
+}
+export {Melodic_Dictation}
 
 //Finds note name using number (0 = middle C)
 function find_note(num) {
@@ -168,6 +204,8 @@ function find_note(num) {
     str = "C3";
   }
 
+  //console.log(str);
+
   return str;
 }
 
@@ -194,6 +232,7 @@ function find_pitch(num) {
 //Finds interval name using number of semitones
 function find_interval(interval) {
   const values = [
+    "Unison",
     "Minor 2nd",
     "Major 2nd",
     "Minor 3rd",
@@ -208,7 +247,7 @@ function find_interval(interval) {
     "Octave",
   ];
 
-  return values[interval - 1];
+  return values[interval];
 }
 
 function find_chord_type(num) {
@@ -306,5 +345,21 @@ function find_chord_progressions(progression_types) {
     types[i] = values[progression_types[i]];
   }
 
+  return types;
+}
+
+function find_intervals_in_context(start_note, first_note, second_note, interval) {
+  var types = ["", "", ""];
+  types[0] = find_scale_degree(start_note, first_note);
+  types[1] = find_scale_degree(start_note, second_note);
+  types[2] = find_interval(interval);
+  return types;
+}
+
+function find_melodic_dictation(start_note, first_note, second_note, third_note) {
+  var types = ["", "", ""];
+  types[0] = find_scale_degree(start_note, first_note);
+  types[1] = find_scale_degree(start_note, second_note);
+  types[2] = find_scale_degree(start_note, third_note);
   return types;
 }

@@ -74,6 +74,57 @@ const ANSWER_DATA = [
     name: 'Chord Progressions',
     answers: ['I', 'ii', 'iii', 'IV', 'V', 'vi'],
   },
+
+  {
+    name: 'Intervals In Context',
+    answers: [
+      '1 (do)',
+      'Raised 1 (di)',
+      '2 (re)',
+      'Raised 2 (ri)',
+      '3 (mi)',
+      '4 (fa)',
+      'Raised 4 (fi)',
+      '5 (so)',
+      'Raised 5 (si)',
+      '6 (la)',
+      'Raised 6 (li)',
+      '7 (ti)',
+    ],
+    answers2: [
+      'Unison',
+      'Minor 2nd',
+      'Major 2nd',
+      'Minor 3rd',
+      'Major 3rd',
+      'Perfect 4th',
+      'Tritone',
+      'Perfect 5th',
+      'Minor 6th',
+      'Major 6th',
+      'Minor 7th',
+      'Major 7th',
+      'Octave',
+    ]
+  },
+
+  {
+    name: 'Melodic Dictation',
+    answers: [
+      '1 (do)',
+      'Raised 1 (di)',
+      '2 (re)',
+      'Raised 2 (ri)',
+      '3 (mi)',
+      '4 (fa)',
+      'Raised 4 (fi)',
+      '5 (so)',
+      'Raised 5 (si)',
+      '6 (la)',
+      'Raised 6 (li)',
+      '7 (ti)',
+    ],
+  }
 ];
 
 export const AuthContext = React.createContext({
