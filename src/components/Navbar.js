@@ -60,11 +60,11 @@ const Navbar = () => {
               Settings
             </Link>
           </li>
-          <li className="nav-item px-3">
+          {/* <li className="nav-item px-3">
             <Link className="nav-link" to="/profile">
               Account
             </Link>
-          </li>
+          </li> */}
           {isLoggedIn && (
             <li className="nav-item px-2">
               <Link
