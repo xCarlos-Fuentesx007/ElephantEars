@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Paper,
@@ -26,6 +26,106 @@ const DisplayErr = (errorCode) => {
       return <Alert severity="error">An unknown error has occurred</Alert>;
   }
 };
+
+function Confirm() {
+  const [password, setPassword] = useState('');
+  const update1 = () => setPassword(() => (document.getElementById('password') === null) ? '' : document.getElementById("password").value);
+
+  const [cPassword, setCPassword] = useState('');
+  const update2 = () => setCPassword(() => (document.getElementById('cPassword') === null) ? '' : document.getElementById("cPassword").value);
+
+  const update = () => {update1(); update2()};
+
+  const [error, setError] = useState();
+  const makeError = () => setError(() => validatePasswords(password, cPassword))
+
+  useEffect(() => {
+    console.log(`confirmed ${password} ${password.length}`)
+    makeError();
+  }, [password, cPassword]);
+
+  return (
+    <Container>
+      <Button type="submit" onClick={() => update()} fullWidth variant="contained" sx={{ my: 3 }}>
+        Confirm
+      </Button>
+      {error}
+    </Container>
+  )
+}
+
+function validatePassword(password) {
+
+  // let minLen = String(password)
+  //   .match(
+  //     /^.{8,20}$/
+  //   );
+
+  // let maxLen = String(password)
+  // .match(
+  //   // /(?=.{1,20})/
+  //   /^.{1,20}$/
+  // );
+
+  // let hasUpper = String(password)
+  // .match(
+  //   /(?=.*[A-Z])/
+  // );
+
+  // let hasLower = String(password)
+  // .match(
+  //   /(?=.*[a-z])/
+  // );
+
+  // let hasSpecial = String(password)
+  // .match(
+  //   /(?=.*[^A-Za-z0-9])/
+  // );
+
+  // let hasDigit = String(password)
+  // .match(
+  //   /(?=.*[0-9])/
+  // );
+
+  // if (!minLen) console.log("minLen");
+  // if (!maxLen) console.log("maxLen");
+  // if (!hasUpper) console.log("hasUpper");
+  // if (!hasLower) console.log("hasLower");
+  // if (!hasSpecial) console.log("hasSpecial");
+  // if (!hasDigit) console.log("hasDigit");
+
+
+  return String(password)
+    .match(
+      /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,20})/
+    );
+};
+
+function validatePasswords(password, cPassword) {
+
+  // Guard condition
+  if (password === '' && cPassword === '') return;
+
+  // Are these valid passwords?
+  if (!validatePassword(password)) {
+    console.log(`${password} is not a valid password`);
+    return DisplayErr(1);
+  }
+
+  // Are the two passwords equal?
+  if (password !== cPassword) {
+    // console.log('They are not equal');
+    return DisplayErr(2);
+  }
+
+  // Technically, validating cPassword is unnecessary because if password is valid and password === cPassword then cPassword must be valid
+  // if (!validatePassword(cPassword)) {
+  //   // console.log(`${cPassword} is not a valid password`);
+  //   return DisplayErr(1);
+  // }
+
+  // console.log('They are equal');
+}
 
 const Reset3 = () => {
   return (
@@ -98,7 +198,7 @@ const Reset3 = () => {
                 />
               </Container>
 
-              <Container>
+              {/* <Container>
                 <Button
                   type="submit"
                   fullWidth
@@ -107,9 +207,10 @@ const Reset3 = () => {
                 >
                   Confirm
                 </Button>
-              </Container>
+              </Container> */}
+              {Confirm()}
 
-              <Container> {DisplayErr(1)}</Container>
+              {/* <Container> {DisplayErr(1)}</Container> */}
             </Paper>
           </Grid>
         </Grid>
