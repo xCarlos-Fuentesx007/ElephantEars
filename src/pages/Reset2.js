@@ -109,7 +109,7 @@ const Reset2 = () => {
             align="center"
             sx={{ padding: 2 }}
           >
-            If you did not receieve an email, click{" "}
+            If you did not receive an email, click{" "}
             <Link to="/reset1" variant="body2">
               here
             </Link>{" "}
