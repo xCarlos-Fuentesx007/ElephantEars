@@ -27,7 +27,13 @@ const notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
 const pathToFolder = "./piano-wav/"; // Where all samples are stored. Lowest note available: C1. Highest note available: C8.
 let audioObjects = []; // Global list to keep track of all sounds currently playing
 
-/** Class representing a note */
+/** Class representing a note 
+ * Separating letter and octave makes for easier and efficient function calls.
+ * @typedef Note
+ * @property {string} name - the full name in scientific pitch notation
+ * @property {string} letter - Just the letter part of `name`.
+ * @property {number} octave - Just the number part of `name`.
+*/
 class Note {
 
   /** Create Note object from note's name.
@@ -53,8 +59,11 @@ class Note {
     this.octave = parseInt(noteName[noteName.length-1]);
   }
 
+  /** Play the note.
+   * @returns {Promise} A Promise which is resolved when playback has been started, or is rejected if for any reason playback cannot be started.
+   */
   play() {
-    console.log('hi')
+    console.log(this.name)
     let path = pathToFolder + this.name + ".wav";
     let audio = new Audio(path);
     let p = audio.play(); 
@@ -86,7 +95,7 @@ function playSound(noteName) {
 // }
 
 /** Pause and delete all Notes currently playing.
- * This works by iterating through the global audioObjects list. So each 
+ * This works by iterating through the global audioObjects list.
  */
 function stopAll() {
 
@@ -98,6 +107,7 @@ function stopAll() {
   }
 }
 
+// Todo: Convert html to this?
 document.getElementById('stopButton').addEventListener('click', () => {
   // document.querySelectorAll('audio').forEach(el => el.stop());
   stopAll();
@@ -125,7 +135,7 @@ function getRandomRoot() {
   return rootNoteName;
 }
 
-/** Function to choose a random root note and return it as an array so the octave and letter portion can be used independently.
+/** Select a random root note and return it as an array so the octave and letter portion can be used independently.
  * @param {number} min - Lowest octave bound (must be an integer)
  * @param {number} max - Highest octave bound (must be an integer)
  * @returns An array describing the root note with the format: [{string} full combined name, {string} just the letter, {number} just the octave].
@@ -141,7 +151,7 @@ function getRandomRootArray(min=2, max=7) {
 
 function getRandomIntervalMap() {
   
-  let intervals = [
+  const intervals = [
     ['minor second',1],
     ['major second', 2],
     ['minor third', 3],
@@ -172,7 +182,7 @@ function sleep(milliseconds) {
 
 function getRandomChordMap() {
   
-  let chords = [
+  const chords = [
     ['major',4,7], // major
     ['major 7th',4,7,11], // major 7th
     ['minor',3,7], // minor
@@ -187,72 +197,57 @@ function getRandomChordMap() {
   return chords[i];
 }
 
-// Todo: rename this to playArpeggio?
-function playSoundRecursiveWrapper(playing, ascending=true) {
+/** Play a scale or arpeggio in ascending or descending order.
+ * @param {Array<string>} playing - A list of note names each in scientfic pitch notation.
+ * @param {number} delay - Time in milliseconds between each note.
+ * @param {boolean} ascending - Play the notes first to last or last to first?
+ */
+function playNotes(playing, delay=750, ascending=true) {
 
   if (ascending) {
-    playSound(playing[0]).then( playSoundRecursiveAscending(playing, 1) );
+    playSound(playing[0]).then( playSoundRecursiveAscending(playing, 1, delay) );
+    console.log('delay', delay)
   }
   else {
     let i = playing.length-1;
-    playSound(playing[i]).then( playSoundRecursiveDescending(playing, --i) );
+    playSound(playing[i]).then( playSoundRecursiveDescending(playing, --i, delay) );
   }
 }
 
-function playSoundRecursiveAscending(playing, i) {
+/** Play a list of notes in order with a delay between each note. This should never be used directly, only by playNotes().
+ * @private Only playNotes() should call this function.
+ * @param {Array<string>} playing - A list of note names to play e.g. ['C2','E2','G2'] 
+ * @param {number} i - Index to tell function to play playing[i]
+ * @param {number} delay - Time in milliseconds to play between chords
+ */
+function playSoundRecursiveAscending(playing, i, delay=750) {
 
   if (playing[i] === undefined) { return; } // no more notes to play
   
   setTimeout( () =>
     {playSound(playing[i]).then(() => { 
-      playSoundRecursive(playing, ++i);
+      playSoundRecursiveAscending(playing, ++i, delay);     console.log('delay', delay)
     }).catch(() => {console.log('interrupted')})},
-    750 // delay between notes
+    delay
   )
 }
 
-function playSoundRecursiveDescending(playing, i) {
+/** Play a list of notes in reverse order with a delay between each note. This should never be used directly, only by playNotes().
+ * @private Only playNotes() should call this function.
+ * @param {Array<string>} playing - A list of note names to play e.g. ['C2','E2','G2'] 
+ * @param {number} i - Index to tell function to play playing[i]
+ * @param {number} delay - Time in milliseconds to play between chords
+ */
+function playSoundRecursiveDescending(playing, i, delay=750) {
 
   if (i < 0) { return; } // no more notes to play
 
   setTimeout( () =>
     {playSound(playing[i]).then(() => {
-      playSoundRecursiveDescending(playing, --i);
+      playSoundRecursiveDescending(playing, --i, delay);
     }).catch(() => {console.log('interrupted')})},
-    750 // delay between notes
+    delay
   )
-}
-
-// Todo: delete this function. It's no longer necessary.
-function playSoundRecursive(playing, i, ascending=true) {
-  // if (i > 0) sleep(750); // delay between notes
-
-  if (ascending) {
-    if (playing[i] === undefined) { return; } // no more notes to play
-    
-    setTimeout( () =>
-      {playSound(playing[i]).then(() => { 
-        playSoundRecursive(playing, ++i);
-      }).catch(() => {console.log('interrupted')})},
-      750
-    )
-    
-  }
-  else { // descending
-    let j = playing.length - 1 - i; 
-    if (playing[j] === undefined) { return; } // no more notes to play
-    
-    // playSound(playing[j]).then(() => {
-    //   playSoundRecursive(playing, ++i, false);
-    // }).catch(() => {console.log('interrupted')})
-
-    setTimeout( () =>
-      {playSound(playing[j]).then(() => {
-        playSoundRecursive(playing, ++i, false);
-      }).catch(() => {console.log('interrupted')})},
-      750
-    )
-  }
 }
 
 var repeatMap;
@@ -292,7 +287,7 @@ function playChord(rootNoteArray, chordMap, arpeggiate=false, ascending=true) {
   
   // Play the chord.
   if (arpeggiate) {
-    playSoundRecursiveWrapper(playing, ascending);
+    playNotes(playing, 750, ascending);
   }
   else {
     let p;
@@ -524,14 +519,17 @@ function makeScale(rootNote, scaleType) {
   });
 
   console.log('scale', scale)
+  return scale;
 }
 
 let e = new Note('E3');
-makeScale(e, 'minor');
+let eMinorScale = makeScale(e, 'minor');
 
-/**
- * @typedef {Object} MyType
- * @property {String} foo - this is some cool string
- * @property {Number} fizz - some number we also expect to receive
- * @property {Number} [bar] - an optional property
- */
+// Todo: Convert html to this?
+document.getElementById('playScaleAscending').addEventListener('click', () => {
+  playNotes(eMinorScale, 200);
+});
+
+document.getElementById('playScaleDescending').addEventListener('click', () => {
+  playNotes(eMinorScale, 200, false);
+});
