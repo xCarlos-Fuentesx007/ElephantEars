@@ -1,31 +1,7 @@
-// var x = document.getElementById("myAudio"); 
-
-// function playAudio() { 
-//   x.play(); 
-// } 
-
-// function pauseAudio() { 
-//   x.pause(); 
-// } 
-
-// function play() {
-//   var audio = document.getElementById("audio");
-//   audio.play();
-// }
-
-// function playLocal(noteName) {
-//   var audio = document.getElementById(noteName);
-//   let p = audio.play();
-//   p.then(() => {
-//     console.log("Played");
-//   }).catch(() => {
-//     console.log("Not played");
-//   });
-// }
-
 const notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
 const pathToFolder = "./piano-wav/"; // Where all samples are stored. Lowest note available: C1. Highest note available: C8.
 let audioObjects = []; // Global list to keep track of all sounds currently playing
+var repeatMap; // Global variable to remember most recently played.
 
 /** Class representing a note 
  * Separating letter and octave makes for easier and efficient function calls.
@@ -88,22 +64,20 @@ function getRandomInt(max) {
 }
 
 // new playSound
+// Todo: this function is inefficient because noteName must be generated from a Note object. 
+  // Todo: It's then converted into a separate object for another function call.
+  // Todo: Rewrite this function and the code that uses it to only use note.play() directly, or at least: new Note(noteName).play().
 function playSound(noteName) {
   if (noteName === undefined) return;
-  let note = new Note(noteName);
-  return note.play();
+  // let note = new Note(noteName);
+  // return note.play();
+  return new Note(noteName).play();
 }
 
-// old playSound
-// function playSound(noteName) {
-//   if (noteName === undefined) return;
-//   let pathToFolder = "./piano-wav/"; // Lowest note available: C1. Highest note available: C8.
-//   let path = pathToFolder + noteName + ".wav";
-//   let audio = new Audio(path);
-//   let p = audio.play(); 
-//   audioObjects.push(audio);
-//   return p;
-// }
+function playNote(note) {
+  if (note == undefined) return;
+  return note.play();
+}
 
 /** Pause and delete all Notes currently playing.
  * This works by iterating through the global audioObjects list.
@@ -111,38 +85,22 @@ function playSound(noteName) {
 function stopAll() {
 
   while (audioObjects.length > 0) {
-    // let a = audioObjects.pop();
-    // console.log(`pausing ${a}`);
-    // a.pause();
     audioObjects.pop().pause();
   }
 }
 
 // Todo: Convert html to this?
 document.getElementById('stopButton').addEventListener('click', () => {
-  // document.querySelectorAll('audio').forEach(el => el.stop());
   stopAll();
 });
 
 // new playRandomNote (uses Note object)
-// Todo: delete this function. It's no longer necessary.
 function playRandomNote() {
   let note = new Note();
   console.log(`Playing ${note.name}`);
-  playSound(note.name); // Todo: convert playSound to use object?
-  // audioObjects.push(note.play());
+  // playSound(note.name); // Todo: convert playSound to use object?
+  note.play();
 }
-
-// old playRandomNote 
-// // Todo: delete this function. It's no longer necessary.
-// function playRandomNote() {
-//   let notes = ['A', 'As', 'B', 'C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs'];
-//   var noteLetter = getRandomInt(12);
-//   var noteNumber = getRandomInt(7) + 1;
-//   var noteName = notes[noteLetter] + noteNumber.toString();
-//   console.log(`Playing ${noteName}`);
-//   playSound(noteName);
-// }
 
 // Todo: delete this function. It's no longer necessary.
 function getRandomRoot() {
@@ -201,6 +159,7 @@ function sleep(milliseconds) {
   } while (currentDate - date < milliseconds);
 }
 
+// Todo: delete this function. It's no longer necessary.
 function getRandomChordMap() {
   
   const chords = [
@@ -270,8 +229,6 @@ function playSoundRecursiveDescending(playing, i, delay=750) {
   )
 }
 
-var repeatMap;
-
 // new playChord (uses Note object)
 /** Play the chord decided by a root note and chord map.
  * @param {Note} rootNote - A Note object to specify the root to build the chord on.
@@ -292,7 +249,6 @@ function playChord(rootNote, chordMap, arpeggiate=false, ascending=true) {
       rootNoteOctave = rootNote.octave,
       noteLetterIndex = rootNote.letterIndex;
   
-  // console.log('rootNote', rootNote) //! delete
   // Store the chord in case we want to replay it.
   repeatMap = [rootNote, chordMap, arpeggiate, ascending];
 
@@ -322,53 +278,6 @@ function playChord(rootNote, chordMap, arpeggiate=false, ascending=true) {
     return p;
   }
 }
-
-// old playChord
-// function playChord(rootNoteArray, chordMap, arpeggiate=false, ascending=true) {
-
-//   // let rootNote = getRandomRootArray();
-//   // let rootNoteName = rootNote[0]+rootNote[1];
-//   // let noteLetterIndex = notes.indexOf(rootNote[0]);
-//   // let rootNoteOctave = rootNote[1];
-//   // console.log(rootNoteName, rootNoteOctave);
-
-//   // Specify the root note and its properties.
-//   if (rootNoteArray == undefined || rootNoteArray.length < 3) {
-//     rootNoteArray = getRandomRootArray();
-//   }
-
-//   let rootNoteName, rootNoteLetter, rootNoteOctave;
-//   [rootNoteName, rootNoteLetter, rootNoteOctave] = rootNoteArray;
-//   // console.log(`Root note name: ${rootNoteName}`)
-//   let noteLetterIndex = notes.indexOf(rootNoteLetter);
-  
-//   // Store the chord in case we want to replay it.
-//   repeatMap = [rootNoteArray, chordMap, arpeggiate, ascending];
-
-//   // Build the chord we're going to play.
-//   let playing = [rootNoteName];
-//   for (let i = 1; i < chordMap.length; i++) {
-//     let notesIndex = noteLetterIndex + chordMap[i];
-//     let note = (notesIndex > 11) ? notes[notesIndex%12] + (rootNoteOctave + 1).toString() : notes[notesIndex] + (rootNoteOctave).toString();
-//     playing.push(note);
-//   }
-//   console.log(`Playing ${playing} ${chordMap[0]}`);
-
-//   // Stop any music that might already be playing.
-//   stopAll();
-  
-//   // Play the chord.
-//   if (arpeggiate) {
-//     playNotes(playing, 750, ascending);
-//   }
-//   else {
-//     let p;
-//     playing.forEach(note => {
-//       p = playSound(note);
-//     });
-//     return p;
-//   }
-// }
 
 // Todo: edit this so it works with scales and chord progressions.
 function repeat() {
@@ -471,13 +380,6 @@ function playRandomChord(arpeggiate=false, ascending=true) {
   playChord(rootNote, chordMap, arpeggiate, ascending);
 }
 
-// old playRandomChord (uses root array)
-// function playRandomChord() {
-//   let rootArr = getRandomRootArray();
-//   let chordMap = getChordMapFromSymbol();
-//   playChord(rootArr, chordMap);
-// }
-
 // new playChordFromSymbol (uses Note object)
 /** Play a chord by describing it with a symbol ('M') instead of a mapping (['major',4,7]).
  * @param {Note} rootNote - Note object
@@ -488,12 +390,6 @@ function playChordFromSymbol(rootNote, chordSymbol) {
   let chordMap = getChordMapFromSymbol(chordSymbol);
   return playChord(rootNote, chordMap);
 }
-
-// old playChordFromSymbol (uses root array)
-// function playChordFromSymbol(rootArr, chordSymbol) {
-//   let chordMap = getChordMapFromSymbol(chordSymbol);
-//   return playChord(rootArr, chordMap);
-// }
 
 let chordProgressionAsSymbols = []; // Todo: ugly global variable just for demonstration purposes. Delete later.
 
@@ -574,47 +470,6 @@ function getRandomChordProgessionMap(length=3) {
   // build specific chords on each based on chord symbol (use a big switch case in some buildChord(symbol) function)
 }
 
-// old playRandomChordProgression (uses root array)
-// /** Play a chord progression given it's root note and a chord progression map.
-//  * @param {Array<string, string, number>} rootArr - 3-tuple to describe the root note.
-//  * @param {Array<Array<number,string>>} chordProgMap - An array of arrays describing chords. Should always be generated by getRandomChordProgessionMap();
-//  * @returns {void} void
-//  */
-// function playRandomChordProgression(rootArr, chordProgMap) {
-  
-//   // Get random root note if one isn't supplied.
-//   if (rootArr == undefined) rootArr = getRandomRootArray(2,6);
-  
-//   // Get random chord progression if one isn't supplied.
-//   if (chordProgMap == undefined) chordProgMap = getRandomChordProgessionMap();
-
-//   // Todo: just for demonstrationg, delete later.
-//   console.log(`${chordProgressionAsSymbols} on ${rootArr[0]}`)
-
-//   // Generate the set of chords to play based on the progression and root note.
-//   let newChordProgression = [];
-//   chordProgMap.forEach(chordSymbolMap => {
-//     let nextNoteIndex = (notes.indexOf(rootArr[1]) + chordSymbolMap[0]); // Calculate the next root note letter name and get its index in `notes`
-//     let nextNoteArr = (nextNoteIndex < 12) 
-//       ? [notes[nextNoteIndex] + rootArr[2], notes[nextNoteIndex], rootArr[2]] 
-//       : [notes[nextNoteIndex % 12] + (rootArr[2] + 1), notes[nextNoteIndex % 12], rootArr[2] + 1]; // Get the new root's octave and create the root array
-//     // console.log('nextNoteArr', nextNoteArr)
-//     newChordProgression.push([nextNoteArr, chordSymbolMap[1]]); // Add the finished chord (root note, chord map) to the chord progression
-//   });
-
-//   // Play the new chord progression.
-//   playChordProgressionWrapper(newChordProgression);
-
-//   // Todo: How do you build a chord off a ii chord when all the chord logic assumes the first note is the root?
-
-//   // I IV V -> 0 5 7
-//   // ii V I -> 3 7 0
-
-//   // generate random root note and look for root chord by doing [].find('I'). 
-//   // use mod arithmetic go around notes array to get other notes
-//   // build specific chords on each based on chord symbol (use a big switch case in some buildChord(symbol) function)
-// }
-
 // new playChordProgressionRecursive (uses Note object)
 /** Recursive function to play a chord progression.
  * @private This should only be called by playChordProgressionWrapper().
@@ -647,39 +502,6 @@ function playChordProgressionWrapper(chordProgMap) {
     playChordProgressionRecursive(chordProgMap, 1);
   }).catch(() => {console.log('interrupted')})
 }
-
-// old playChordProgressionRecursive (uses root array)
-// /** Recursive function to play a chord progression. This should only be called by playChordProgressionWrapper().
-//  * @private
-//  * @param {Array<string[]>} chordProgMap - List of arrays where each child array describes a chord e.g. ['C3','E3','G3'].
-//  * @param {number} i - Index of the chord in chordProgMap to play.
-//  * @returns void
-//  */
-// function playChordProgressionRecursive(chordProgMap, i) {
-
-//   if (chordProgMap[i] === undefined) { return; } // no more chords to play
-  
-//   setTimeout( () =>
-//     {playChordFromSymbol(chordProgMap[i][0], chordProgMap[i][1]).then(() => { 
-//       playChordProgressionRecursive(chordProgMap, ++i);
-//     }).catch(() => {console.log('interrupted')})},
-//     1100 // delay between chords
-//   )
-// }
-
-// old playChordProgressionWrapper (uses root array)
-// /** Wrapper function for playChordProgressionRecursive(). This should only be called by playRandomChordProgression().
-//  * @private
-//  * @param {Array<string[]>} chordProgMap - List of arrays where each child array describes a chord e.g. ['C3','E3','G3'].
-//  * @returns void
-//  */
-// function playChordProgressionWrapper(chordProgMap) {
-//   if (chordProgMap === undefined || chordProgMap[0] === undefined) { return; } // guard condition
-
-//   playChordFromSymbol(chordProgMap[0][0], chordProgMap[0][1]).then(() => { 
-//     playChordProgressionRecursive(chordProgMap, 1);
-//   }).catch(() => {console.log('interrupted')})
-// }
 
 /** Return a scale given a starting root note and scale type
  * @param {Note} rootNote - Note object
