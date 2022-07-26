@@ -23,25 +23,71 @@
 //   });
 // }
 
+const notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
+const pathToFolder = "./piano-wav/"; // Where all samples are stored. Lowest note available: C1. Highest note available: C8.
+let audioObjects = []; // Global list to keep track of all sounds currently playing
+
+/** Class representing a note */
+class Note {
+
+  /** Create Note object from note's name.
+   * @param {string} noteName - string form of a note e.g. 'Cs4'
+   */
+  constructor(noteName) {
+    if (noteName === undefined) { // if no noteName is specified, generate a random one
+      let noteArray = getRandomRootArray();
+      this.name = noteArray[0];
+      this.letter = noteArray[1];
+      this.octave = noteArray[2];
+    }
+    else {
+      this.name = noteName;
+      this.letter = noteName.slice(0,-1);
+      this.octave = parseInt(noteName[noteName.length-1]);
+    }
+  }
+
+  changeNote(noteName) {
+    this.name = noteName;
+    this.letter = noteName.slice(0,-1);
+    this.octave = parseInt(noteName[noteName.length-1]);
+  }
+
+  play() {
+    console.log('hi')
+    let path = pathToFolder + this.name + ".wav";
+    let audio = new Audio(path);
+    let p = audio.play(); 
+    audioObjects.push(audio);
+    return p;
+  }
+}
+
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-// Lowest note available: C1
-// Highest note available: C8
-
-let audioObjects = [];
-
+// new playSound
 function playSound(noteName) {
   if (noteName === undefined) return;
-  let pathToFolder = "./piano-wav/";
-  let path = pathToFolder + noteName + ".wav";
-  let audio = new Audio(path);
-  let p = audio.play(); 
-  audioObjects.push(audio);
-  return p;
+  let note = new Note(noteName);
+  return note.play();
 }
 
+// old playSound
+// function playSound(noteName) {
+//   if (noteName === undefined) return;
+//   let pathToFolder = "./piano-wav/"; // Lowest note available: C1. Highest note available: C8.
+//   let path = pathToFolder + noteName + ".wav";
+//   let audio = new Audio(path);
+//   let p = audio.play(); 
+//   audioObjects.push(audio);
+//   return p;
+// }
+
+/** Pause and delete all Notes currently playing.
+ * This works by iterating through the global audioObjects list. So each 
+ */
 function stopAll() {
 
   while (audioObjects.length > 0) {
@@ -57,6 +103,7 @@ document.getElementById('stopButton').addEventListener('click', () => {
   stopAll();
 });
 
+// Todo: delete this function. It's no longer necessary.
 function playRandomNote() {
   let notes = ['A', 'As', 'B', 'C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs'];
   var noteLetter = getRandomInt(12);
@@ -66,8 +113,7 @@ function playRandomNote() {
   playSound(noteName);
 }
 
-let notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
-
+// Todo: delete this function. It's no longer necessary.
 function getRandomRoot() {
   // let noteLetterIndex = getRandomInt(12);
   let majorScale = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
@@ -456,3 +502,36 @@ function playChordProgressionWrapper(chordProgMap) {
     playChordProgressionRecursive(chordProgMap, 1);
   }).catch(() => {console.log('interrupted')})
 }
+
+/** Return a scale given a starting root note and scale type
+ * @param {Note} rootNote - Note object
+ * @param {string} scaleType - string describing the scale type
+ */
+function makeScale(rootNote, scaleType) {
+  let scales = {
+    'major' : [0,2,4,5,7,9,11,12],
+    'minor' : [0,2,3,5,7,8,10,12],
+  }
+
+  let scaleMap = scales[scaleType]
+  if (scaleMap == undefined) {console.error(`invalid scale type: ${scaleType}`); return;}
+  let rootNoteIndex = notes.indexOf(rootNote.letter);
+
+  let scale = []
+  scaleMap.forEach(note => {
+    let index = rootNoteIndex + note;
+    scale.push(notes[index%12] + (rootNote.octave + (index<12 ? 0 : 1)))
+  });
+
+  console.log('scale', scale)
+}
+
+let e = new Note('E3');
+makeScale(e, 'minor');
+
+/**
+ * @typedef {Object} MyType
+ * @property {String} foo - this is some cool string
+ * @property {Number} fizz - some number we also expect to receive
+ * @property {Number} [bar] - an optional property
+ */
