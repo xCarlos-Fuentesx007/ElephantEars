@@ -291,6 +291,7 @@ const AuthContextProvider = (props) => {
       return;
     }
     console.log(responseData);
+    return responseData;
   };
 
   const verifyEmail = async (token) => {
