@@ -259,56 +259,6 @@ function getChordMapFromSymbol(chordSymbol) {
   // console.log(`Chord symbol: ${chordSymbol}`);
   
   return chordMapsDictionary[chordSymbol];
-
-  // Explanations from this video: https://www.youtube.com/watch?v=aMLdWrZqwLg
-  // C, major
-  // Cm or C-, minor
-  // Cdim or C°, diminished triad
-  // Caug or C+ or C(#5), augmented triad
-  // Csus4, suspended 4th triad
-  // Csus2, suspended 2nd triad
-  // Csus, referring to Csus4
-  // C7, dominant 7th chord
-  // Cm7, minor triad with dominant 7th
-  // Cmaj7 or C△7 or C△, major 7th chord (△ means major in jazz)
-  // CmM7, minor triad with major 7th
-  // Cdim7 or C°7, minor triad with diminished 7th (same as major 6th) -> stack of minor thirds
-  // C⊘7 or Cm7(b5), half diminished 7th aka minor triad with flat 5 and dominant 7th
-
-  // Upper Chord Extensions
-  // Cadd9, C chord plus 9th scale degree
-  // C9, "Stack up" to the 9th so include the 7th aka C7(add9)
-  // C11, "stack up" to 11th aka [1,3,5,b7,9,11]
-  // Cadd11, C triad plus add 11th scale degree
-  // C13, stack up to 13th aka [1,3,5,b7,9,11,13] (but usually the third or fifth is omitted because this chord is so dense already)
-
-  // omit (or sometimes 'no')
-  // C7sus4 (omit5), normal C7sus4 but remove the fifth
-
-  // Upper chord extension alterations (sharps and flats)
-  // [1,3,5,b7,9,11,b13] isn't labeled E(b13) because this could be confused with Eb13. It's labeled E11(b13)
-  // Cmaj9, stack Cmaj7 and add a 9th
-
-  // Power chords
-  // C5, [1,5] but usually [1,5,8]
-
-  // 6th chord
-  // C6, [1,3,5,6]
-  // Cm6, [1,b3,5,6] you still add the 6th from the MAJOR scale even though this is a minor chord
-  // Cm(b6) or Cm(add b6), [1,b3,5,b6]
-  // C^{6}_{9} or C(add 6)(add 9), [1,3,5,6,9]
-
-  // Altered chords -> not one specific chord but a family of possible altered chords
-  // Calt -> C7 with either a flat or sharp 5. And/or we can add a flat/sharp 9. So:
-    // [1,3,b5,b7]
-    // [1,3,#5,b7]
-    // [1,3,b5,b7,b9]
-    // [1,3,#5,b7,#9]
-
-  // Slash chords -> play left side as normal chord but play right side as lowest note
-  // C/E, CEG or [3,5,8]
-    // note: this is an inversion because C major chord already includes E
-  // G/A, actually A11 chord but you're only playing [1,b7,9,13]
 }
 
 function playRandomChord(arpeggiate=false, ascending=true) {
