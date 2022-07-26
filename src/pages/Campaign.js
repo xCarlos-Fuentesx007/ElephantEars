@@ -1,4 +1,5 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useContext } from "react";
+import { AuthContext } from "../context/auth-context";
 import {
   Container,
   Paper,
@@ -15,6 +16,9 @@ import {
 import Navbar from "../components/Navbar";
 
 const Campaign = () => {
+  const authCtx = useContext(AuthContext);
+  const { userData, getCampaignData, getStatsData } = authCtx;
+
   return (
     <Fragment>
       <Navbar />
@@ -100,6 +104,15 @@ const Campaign = () => {
           >
             <Button type="submit" variant="contained" sx={{ my: 1 }}>
               Lets Get Started!
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                getCampaignData(userData);
+                getStatsData(userData);
+              }}
+            >
+              Pull Campaign and Stats Data
             </Button>
           </Container>
         </Paper>

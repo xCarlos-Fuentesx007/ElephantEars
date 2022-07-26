@@ -1,130 +1,132 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 const url = process.env.REACT_APP_BACKEND_USERS_URL;
+const campaignUrl = "https://elephantearsbackend.herokuapp.com/api/campaign";
+const statsUrl = "https://elephantearsbackend.herokuapp.com/api/stats";
 
 const ANSWER_DATA = [
   {
-    name: 'Intervals',
+    name: "Intervals",
     answers: [
-      'Minor 2nd',
-      'Major 2nd',
-      'Minor 3rd',
-      'Major 3rd',
-      'Perfect 4th',
-      'Tritone',
-      'Perfect 5th',
-      'Minor 6th',
-      'Major 6th',
-      'Minor 7th',
-      'Major 7th',
-      'Octave',
+      "Minor 2nd",
+      "Major 2nd",
+      "Minor 3rd",
+      "Major 3rd",
+      "Perfect 4th",
+      "Tritone",
+      "Perfect 5th",
+      "Minor 6th",
+      "Major 6th",
+      "Minor 7th",
+      "Major 7th",
+      "Octave",
     ],
   },
   {
-    name: 'Perfect Pitch',
-    answers: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+    name: "Perfect Pitch",
+    answers: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
   },
 
   {
-    name: 'Chords',
+    name: "Chords",
     answers: [
-      'Major',
-      'Minor',
-      'Diminished',
-      'Augmented',
-      'Dominant Seventh',
-      'Major Seventh',
-      'Minor Seventh',
-    ],
-  },
-
-  {
-    name: 'Scales',
-    answers: [
-      'Major (Ionian)',
-      'Natural Minor (Aeolian)',
-      'Harmonic Minor',
-      'Dorian',
-      'Phygian',
-      'Lydian',
-      'Mixolydian',
-      'Locrian',
+      "Major",
+      "Minor",
+      "Diminished",
+      "Augmented",
+      "Dominant Seventh",
+      "Major Seventh",
+      "Minor Seventh",
     ],
   },
 
   {
-    name: 'Scale Degrees',
+    name: "Scales",
     answers: [
-      '1 (do)',
-      'Raised 1 (di)',
-      '2 (re)',
-      'Raised 2 (ri)',
-      '3 (mi)',
-      '4 (fa)',
-      'Raised 4 (fi)',
-      '5 (so)',
-      'Raised 5 (si)',
-      '6 (la)',
-      'Raised 6 (li)',
-      '7 (ti)',
+      "Major (Ionian)",
+      "Natural Minor (Aeolian)",
+      "Harmonic Minor",
+      "Dorian",
+      "Phygian",
+      "Lydian",
+      "Mixolydian",
+      "Locrian",
     ],
   },
 
   {
-    name: 'Chord Progressions',
-    answers: ['I', 'ii', 'iii', 'IV', 'V', 'vi'],
+    name: "Scale Degrees",
+    answers: [
+      "1 (do)",
+      "Raised 1 (di)",
+      "2 (re)",
+      "Raised 2 (ri)",
+      "3 (mi)",
+      "4 (fa)",
+      "Raised 4 (fi)",
+      "5 (so)",
+      "Raised 5 (si)",
+      "6 (la)",
+      "Raised 6 (li)",
+      "7 (ti)",
+    ],
   },
 
   {
-    name: 'Intervals In Context',
+    name: "Chord Progressions",
+    answers: ["I", "ii", "iii", "IV", "V", "vi"],
+  },
+
+  {
+    name: "Intervals In Context",
     answers: [
-      '1 (do)',
-      'Raised 1 (di)',
-      '2 (re)',
-      'Raised 2 (ri)',
-      '3 (mi)',
-      '4 (fa)',
-      'Raised 4 (fi)',
-      '5 (so)',
-      'Raised 5 (si)',
-      '6 (la)',
-      'Raised 6 (li)',
-      '7 (ti)',
+      "1 (do)",
+      "Raised 1 (di)",
+      "2 (re)",
+      "Raised 2 (ri)",
+      "3 (mi)",
+      "4 (fa)",
+      "Raised 4 (fi)",
+      "5 (so)",
+      "Raised 5 (si)",
+      "6 (la)",
+      "Raised 6 (li)",
+      "7 (ti)",
     ],
     answers2: [
-      'Unison',
-      'Minor 2nd',
-      'Major 2nd',
-      'Minor 3rd',
-      'Major 3rd',
-      'Perfect 4th',
-      'Tritone',
-      'Perfect 5th',
-      'Minor 6th',
-      'Major 6th',
-      'Minor 7th',
-      'Major 7th',
-      'Octave',
-    ]
+      "Unison",
+      "Minor 2nd",
+      "Major 2nd",
+      "Minor 3rd",
+      "Major 3rd",
+      "Perfect 4th",
+      "Tritone",
+      "Perfect 5th",
+      "Minor 6th",
+      "Major 6th",
+      "Minor 7th",
+      "Major 7th",
+      "Octave",
+    ],
   },
 
   {
-    name: 'Melodic Dictation',
+    name: "Melodic Dictation",
     answers: [
-      '1 (do)',
-      'Raised 1 (di)',
-      '2 (re)',
-      'Raised 2 (ri)',
-      '3 (mi)',
-      '4 (fa)',
-      'Raised 4 (fi)',
-      '5 (so)',
-      'Raised 5 (si)',
-      '6 (la)',
-      'Raised 6 (li)',
-      '7 (ti)',
+      "1 (do)",
+      "Raised 1 (di)",
+      "2 (re)",
+      "Raised 2 (ri)",
+      "3 (mi)",
+      "4 (fa)",
+      "Raised 4 (fi)",
+      "5 (so)",
+      "Raised 5 (si)",
+      "6 (la)",
+      "Raised 6 (li)",
+      "7 (ti)",
     ],
-  }
+  },
 ];
 
 export const AuthContext = React.createContext({
@@ -133,7 +135,7 @@ export const AuthContext = React.createContext({
   token: null,
   isLoading: false,
   error: undefined,
-  exercise: '',
+  exercise: "",
   percentage: 0,
   correctAnswers: 0,
   incorrectAnswers: 0,
@@ -147,13 +149,15 @@ export const AuthContext = React.createContext({
   signup: (userData) => {},
   verifyEmail: (token) => {},
   logout: () => {},
+  getCampaignData: (userData) => {},
+  getStatsData: (userData) => {},
 });
 
 const AuthContextProvider = (props) => {
   const [userData, setUserData] = useState([]);
   const [answerData, setAnswerData] = useState();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [exercise, setExercise] = useState('');
+  const [exercise, setExercise] = useState("");
   const [percentage, setPercentage] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
@@ -163,7 +167,7 @@ const AuthContextProvider = (props) => {
   const [token, setToken] = useState();
 
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem('userData'));
+    const storedData = JSON.parse(localStorage.getItem("userData"));
     if (
       storedData &&
       storedData.token &&
@@ -173,7 +177,7 @@ const AuthContextProvider = (props) => {
       setToken(storedData.token);
       setIsLoggedIn(true);
     } else {
-      localStorage.removeItem('userData');
+      localStorage.removeItem("userData");
     }
   }, []);
 
@@ -181,9 +185,9 @@ const AuthContextProvider = (props) => {
     setIsLoading(true);
     setError(undefined);
     const response = await fetch(`${url}/login`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(userData),
     });
@@ -198,7 +202,7 @@ const AuthContextProvider = (props) => {
     setToken(responseData.token);
     const expirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
     localStorage.setItem(
-      'userData',
+      "userData",
       JSON.stringify({
         token: responseData.token,
         expiresIn: expirationDate,
@@ -211,16 +215,16 @@ const AuthContextProvider = (props) => {
     setIsLoading(true);
     setError(undefined);
     const response = await fetch(`${url}/update`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
         Authorization: `Bearer ${userData.token}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(userData),
     });
     const responseData = await response.json();
     setIsLoading(false);
-    const storedData = JSON.parse(localStorage.getItem('userData'));
+    const storedData = JSON.parse(localStorage.getItem("userData"));
     storedData.userData = {
       id: userData.id,
       firstname: userData.firstname,
@@ -229,7 +233,7 @@ const AuthContextProvider = (props) => {
       email: userData.email,
       token: userData.token,
     };
-    localStorage.setItem('userData', JSON.stringify(storedData));
+    localStorage.setItem("userData", JSON.stringify(storedData));
     setUserData(storedData.userData);
   };
 
@@ -237,9 +241,9 @@ const AuthContextProvider = (props) => {
     setIsLoading(true);
     setError(undefined);
     const response = await fetch(`${url}/signup`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(userData),
     });
@@ -249,6 +253,44 @@ const AuthContextProvider = (props) => {
       setError(responseData.message);
       return;
     }
+  };
+
+  // get campaign data
+  const getCampaignData = async (userData) => {
+    setIsLoading(true);
+    setError(undefined);
+    const response = await fetch(`${campaignUrl}/all`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userData.token}`,
+      },
+    });
+    const responseData = await response.json();
+    setIsLoading(false);
+    if (responseData.message) {
+      setError(responseData.message);
+      return;
+    }
+    console.log(responseData);
+  };
+
+  // get stats data
+  const getStatsData = async (userData) => {
+    setIsLoading(true);
+    setError(undefined);
+    const response = await fetch(`${statsUrl}/all`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userData.token}`,
+      },
+    });
+    const responseData = await response.json();
+    setIsLoading(false);
+    if (responseData.message) {
+      setError(responseData.message);
+      return;
+    }
+    console.log(responseData);
   };
 
   const verifyEmail = async (token) => {
@@ -266,7 +308,7 @@ const AuthContextProvider = (props) => {
     setToken(responseData.token);
     const expirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
     localStorage.setItem(
-      'userData',
+      "userData",
       JSON.stringify({
         token: responseData.token,
         expiresIn: expirationDate,
@@ -301,7 +343,7 @@ const AuthContextProvider = (props) => {
   const logout = () => {
     setIsLoggedIn(false);
     setToken(undefined);
-    localStorage.removeItem('userData');
+    localStorage.removeItem("userData");
   };
 
   return (
@@ -326,6 +368,8 @@ const AuthContextProvider = (props) => {
         verifyEmail: verifyEmail,
         error: error,
         isLoading: isLoading,
+        getCampaignData: getCampaignData,
+        getStatsData: getStatsData,
       }}
     >
       {props.children}
