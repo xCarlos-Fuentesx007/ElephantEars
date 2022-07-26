@@ -60,17 +60,6 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-// new playSound
-// Todo: this function is inefficient because noteName must be generated from a Note object. 
-  // Todo: It's then converted into a separate object for another function call.
-  // Todo: Rewrite this function and the code that uses it to only use note.play() directly, or at least: new Note(noteName).play().
-function playSound(noteName) {
-  if (noteName === undefined) return;
-  // let note = new Note(noteName);
-  // return note.play();
-  return new Note(noteName).play();
-}
-
 /** Pause and delete all Notes currently playing.
  * This works by iterating through the global audioObjects list.
  */
@@ -89,7 +78,6 @@ document.getElementById('stopButton').addEventListener('click', () => {
 function playRandomNote() {
   let note = new Note();
   console.log(`Playing ${note.name}`);
-  // playSound(note.name); // Todo: convert playSound to use object?
   note.play();
 }
 
@@ -133,7 +121,6 @@ function getRandomChordMap() {
   return chords[i];
 }
 
-// new playNotes (edit code so `playing` is a list of Note objects)
 /** Play a scale or arpeggio in ascending or descending order.
  * @param {Array<string>} playing - A list of note names each in scientfic pitch notation.
  * @param {number} delay - Time in milliseconds between each note.
@@ -150,23 +137,6 @@ function playNotes(playing, delay=750, ascending=true) {
   }
 }
 
-// /** Play a scale or arpeggio in ascending or descending order.
-//  * @param {Array<string>} playing - A list of note names each in scientfic pitch notation.
-//  * @param {number} delay - Time in milliseconds between each note.
-//  * @param {boolean} ascending - Play the notes first to last or last to first?
-//  */
-//  function playNotes(playing, delay=750, ascending=true) {
-
-//   if (ascending) {
-//     playSound(playing[0]).then( playSoundRecursiveAscending(playing, 1, delay) );
-//   }
-//   else {
-//     let i = playing.length-1;
-//     playSound(playing[i]).then( playSoundRecursiveDescending(playing, --i, delay) );
-//   }
-// }
-
-// new
 /** Play a list of notes in order with a delay between each note. This should never be used directly, only by playNotes().
  * @private Only playNotes() should call this function.
  * @param {Array<string>} playing - A list of note names to play e.g. ['C2','E2','G2'] 
@@ -185,26 +155,6 @@ function playSoundRecursiveAscending(playing, i, delay=750) {
   )
 }
 
-// old playSoundRecursiveAscending
-// /** Play a list of notes in order with a delay between each note. This should never be used directly, only by playNotes().
-//  * @private Only playNotes() should call this function.
-//  * @param {Array<string>} playing - A list of note names to play e.g. ['C2','E2','G2'] 
-//  * @param {number} i - Index to tell function to play playing[i]
-//  * @param {number} delay - Time in milliseconds to play between chords
-//  */
-//  function playSoundRecursiveAscending(playing, i, delay=750) {
-
-//   if (playing[i] === undefined) { return; } // no more notes to play
-  
-//   setTimeout( () =>
-//     {playSound(playing[i]).then(() => { 
-//       playSoundRecursiveAscending(playing, ++i, delay);
-//     }).catch(() => {console.log('interrupted')})},
-//     delay
-//   )
-// }
-
-// new
 /** Play a list of notes in reverse order with a delay between each note. This should never be used directly, only by playNotes().
  * @private Only playNotes() should call this function.
  * @param {Array<string>} playing - A list of note names to play e.g. ['C2','E2','G2'] 
@@ -223,26 +173,6 @@ function playSoundRecursiveDescending(playing, i, delay=750) {
   )
 }
 
-// old
-// /** Play a list of notes in reverse order with a delay between each note. This should never be used directly, only by playNotes().
-//  * @private Only playNotes() should call this function.
-//  * @param {Array<string>} playing - A list of note names to play e.g. ['C2','E2','G2'] 
-//  * @param {number} i - Index to tell function to play playing[i]
-//  * @param {number} delay - Time in milliseconds to play between chords
-//  */
-// function playSoundRecursiveDescending(playing, i, delay=750) {
-
-//   if (i < 0) { return; } // no more notes to play
-
-//   setTimeout( () =>
-//     {playSound(playing[i]).then(() => {
-//       playSoundRecursiveDescending(playing, --i, delay);
-//     }).catch(() => {console.log('interrupted')})},
-//     delay
-//   )
-// }
-
-// new playChord (edit code so `playing` is a list of Note objects)
 /** Play the chord decided by a root note and chord map.
  * @param {Note} rootNote - A Note object to specify the root to build the chord on.
  * @param {Array<string|number>} chordMap - An array from chords[] where chordMap[0] is the chord's name and the rest of the list describes the semitones to build the chord.
@@ -287,54 +217,7 @@ function playSoundRecursiveDescending(playing, i, delay=750) {
   }
 }
 
-// /** Play the chord decided by a root note and chord map.
-//  * @param {Note} rootNote - A Note object to specify the root to build the chord on.
-//  * @param {Array<string|number>} chordMap - An array from chords[] where chordMap[0] is the chord's name and the rest of the list describes the semitones to build the chord.
-//  * @param {boolean} arpeggiate - Whether to play this chord as a block chord or arpeggio.
-//  * @param {boolean} ascending - When (boolean == true), whether to play the arpeggio in ascending or descending order.
-//  * @returns A Promise that resolves when the last note begins playing.
-//  */
-// function playChord(rootNote, chordMap, arpeggiate=false, ascending=true) {
-
-//   // Make sure we have a chord to play.
-//   if (rootNote == undefined) {
-//     rootNote = new Note();
-//     chordMap = getRandomChordMap(); // If rootNote is undefined, chordMap would be too.
-//   }
-  
-//   // Store the chord in case we want to replay it. // Todo: edit repeat() and repeatMap so first argument is name of the function to replay
-//   repeatMap = [rootNote, chordMap, arpeggiate, ascending];
-
-//   // Build the chord we're going to play. // Todo: edit code so `playing` is a list of Note objects
-//   let playing = [rootNote.name];
-//   for (let i = 1; i < chordMap.length; i++) { // Start at 1 because chordMap[0] is the chord's name.
-//     let notesIndex = rootNote.letterIndex + chordMap[i];
-//     // let note = (notesIndex > 11) 
-//     //   ? notes[notesIndex%12] + (rootNote.octave + 1).toString() 
-//     //   : notes[notesIndex] + (rootNote.octave).toString();
-//     let note = notes[notesIndex%12] + (rootNote.octave + (notesIndex < 12 ? 0 : 1)).toString();
-//     playing.push(note);
-//   }
-//   console.log(`Playing ${playing} ${chordMap[0]}`);
-
-//   // Stop any music that might already be playing.
-//   stopAll();
-  
-//   // Play the chord.
-//   if (arpeggiate) {
-//     playNotes(playing, 750, ascending);
-//   }
-//   else {
-//     let p;
-//     playing.forEach(note => {
-//       p = playSound(note);
-//     });
-//     return p;
-//   }
-// }
-
 // Todo: edit this so it works with scales and chord progressions.
-
 function repeat() {
   playChord(...repeatMap);
 }
@@ -579,29 +462,6 @@ function playChordProgressionWrapper(chordProgMap) {
 
   return scale;
 }
-
-// old
-// /** Return a scale given a starting root note and scale type
-//  * @param {Note} rootNote - Note object
-//  * @param {string} scaleType - string describing the scale type
-//  */
-// function makeScale(rootNote, scaleType) {
-//   let scales = {
-//     'major' : [0,2,4,5,7,9,11,12],
-//     'minor' : [0,2,3,5,7,8,10,12],
-//   }
-
-//   let scaleMap = scales[scaleType]
-//   if (scaleMap == undefined) {console.error(`invalid scale type: ${scaleType}`); return;}
-
-//   let scale = []
-//   scaleMap.forEach(note => {
-//     let index = rootNote.letterIndex + note;
-//     scale.push(notes[index%12] + (rootNote.octave + (index<12 ? 0 : 1)))
-//   });
-
-//   return scale;
-// }
 
 function playScale(rootNote, scaleType, ascending=true) {
   let scale = makeScale(rootNote, scaleType);
