@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="pianoSoundTest.js" type="text/javascript" defer></script>
+  <script src="pianoSounds.js" type="text/javascript" defer></script>
 </head>
 <body>
   <!-- <audio id="audio" src="http://carolinegabriel.com/demo/js-keyboard/sounds/056.wav"></audio>
@@ -37,7 +37,7 @@
 
 <br><br>
 
-<button id="playScaleAscending">Play Ascending Scale</button><button id="playScaleDescending">Play Descending Scale</button>
+<button id="playScaleAscending" onclick="playScale(new Note('E3'), 'minor')">Play Ascending Scale</button><button id="playScaleDescending" onclick="playScale(new Note('E3'), 'minor', false)">Play Descending Scale</button>
 
 <br>
 
@@ -73,7 +73,7 @@
 
 <br>
 
-<button id='randomNote' onclick="playRandomChordProgression()" accesskey="r">Play Random Chord Progression</button>
+<button id='randomNote' onclick="playChordProgression()" accesskey="r">Play Random Chord Progression</button>
 
 
 </body>
