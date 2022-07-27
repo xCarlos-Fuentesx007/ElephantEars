@@ -1,15 +1,20 @@
 import * as Tone from "tone";
+import {playRandomInterval} from "./pianoSounds/pianoSounds.js";
+
 
 function Intervals(first_note, interval) {
 
-  const synth = new Tone.Synth().toDestination();
+  // const synth = new Tone.Synth().toDestination();
 
-  var second_note = first_note + interval;
+  // var second_note = first_note + interval;
 
-  synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
-  synth.triggerAttackRelease(find_note(second_note), "4n", Tone.now() + 0.8);
+  // synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
+  // synth.triggerAttackRelease(find_note(second_note), "4n", Tone.now() + 0.8);
 
-  return find_interval(interval);
+  // return find_interval(interval);
+
+  let intervalName = playRandomInterval(true);
+  return intervalName;
 }
 export { Intervals };
 

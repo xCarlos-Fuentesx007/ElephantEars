@@ -1,3 +1,21 @@
+// import * as piano from "./test";
+// console.log('piano', piano)
+// piano.test();
+import sound from "./piano-wav/C3.wav"
+// console.log('sound (C3): ', sound)
+console.log(`sound (C3): ${sound}, type: ${typeof sound}`)
+const C3 = new Audio(sound)
+
+// let s = "A3.wav";
+// let p = import("./piano-wav/" + s).then( (asdf) => console.log('asdf', asdf))
+// console.log('p', p)
+
+// const s = "A3.wav";
+// const p = await import("./piano-wav/" + s).then( (asdf) => console.log('asdf', asdf))
+// console.log('p', p)
+
+
+
 const notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
 const pathToFolder = "./piano-wav/"; // Where all samples are stored. Lowest note available: C1. Highest note available: C8.
 let audioObjects = []; // Global list to keep track of all sounds currently playing
@@ -13,7 +31,8 @@ let repeatMap; // Global variable to remember most recently played.
 class Note {
 
   static min = 2;
-  static max = 5;
+  static max = 4;
+  static #pathToFolder = "./piano-wav/";
 
   /** Create a Note object from a note name. 
    * If one isn't given, a random note is generated.
@@ -48,11 +67,64 @@ class Note {
    * @returns {Promise} A Promise which is resolved when playback has been started, or is rejected if for any reason playback cannot be started.
    */
   play() {
-    let path = pathToFolder + this.name + ".wav";
-    let audio = new Audio(path);
-    let p = audio.play(); 
-    audioObjects.push(audio);
-    return p;
+    // let path = pathToFolder + this.name + ".wav";
+    // console.log(path);
+    // let audio = new Audio(path); // old way
+    // new way
+    
+    // let wavSrc = process.env.PUBLIC_URL + props.sounds[props.currentSoundIndex].wav;
+
+    
+    // let testing;
+    // import("./test").then()
+    // console.log('test()', );
+    // let fileName = this.name + ".wav";
+    // let audio;
+    // let pianoSounds = import(pathToFolder);
+    // console.log('pianoSounds', pianoSounds)
+    // audio = new Audio(pianoSounds.fileName)
+    // console.log('audio: ', audio)
+
+    // let audio = new Audio(sound)
+    // console.log('audio: ', audio)
+
+    // console.log("\tCalling play()")
+    return Note.#makeAudio(this.name).then( (newAudioElement) => {
+      // console.log(`play(): newAudioElement ${newAudioElement}, typeof: ${typeof newAudioElement}`)
+      let p = newAudioElement.play().then(() => {
+                console.log("play(): nice!");
+              }).catch(() => {
+                console.log('play(): uh oh');
+              });
+      audioObjects.push(newAudioElement);
+      return p;
+    } ).catch((err) => {
+          console.error(`From Note.#makeAudio(noteName): ${err}`);
+        });
+    
+
+    // let audio = this.makeAudio();
+    // console.log('audio: ', audio)
+    // let p = audio.play().then(() => {console.log("nice!")}).catch(() => {console.log('uh oh')});
+    // audioObjects.push(audio);
+    // return p;
+  }
+
+  static async #makeAudio(noteName) {
+
+    const nameInFS = await import(pathToFolder + noteName + ".wav").then( (module) => {
+      // console.log('makeAudio: returning module.default', module.default);
+      return module.default;
+    }).catch(() => {
+      console.error('In makeAudio(noteName): Path not found!');
+    });
+    // console.log('makeAudio: nameInFS', nameInFS)
+
+    const audioHTMLElement = new Audio(nameInFS);
+    // console.log(`makeAudio: audioHTMLElement ${audioHTMLElement}, typeof ${typeof audioHTMLElement}`)
+    
+    // let p = audioHTMLElement.play().then(() => {console.log("makeAudio: nice!")}).catch(() => {console.log('makeAudio: uh oh')});
+    return audioHTMLElement;
   }
 }
 
@@ -70,10 +142,10 @@ function stopAll() {
   }
 }
 
-//? Convert html to this?
-document.getElementById('stopButton').addEventListener('click', () => {
-  stopAll();
-});
+// //? Convert html to this?
+// document.getElementById('stopButton').addEventListener('click', () => {
+//   stopAll();
+// });
 
 function playRandomNote() {
   let note = new Note();
@@ -83,19 +155,20 @@ function playRandomNote() {
 
 function getRandomIntervalMap() {
   
+  // Names must match the names in ../../context/auth-context.js
   const intervals = [
-    ['minor second',1],
-    ['major second', 2],
-    ['minor third', 3],
-    ['major third', 4],
-    ['perfect fourth', 5],
-    ['tritone', 6],
-    ['perfect fifth', 7],
-    ['minor sixth', 8],
-    ['major sixth', 9],
-    ['minor seventh', 10],
-    ['major seventh', 11],
-    ['octave', 12]
+    ["Minor 2nd", 1],
+    ["Major 2nd", 2],
+    ["Minor 3rd", 3],
+    ["Major 3rd", 4],
+    ["Perfect 4th", 5],
+    ["Tritone", 6],
+    ["Perfect 5th", 7],
+    ["Minor 6th", 8],
+    ["Major 6th", 9],
+    ["Minor 7th", 10],
+    ["Major 7th", 11],
+    ["Octave", 12]
   ]
   
   let i = getRandomInt(intervals.length);
@@ -206,6 +279,7 @@ function playSoundRecursiveDescending(playing, i, delay=750) {
   
   // Play the chord.
   if (arpeggiate) {
+    // console.log("got here")
     playNotes(playing, 750, ascending);
   }
   else {
@@ -230,10 +304,11 @@ function getRandomKey(obj) {
 
 // Todo: add doc string
 // Todo: Also, do this and playRandomChord really need to be different functions?
-function playRandomInterval(arpeggiate=false, ascending=true) {
+export function playRandomInterval(arpeggiate=false, ascending=true) {
   let rootNote = new Note();
   let chordMap = getRandomIntervalMap();
   playChord(rootNote, chordMap, arpeggiate, ascending);
+  return chordMap[0]; // Return the interval's name
 }
 
 function getChordMapFromSymbol(chordSymbol) {
@@ -408,6 +483,11 @@ function playChordProgressionWrapper(chordProgMap) {
   return scale;
 }
 
+/** Play a scale given a root note and scale type.
+ * @param {Note} rootNote - Root of the scale.
+ * @param {string} scaleType - Select either ['major', 'minor']
+ * @param {boolean} ascending - Play the scale ascending or descending.
+ */
 function playScale(rootNote, scaleType, ascending=true) {
   let scale = makeScale(rootNote, scaleType);
   let display = [];
