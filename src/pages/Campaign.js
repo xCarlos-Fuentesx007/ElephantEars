@@ -4,20 +4,19 @@ import {
   Container,
   Paper,
   Typography,
-  TextField,
   Button,
-  Alert,
   List,
   ListItem,
   ListItemText,
-  Divider,
 } from "@mui/material";
 
 import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom";
 
 const Campaign = () => {
   const authCtx = useContext(AuthContext);
-  const { userData, getCampaignData, getStatsData } = authCtx;
+  const { userData, getCampaignData, getStatsData, runCampaign, schedule } =
+    authCtx;
 
   return (
     <Fragment>
@@ -102,18 +101,16 @@ const Campaign = () => {
               alignItems: "center",
             }}
           >
-            <Button type="submit" variant="contained" sx={{ my: 1 }}>
-              Lets Get Started!
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => {
-                getCampaignData(userData);
-                getStatsData(userData);
-              }}
-            >
-              Pull Campaign and Stats Data
-            </Button>
+            <Link to="/exercise">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ my: 1 }}
+                onClick={runCampaign}
+              >
+                Lets Get Started!
+              </Button>
+            </Link>
           </Container>
         </Paper>
       </Container>

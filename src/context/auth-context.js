@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Queue from "../components/Queue";
 
 const url = process.env.REACT_APP_BACKEND_USERS_URL;
 const campaignUrl = "https://elephantearsbackend.herokuapp.com/api/campaign";
@@ -129,6 +130,15 @@ const ANSWER_DATA = [
   },
 ];
 
+const sampleSchedule = new Queue([
+  "Intervals",
+  "Scale Degrees",
+  "Scales",
+  "Intervals In Context",
+  "Perfect Pitch",
+  "Chord Progressions",
+]); // hard coded
+
 export const AuthContext = React.createContext({
   userData: [],
   isLoggedIn: false,
@@ -141,6 +151,8 @@ export const AuthContext = React.createContext({
   incorrectAnswers: 0,
   answerData: undefined,
   startedDate: undefined,
+  campaignRunning: false,
+  schedule: undefined,
   exerciseHandler: (exerciseValue) => {},
   percentageHandler: (percentageValue) => {},
   answersHandler: (correctAnswersValue, incorrectAnswersValue) => {},
@@ -151,6 +163,7 @@ export const AuthContext = React.createContext({
   logout: () => {},
   getCampaignData: (userData) => {},
   getStatsData: (userData) => {},
+  runCampaign: () => {},
 });
 
 const AuthContextProvider = (props) => {
@@ -165,6 +178,8 @@ const AuthContextProvider = (props) => {
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState();
+  const [campaignRunning, setCampaignRunning] = useState(false);
+  const [schedule, setSchedule] = useState(sampleSchedule);
 
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("userData"));
@@ -347,6 +362,11 @@ const AuthContextProvider = (props) => {
     localStorage.removeItem("userData");
   };
 
+  const runCampaign = () => {
+    setCampaignRunning(true);
+    exerciseHandler(schedule.dequeue());
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -359,6 +379,8 @@ const AuthContextProvider = (props) => {
         correctAnswers: correctAnswers,
         incorrectAnswers: incorrectAnswers,
         startedDate: startedDate,
+        campaignRunning: campaignRunning,
+        schedule: schedule,
         answersHandler: answersHandler,
         percentageHandler: percentageHandler,
         exerciseHandler: exerciseHandler,
@@ -371,6 +393,7 @@ const AuthContextProvider = (props) => {
         isLoading: isLoading,
         getCampaignData: getCampaignData,
         getStatsData: getStatsData,
+        runCampaign: runCampaign,
       }}
     >
       {props.children}

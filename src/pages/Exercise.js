@@ -30,7 +30,7 @@ import {
   Scale_Degrees,
   Chord_Progressions,
   Intervals_In_Context,
-  Melodic_Dictation
+  Melodic_Dictation,
 } from "../exercises/toneFunctions";
 
 const sfx = {
@@ -146,6 +146,9 @@ const Exercise = () => {
     correctAnswers,
     incorrectAnswers,
     answersHandler,
+    campaignRunning,
+    runCampaign,
+    schedule,
   } = authCtx;
 
   const [active, setActive] = useState("");
@@ -181,9 +184,15 @@ const Exercise = () => {
     Math.floor(Math.random() * 6),
     Math.floor(Math.random() * 6),
   ]);
-  const [context_num1, set_context_num1] = useState(Math.floor(Math.random() * 12));
-  const [context_num2, set_context_num2] = useState(Math.floor(Math.random() * 12));
-  const [melodic_num, set_melodic_num] = useState(Math.floor(Math.random() * 12));
+  const [context_num1, set_context_num1] = useState(
+    Math.floor(Math.random() * 12)
+  );
+  const [context_num2, set_context_num2] = useState(
+    Math.floor(Math.random() * 12)
+  );
+  const [melodic_num, set_melodic_num] = useState(
+    Math.floor(Math.random() * 12)
+  );
 
   useEffect(() => {
     if (correctAnswers === 0 && incorrectAnswers === 0) {
@@ -272,11 +281,20 @@ const Exercise = () => {
       console.log(answerValue);
       setAnswers(answerValue);
     } else if (answerData.name === "Intervals In Context") {
-      const answerValue = Intervals_In_Context(first_noteV2, context_num1, context_num2);
+      const answerValue = Intervals_In_Context(
+        first_noteV2,
+        context_num1,
+        context_num2
+      );
       console.log(answerValue);
       setAnswers(answerValue);
     } else if (answerData.name === "Melodic Dictation") {
-      const answerValue = Melodic_Dictation(first_noteV2, context_num1, context_num2, melodic_num);
+      const answerValue = Melodic_Dictation(
+        first_noteV2,
+        context_num1,
+        context_num2,
+        melodic_num
+      );
       console.log(answerValue);
       setAnswers(answerValue);
     }
@@ -558,7 +576,7 @@ const Exercise = () => {
             </Button>
           </Grid>
         ))}
-        
+
         <Grid item xs={2}>
           {answerData.name === "Intervals In Context" ? (
             <Typography component="body1">Interval:</Typography>
@@ -698,8 +716,10 @@ const Exercise = () => {
                 <Container>
                   <Grid container alignItems="center">
                     <Grid item xs={6}>
-                      {(answerData.name === "Chord Progressions" || answerData.name === "Intervals In Context" || answerData.name === "Melodic Dictation") ?
-                        DisplayErr(errorIdx, answers.join(", "))
+                      {answerData.name === "Chord Progressions" ||
+                      answerData.name === "Intervals In Context" ||
+                      answerData.name === "Melodic Dictation"
+                        ? DisplayErr(errorIdx, answers.join(", "))
                         : DisplayErr(errorIdx, answer)}
                     </Grid>
                     <Grid
@@ -725,8 +745,8 @@ const Exercise = () => {
                         // disabled={!isSoundPlayed ? true : false}
                         onClick={() => {
                           if (
-                            answerData.name === "Chord Progressions" || 
-                            answerData.name === "Intervals In Context" || 
+                            answerData.name === "Chord Progressions" ||
+                            answerData.name === "Intervals In Context" ||
                             answerData.name === "Melodic Dictation"
                           ) {
                             if (clickCount === false) {
@@ -765,6 +785,10 @@ const Exercise = () => {
                               setIsSoundPlayed(false);
                               set_continue(true);
                             } else {
+                              if (campaignRunning) {
+                                console.log(schedule);
+                                runCampaign();
+                              }
                               exerciseMaker();
                               set_continue(false);
                               setIsMultiAnswerTrue([false, false, false]);
@@ -796,6 +820,10 @@ const Exercise = () => {
                               setIsSoundPlayed(false);
                               set_continue(true);
                             } else {
+                              if (campaignRunning) {
+                                console.log(schedule);
+                                runCampaign();
+                              }
                               exerciseMaker();
                               set_continue(false);
                               setIsAnswerFalse(false);
