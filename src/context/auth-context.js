@@ -134,6 +134,12 @@ const sampleSchedule = new Queue([
   "Intervals",
   "Chord Progressions",
   "Perfect Pitch",
+  "Intervals",
+  "Chord Progressions",
+  "Perfect Pitch",
+  "Intervals",
+  "Chord Progressions",
+  "Perfect Pitch",
 ]); // hard coded
 
 const sampleSchedule2 = new Queue(["Intervals", "Chords"]);

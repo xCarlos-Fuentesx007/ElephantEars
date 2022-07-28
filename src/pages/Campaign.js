@@ -2,6 +2,7 @@ import React, { Fragment, useContext } from "react";
 import { AuthContext } from "../context/auth-context";
 import {
   Container,
+  Divider,
   Paper,
   Typography,
   Button,
@@ -67,30 +68,14 @@ const Campaign = () => {
                 },
               }}
             >
-              <ListItem>
-                <ListItemText primary="Intervals" secondary="All" />
-              </ListItem>
-              <ListItem>
-                <ListItemText primary="Scale Degrees" secondary="Chromatic" />
-              </ListItem>
-              <ListItem>
-                <ListItemText primary="Scales" secondary="All" />
-              </ListItem>
-              <ListItem>
-                <ListItemText
-                  primary="Intervals in Context"
-                  secondary="Diatonic"
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText primary="Pitch" secondary="C Sale" />
-              </ListItem>
-              <ListItem>
-                <ListItemText
-                  primary="Chord Progressions"
-                  secondary="All Triads and Sevenths"
-                />
-              </ListItem>
+              {schedule.exercises.map((exercise, index) => (
+                <Container key={index}>
+                  <ListItem>
+                    <ListItemText primary={exercise} />
+                  </ListItem>
+                  {index !== schedule.getSize() - 1 ? <Divider /> : null}
+                </Container>
+              ))}
             </List>
           </Container>
           <Container
