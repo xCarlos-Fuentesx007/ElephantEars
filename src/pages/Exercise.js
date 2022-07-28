@@ -371,7 +371,7 @@ const Exercise = () => {
         }}
       >
         <Grid item xs={2}>
-          <Typography component="body1">Chord 1:</Typography>
+          <Typography variant="body1">Chord 1:</Typography>
         </Grid>
         <Grid item xs={2}>
           <Button variant="contained" sx={{ width: "100%" }}>
@@ -379,14 +379,14 @@ const Exercise = () => {
           </Button>
         </Grid>
         <Grid item xs={10}>
-          <Typography component="body1">
+          <Typography variant="body1">
             This is the first chord you heard and will always be the tonic
             chord.
           </Typography>
         </Grid>
 
         <Grid item xs={2}>
-          <Typography component="body1">Chord 2:</Typography>
+          <Typography variant="body1">Chord 2:</Typography>
         </Grid>
         {answers.map((type) => (
           <Grid item xs={2} key={type}>
@@ -421,7 +421,7 @@ const Exercise = () => {
         ))}
 
         <Grid item xs={2}>
-          <Typography component="body1">Chord 3:</Typography>
+          <Typography variant="body1">Chord 3:</Typography>
         </Grid>
         {answers.map((type) => (
           <Grid item xs={2} key={type}>
@@ -456,7 +456,7 @@ const Exercise = () => {
         ))}
 
         <Grid item xs={2}>
-          <Typography component="body1">Chord 4:</Typography>
+          <Typography variant="body1">Chord 4:</Typography>
         </Grid>
         {answers.map((type) => (
           <Grid item xs={2} key={type}>
@@ -509,7 +509,7 @@ const Exercise = () => {
         }}
       >
         <Grid item xs={2}>
-          <Typography component="body1">Note 1:</Typography>
+          <Typography variant="body1">Note 1:</Typography>
         </Grid>
         {answers.map((type) => (
           <Grid item xs={2} key={type}>
@@ -544,7 +544,7 @@ const Exercise = () => {
         ))}
 
         <Grid item xs={2}>
-          <Typography component="body1">Note 2:</Typography>
+          <Typography variant="body1">Note 2:</Typography>
         </Grid>
         {answers.map((type) => (
           <Grid item xs={2} key={type}>
@@ -580,9 +580,9 @@ const Exercise = () => {
 
         <Grid item xs={2}>
           {answerData.name === "Intervals In Context" ? (
-            <Typography component="body1">Interval:</Typography>
+            <Typography variant="body1">Interval:</Typography>
           ) : (
-            <Typography component="body1">Note 3:</Typography>
+            <Typography variant="body1">Note 3:</Typography>
           )}
         </Grid>
         {answers.map((type) => (
