@@ -44,7 +44,7 @@ function Scales(first_note, scale_type) {
     case 3:
       scale = [0,2,1,2,2,2,1,2]; //W H W W W H W
       break;
-    //Phygian
+    //Phrygian
     case 4:
       scale = [0,1,2,2,2,1,2,2]; //H W W W H W W
       break;
@@ -270,7 +270,7 @@ function find_scale_type(num) {
     "Natural Minor (Aeolian)",
     "Harmonic Minor",
     "Dorian",
-    "Phygian",
+    "Phrygian",
     "Lydian",
     "Mixolydian",
     "Locrian",

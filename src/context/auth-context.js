@@ -48,7 +48,7 @@ const ANSWER_DATA = [
       "Natural Minor (Aeolian)",
       "Harmonic Minor",
       "Dorian",
-      "Phygian",
+      "Phrygian",
       "Lydian",
       "Mixolydian",
       "Locrian",
@@ -162,6 +162,7 @@ export const AuthContext = React.createContext({
   logout: () => {},
   getCampaignData: (userData) => {},
   getStatsData: (userData) => {},
+  statsData: "",
   runCampaign: () => {},
   stopCampaign: () => {},
 });
@@ -180,6 +181,8 @@ const AuthContextProvider = (props) => {
   const [token, setToken] = useState();
   const [campaignRunning, setCampaignRunning] = useState(false);
   const [schedule, setSchedule] = useState(sampleSchedule);
+
+  const [stats, set_stats] = useState("err");
 
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("userData"));
@@ -305,7 +308,7 @@ const AuthContextProvider = (props) => {
       setError(responseData.message);
       return;
     }
-    console.log(responseData);
+    set_stats(responseData);
     return responseData;
   };
 
@@ -401,6 +404,7 @@ const AuthContextProvider = (props) => {
         isLoading: isLoading,
         getCampaignData: getCampaignData,
         getStatsData: getStatsData,
+        statsData: stats,
         runCampaign: runCampaign,
         stopCampaign: stopCampaign,
       }}
