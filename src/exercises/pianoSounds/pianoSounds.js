@@ -1,6 +1,6 @@
 import { Sounds } from "./piano-wav/exportSounds";
 
-const notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
+// const notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B']; // Dead code: transferred this to Notes class as static object.
 // const pathToFolder = "./piano-wav/"; // Where all samples are stored. Lowest note available: C1. Highest note available: C8.
 let audioObjects = []; // Global list to keep track of all sounds currently playing
 let repeatMap; // Global variable to remember most recently played.
@@ -34,7 +34,7 @@ export class Note {
       this.name = noteName;
       this.letter = noteName.slice(0,-1);
       this.octave = parseInt(noteName[noteName.length-1]);
-      this.letterIndex = notes.indexOf(this.letter);
+      this.letterIndex = Note.notes.indexOf(this.letter);
     }
   }
 
@@ -225,7 +225,7 @@ function playSoundRecursiveDescending(playing, i, delay=750) {
   // playing.forEach(note => {display.push(note.name)});
   // console.log(`Playing ${display} ${chordMap[0]}`);
   */
- 
+
   // Stop any music that might already be playing.
   stopAll();
   
@@ -256,7 +256,7 @@ function getRandomKey(obj) {
 
 // Todo: add doc string
 // Todo: Also, do this and playRandomChord really need to be different functions?
-export function playRandomInterval(arpeggiate=false, ascending=true) {
+function playRandomInterval(arpeggiate=false, ascending=true) {
   let rootNote = new Note();
   let chordMap = getIntervalMap();
   playChord(rootNote, chordMap, arpeggiate, ascending);
@@ -264,11 +264,11 @@ export function playRandomInterval(arpeggiate=false, ascending=true) {
 }
 
 /** Wrapper function for playChord() to make playing intervals more intuitive.
- * @param {Note} rootNote - Note to build interval on.
- * @param {string} intervalMap - 
- * @param {*} arpeggiate 
- * @param {*} ascending 
- * @returns 
+ * @param {Note} rootNote - Note to build the interval on.
+ * @param {string} intervalMap - Array of [name, semitones]. Should be produced by getIntervalMap()
+ * @param {boolean} arpeggiate - Whether to play as chord or arpeggio.
+ * @param {boolean} ascending - If (arpeggiate): whether to play arpeggio ascending or descending.
+ * @returns {string} The name of the interval.
  */
 export function playInterval(rootNote, intervalMap, arpeggiate=false, ascending=true) {
   if (rootNote === undefined) {console.error(`In playInterval(): rootNote is undefined`); return;}
@@ -443,9 +443,12 @@ function playChordProgressionWrapper(chordProgMap) {
 
   let scale = []
   scaleMap.forEach(note => {
-    let index = rootNote.letterIndex + note;
-    let newNote = new Note(notes[index%12] + (rootNote.octave + (index<12 ? 0 : 1)));
-    scale.push(newNote);
+    // let index = rootNote.letterIndex + note;
+    // let newNote = new Note(notes[index%12] + (rootNote.octave + (index<12 ? 0 : 1)));
+    // scale.push(newNote);
+
+    let nextNote = rootNote.nextNote(note);
+    scale.push(nextNote);
   });
 
   return scale;
