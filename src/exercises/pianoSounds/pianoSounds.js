@@ -507,7 +507,7 @@ function playChordProgressionWrapper(chordProgMap) {
   let scaleMap = scales[scaleType]
   if (scaleMap == undefined) {console.error(`invalid scale type: ${scaleType}`); return;}
 
-  let scale = []
+  let scale = [rootNote]
   scaleMap.forEach(note => {
     // let index = rootNote.letterIndex + note;
     // let newNote = new Note(notes[index%12] + (rootNote.octave + (index<12 ? 0 : 1)));
