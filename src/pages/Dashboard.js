@@ -8,9 +8,8 @@ import CircularProgressBar from "../components/CircularProgressBar";
 
 const Dashboard = () => {
   const authCtx = useContext(AuthContext);
-  const { userData, getStatsData } = authCtx;
+  const { userData, getStatsData, statsData } = authCtx;
 
-  const [all_stats, set_all_stats] = useState("err");
   const [intervals_data, set_intervals_data] = useState("err");
   const [chords_data, set_chords_data] = useState("err");
   const [scales_data, set_scales_data] = useState("err");
@@ -21,18 +20,16 @@ const Dashboard = () => {
   const [melodic_dictation_data, set_melodic_dictation_data] = useState("err");
 
   const LoadData = async () => {
-    const data = await getStatsData(userData);
-    set_all_stats(data);
-    // console.log(data);
-    set_intervals_data(data.intervals);
-    set_chords_data(data.chords);
-    set_scales_data(data.scales);
-    set_pitch_data(data.pitch);
-    // set_chord_progression_data(data.)
-    // set_scale_degree_data(data.)
-    // set_IIC_data(data.)
-    // set_melodic_dictation_data(data.)
-
+    const data = await getStatsData(userData)
+    set_intervals_data(data.intervals)
+    set_chords_data(data.chords)
+    set_scales_data(data.scales)
+    set_pitch_data(data.pitch)
+    set_chord_progression_data(data.chord_progressions)
+    set_scale_degree_data(data.scale_degrees)
+    set_IIC_data(data.intervals_in_context)
+    set_melodic_dictation_data(data.melodic_dictation)
+    
     return;
   };
 
@@ -49,10 +46,24 @@ const Dashboard = () => {
     );
   };
 
+  const Button2 = () => {
+    return (
+      <Button
+        variant="contained"
+        onClick={() => {
+          console.log(statsData)
+        }}
+      >
+        s Data
+      </Button>
+    )
+  }
+
   return (
     <Fragment>
       <Navbar />
       <Button1 />
+      <Button2 />
       <Container>
         <Typography
           variant="h4"
@@ -104,35 +115,33 @@ const Dashboard = () => {
               <h2 style={{ margin: "20px 0" }}>Lifetime Stats</h2>
               <div style={{ margin: "10px 0" }}>
                 <h4>Sessions completed:</h4>
-                <h6>{all_stats.sessionsCompleted}</h6>
+                <h6>{statsData.sessionsCompleted}</h6>
               </div>
               <div style={{ margin: "10px 0" }}>
                 <h4>Overall accuracy:</h4>
-                <h6>{all_stats.overallAccuracy}</h6>
+                <h6>{statsData.overallAccuracy}</h6>
               </div>
               <div style={{ margin: "10px 0" }}>
                 <h4>Total time:</h4>
-                <h6>needs default value{/* all_stats.totalTime */}</h6>
+                <h6>{statsData.totalTime}</h6>
               </div>
               <div style={{ margin: "10px 0" }}>
                 <h4>Average time/question:</h4>
-                <h6>
-                  needs default value{/* all_stats.averageTimePerQuestion */}
-                </h6>
+                <h6>{statsData.averageTimePerQuestion}</h6>
               </div>
             </Grid>
             <Grid item xs={12} md={6}>
               <Grid container spacing={1}>
                 <Grid item xs={4}>
                   <CircularProgressBar
-                    percentage={intervals_data.totalAccuracy}
+                    percentage={intervals_data.totalAccuracy} //This will be changed to statsData.intervals.totalAccuracy
                     title="Intervals"
                     color="#6F2DBD"
                   />
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
-                    percentage={chords_data.totalAccuracy}
+                    percentage={chords_data.totalAccuracy}  //also changed
                     title="Chords"
                     color="#1E96FC"
                   />
