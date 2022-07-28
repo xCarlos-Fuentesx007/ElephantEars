@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 import { DEMO } from "../pages/Exercise.js";
-import {Note, playInterval, getIntervalMap, getChordMap, playChord, getScaleMap, playScale} from "./pianoSounds/pianoSounds.js";
+import {Note, playInterval, getIntervalMap, getChordMap, playChord, getScaleMap, playScale, getRandomKey} from "./pianoSounds/pianoSounds.js";
 // import {playRandomNote} from "./pianoSounds/pianoSounds.js";
 
 
@@ -110,9 +110,55 @@ export { Scales };
 ///////////////////////////Chord Progressions
 
 function Perfect_Pitch(first_note) {
-  const synth = new Tone.Synth().toDestination();
-  synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
-  return find_pitch(first_note);
+  
+  const nameDictionary = {
+    "C3" : "C3", 
+    "C#3" : "Cs3", 
+    "D3" : "D3", 
+    "D#3" : "Ds3", 
+    "E3" : "E3", 
+    "F3" : "F3", 
+    "F#3" : "Fs3", 
+    "G3" : "G3", 
+    "G#3" : "Gs3", 
+    "A3" : "A3", 
+    "A#3" : "As3", 
+    "B3" : "B3", 
+    "C4" : "C4", 
+    "C#4" : "Cs4", 
+    "D4" : "D4", 
+    "D#4" : "Ds4", 
+    "E4" : "E4", 
+    "F4" : "F4", 
+    "F#4" : "Fs4", 
+    "G4" : "G4", 
+    "G#4" : "Gs4", 
+    "A4" : "A4", 
+    "A#4" : "As4", 
+    "B4" : "B4", 
+    "C5" : "C5", 
+    "C#5" : "Cs5", 
+    "D5" : "D5", 
+    "D#5" : "Ds5", 
+    "E5" : "E5", 
+    "F5" : "F5", 
+    "F#5" : "Fs5", 
+    "G5" : "G5", 
+    "G#5" : "Gs5", 
+    "A5" : "A5", 
+    "A#5" : "As5", 
+    "B5" : "B5",   
+  }
+
+  let key = find_pitch(first_note%12);
+  let noteName = nameDictionary[key];
+  let note = new Note(noteName);
+  note.play();
+  return key;
+
+  // const synth = new Tone.Synth().toDestination();
+  // synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
+  // return find_pitch(first_note);
 }
 export { Perfect_Pitch };
 
