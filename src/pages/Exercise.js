@@ -20,6 +20,8 @@ import incorrectImg from "../img/incorrect.svg";
 
 import { Intervals, Perfect_Pitch, Chords, Scales, Scale_Degrees } from "../exercises/toneFunctions";
 
+const DEMO = true; // Use for console logging answers during demo.
+
 const DisplayErr = (errorCode, correctOption) => {
   switch (errorCode) {
     case 0:
@@ -176,17 +178,19 @@ const Exercise = () => {
   const exerciseHandler = () => {
     if (answerData.name === "Intervals") {
       const answerValue = Intervals(first_note, interval);
-      console.log(answerValue);
+      if (DEMO) console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Perfect Pitch") {
       const answerValue = Perfect_Pitch(first_note);
+      if (DEMO) console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Chords") {
       const answerValue = Chords(first_note, chord_type);
+      if (DEMO) console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Scales") {
       const answerValue = Scales(first_note, scale_type);
-      console.log(answerValue);
+      if (DEMO) console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Scale Degrees") {
       while (answer_note - first_note >= 12 || answer_note - first_note <= -12) { //ensures the answer is within an octave of the starting note
@@ -198,7 +202,7 @@ const Exercise = () => {
         }
       }
       const answerValue = Scale_Degrees(first_note, answer_note);
-      console.log(answerValue);
+      if (DEMO) console.log(answerValue);
       setAnswer(answerValue);
     }
     setIsSoundPlayed(true);
