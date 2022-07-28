@@ -5,8 +5,9 @@ import { Sounds } from "./piano-wav/exportSounds";
 let audioObjects = []; // Global list to keep track of all sounds currently playing
 let repeatMap; // Global variable to remember most recently played.
 
-/** Class representing a note 
- * Separating letter and octave makes for easier and more efficient function calls.
+/** Class representing a note.
+ * 
+ * Separating the letter and octave makes for easier and more efficient function calls.
  * @typedef {Object} Note
  * @property {string} name - the full name in scientific pitch notation
  * @property {string} letter - Just the letter part of `name`.
@@ -74,6 +75,29 @@ export class Note {
     let noteName = Note.notes[nextIndex%12] + (this.octave + (nextIndex < 12 ? 0 : 1)).toString();
     return new Note(noteName);
   }
+
+  /** Get the corresponding note name of an integer.
+   * 
+   * The lowest note name this can generate is C2.
+   * @param {number} i - A non-negative integer.
+   * @returns {string} The name of the note in scientific pitch notation.
+   */
+  static numberToNoteName(i) {
+    if (i < 0) return; // guard condition
+    let letter = Note.notes[i%12];
+    let octave = (Math.trunc(i/12) + 2); // Alternatively, use Note.min for floor
+    return letter + octave;
+  }
+
+  /** Generate a Note object from a number.
+   * @param {number} i - A non-negative integer.
+   * @returns {Note} A new Note object.
+   */
+  static numberToNote(i) {
+    if (i < 0) return; // guard condition
+    let noteName = Note.numberToNoteName(i);
+    return new Note(noteName);
+  }
 }
 
 function getRandomInt(max) {
@@ -125,6 +149,48 @@ export function getIntervalMap(semitones) {
     : semitones - 1;
 
   return intervals[i];
+}
+
+/** Given a number, return a map describing the chord's name and structure.
+ * 
+ * This function is specifically designed to be used in Chords(first_note, chord_type)
+ * in toneFunctions.js.
+ * @param {number} index - The index to access in values[] to select the chord type.
+ * @returns {Array<string, number} An array where the first element is the chord's name
+ * and the rest of the elements are the chords intervals as semitones.
+ */
+export function getChordMap(index) {
+
+  /** Values must match the values in ../toneFunctions.js function find_chord_type(num)
+   *  Values must also match the values in ../../context/auth-context.js
+  */
+  const values = [
+    "Major",
+    "Minor",
+    "Diminished",
+    "Augmented",
+    "Dominant Seventh",
+    "Major Seventh",
+    "Minor Seventh",
+  ];
+  
+  const chordsDictionary = {
+    "Major" : ["Major",4,7],
+    "Major Seventh" : ["Major Seventh",4,7,11],
+    "Dominant Seventh" : ["Dominant Seventh",4,7,10],
+    "Minor" : ["Minor",3,7],
+    "Minor Seventh" : ["Minor Seventh",3,7,10],
+    "Diminished" : ["Diminished",3,6],
+    "Augmented" : ["Augmented",4,8],
+    "Half Diminished 7th" : ["Half Diminished 7th",3,6,10], // (minor triad with dominant 7th)
+  }
+
+  // If no chord type is specified, return a random chord map
+  if (index === undefined) { index = getRandomInt(values.length) }
+
+  let key = values[index];
+
+  return chordsDictionary[key];
 }
 
 // Todo: delete this function. It's no longer necessary.

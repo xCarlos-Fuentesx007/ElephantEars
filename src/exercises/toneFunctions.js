@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import {Note, playInterval, getIntervalMap, playChord, playChordProgression} from "./pianoSounds/pianoSounds.js";
+import {Note, playInterval, getIntervalMap, getChordMap, playChord, playChordProgression} from "./pianoSounds/pianoSounds.js";
 // import {playRandomNote} from "./pianoSounds/pianoSounds.js";
 
 
@@ -21,17 +21,22 @@ function Intervals(first_note, interval) {
   // return find_interval(interval);
 
   let intervalName = playInterval(rootNote, intervalMap, true);
-  // let intervalName = playRandomInterval(true);
-  // let intervalName = playRandomNote();
   return intervalName;
 }
 export { Intervals };
 
+
 function Chords(first_note, chord_type) {
-  const synth = new Tone.PolySynth().toDestination();
-  var chord = make_chord(first_note, chord_type);
-  synth.triggerAttackRelease(chord, "4n", Tone.now());
-  return find_chord_type(chord_type);
+  // const synth = new Tone.PolySynth().toDestination();
+  // var chord = make_chord(first_note, chord_type);
+  // synth.triggerAttackRelease(chord, "4n", Tone.now());
+  // return find_chord_type(chord_type);
+
+  let rootNote = Note.numberToNote(first_note);
+  let chordMap = getChordMap(chord_type);
+  playChord(rootNote, chordMap);
+  
+  return chordMap[0] // returning the name
 }
 export { Chords };
 
