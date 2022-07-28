@@ -15,8 +15,7 @@ import { Link } from "react-router-dom";
 
 const Campaign = () => {
   const authCtx = useContext(AuthContext);
-  const { userData, getCampaignData, getStatsData, runCampaign, schedule } =
-    authCtx;
+  const { runCampaign, schedule } = authCtx;
 
   return (
     <Fragment>

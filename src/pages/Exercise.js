@@ -171,7 +171,6 @@ const Exercise = () => {
   const [isSoundPlayed, setIsSoundPlayed] = useState(false);
 
   const [clickCount, set_continue] = useState(false);
-  const [correct, set_correct] = useState(0);
 
   const [first_note, setFirst_note] = useState(Math.floor(Math.random() * 24));
   const [first_noteV2, setFirst_noteV2] = useState(
@@ -764,7 +763,6 @@ const Exercise = () => {
                                 );
                                 setErrorIdx(1);
                                 setIsMultiAnswerTrue([true, true, true]);
-                                set_correct(1);
                               } else {
                                 sfx.wrong.play();
                                 answersHandler(
@@ -782,7 +780,6 @@ const Exercise = () => {
                                   answers[1] !== multiActive[1],
                                   answers[2] !== multiActive[2],
                                 ]);
-                                set_correct(0);
                               }
                               setIsSoundPlayed(false);
                               set_continue(true);
@@ -812,7 +809,6 @@ const Exercise = () => {
                                 );
                                 setErrorIdx(1);
                                 setIsAnswerTrue(true);
-                                set_correct(1);
                               } else {
                                 sfx.wrong.play();
                                 answersHandler(
@@ -821,7 +817,6 @@ const Exercise = () => {
                                 );
                                 setErrorIdx(2);
                                 setIsAnswerFalse(true);
-                                set_correct(0);
                               }
                               setIsSoundPlayed(false);
                               set_continue(true);
