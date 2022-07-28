@@ -30,12 +30,14 @@ export class Note {
       this.octave = Note.#getRandomOctave(Note.min, Note.max);
       this.letter = Note.notes[this.letterIndex];
       this.name = this.letter + this.octave;
+      this.audioElement = new Audio(Sounds[this.name]);
     }
     else {
       this.name = noteName;
       this.letter = noteName.slice(0,-1);
       this.octave = parseInt(noteName[noteName.length-1]);
       this.letterIndex = Note.notes.indexOf(this.letter);
+      this.audioElement = new Audio(Sounds[noteName]);
     }
   }
 
@@ -53,10 +55,20 @@ export class Note {
    * @returns {Promise} A Promise which is resolved when playback has been started, or is rejected if for any reason playback cannot be started.
    */
   play() {
-    let newAudioElement = new Audio(Sounds[this.name]);
+    // let newAudioElement = new Audio(Sounds[this.name]);
     // console.log(`play(${this.name}): newAudioElement: ${newAudioElement}`);
-    audioObjects.push(newAudioElement);
-    let p = newAudioElement.play() // returning a Promise
+    // audioObjects.push(newAudioElement);
+    // let p = newAudioElement.play() // returning a Promise
+    //   // .then( () => {
+    //   //   console.log(`play(${this.name}): nice!`);
+    //   // })
+    //   // .catch( (err) => {
+    //   //   console.error(`play(${this.name}): uh oh \n`, err);
+    //   // });
+    // return p;
+
+    audioObjects.push(this.audioElement);
+    let p = this.audioElement.play() // returning a Promise
       // .then( () => {
       //   console.log(`play(${this.name}): nice!`);
       // })
