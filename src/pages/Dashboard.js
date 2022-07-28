@@ -21,20 +21,20 @@ const Dashboard = () => {
   const [melodic_dictation_data, set_melodic_dictation_data] = useState("err");
 
   const LoadData = async () => {
-    const data = await getStatsData(userData)
+    const data = await getStatsData(userData);
     set_all_stats(data);
     // console.log(data);
-    set_intervals_data(data.intervals)
-    set_chords_data(data.chords)
-    set_scales_data(data.scales)
-    set_pitch_data(data.pitch)
+    set_intervals_data(data.intervals);
+    set_chords_data(data.chords);
+    set_scales_data(data.scales);
+    set_pitch_data(data.pitch);
     // set_chord_progression_data(data.)
     // set_scale_degree_data(data.)
     // set_IIC_data(data.)
     // set_melodic_dictation_data(data.)
-    
+
     return;
-  }
+  };
 
   const Button1 = () => {
     return (
@@ -46,8 +46,8 @@ const Dashboard = () => {
       >
         Pull Data
       </Button>
-    )
-  }
+    );
+  };
 
   return (
     <Fragment>
@@ -116,7 +116,9 @@ const Dashboard = () => {
               </div>
               <div style={{ margin: "10px 0" }}>
                 <h4>Average time/question:</h4>
-                <h6>needs default value{/* all_stats.averageTimePerQuestion */}</h6>
+                <h6>
+                  needs default value{/* all_stats.averageTimePerQuestion */}
+                </h6>
               </div>
             </Grid>
             <Grid item xs={12} md={6}>

@@ -132,12 +132,11 @@ const ANSWER_DATA = [
 
 const sampleSchedule = new Queue([
   "Intervals",
-  "Scale Degrees",
-  "Scales",
-  "Intervals In Context",
-  "Perfect Pitch",
   "Chord Progressions",
+  "Perfect Pitch",
 ]); // hard coded
+
+const sampleSchedule2 = new Queue(["Intervals", "Chords"]);
 
 export const AuthContext = React.createContext({
   userData: [],
@@ -164,6 +163,7 @@ export const AuthContext = React.createContext({
   getCampaignData: (userData) => {},
   getStatsData: (userData) => {},
   runCampaign: () => {},
+  stopCampaign: () => {},
 });
 
 const AuthContextProvider = (props) => {
@@ -334,11 +334,13 @@ const AuthContextProvider = (props) => {
   };
 
   const exerciseHandler = (exerciseValue) => {
-    const date = new Date();
-    setStartedDate(date);
-    setPercentage(0);
-    setCorrectAnswers(0);
-    setIncorrectAnswers(0);
+    if (!campaignRunning) {
+      const date = new Date();
+      setStartedDate(date);
+      setPercentage(0);
+      setCorrectAnswers(0);
+      setIncorrectAnswers(0);
+    }
     setExercise(exerciseValue);
     ANSWER_DATA.map((item) => {
       if (item.name === exerciseValue) {
@@ -365,6 +367,12 @@ const AuthContextProvider = (props) => {
   const runCampaign = () => {
     setCampaignRunning(true);
     exerciseHandler(schedule.dequeue());
+  };
+
+  const stopCampaign = () => {
+    setCampaignRunning(false);
+    // eventually needs to be newly generated schedule
+    setSchedule(sampleSchedule2);
   };
 
   return (
@@ -394,6 +402,7 @@ const AuthContextProvider = (props) => {
         getCampaignData: getCampaignData,
         getStatsData: getStatsData,
         runCampaign: runCampaign,
+        stopCampaign: stopCampaign,
       }}
     >
       {props.children}

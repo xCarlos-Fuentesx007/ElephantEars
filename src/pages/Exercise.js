@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../context/auth-context";
 
@@ -138,6 +138,7 @@ const Exercise = () => {
   const [answers, setAnswers] = useState([]);
 
   const [isExitVisible, setIsExitVisible] = useState(false);
+  let navigate = useNavigate();
 
   const {
     answerData,
@@ -148,6 +149,7 @@ const Exercise = () => {
     answersHandler,
     campaignRunning,
     runCampaign,
+    stopCampaign,
     schedule,
   } = authCtx;
 
@@ -786,8 +788,12 @@ const Exercise = () => {
                               set_continue(true);
                             } else {
                               if (campaignRunning) {
-                                console.log(schedule);
-                                runCampaign();
+                                if (schedule.isEmpty()) {
+                                  stopCampaign();
+                                  navigate("/score", { replace: true });
+                                } else {
+                                  runCampaign();
+                                }
                               }
                               exerciseMaker();
                               set_continue(false);
@@ -821,8 +827,12 @@ const Exercise = () => {
                               set_continue(true);
                             } else {
                               if (campaignRunning) {
-                                console.log(schedule);
-                                runCampaign();
+                                if (schedule.isEmpty()) {
+                                  stopCampaign();
+                                  navigate("/score", { replace: true });
+                                } else {
+                                  runCampaign();
+                                }
                               }
                               exerciseMaker();
                               set_continue(false);
