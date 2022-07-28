@@ -1,8 +1,15 @@
 import * as Tone from "tone";
-import {playRandomInterval} from "./pianoSounds/pianoSounds.js";
+import {Note, playInterval, getIntervalMap, playChord, playChordProgression} from "./pianoSounds/pianoSounds.js";
+// import {playRandomNote} from "./pianoSounds/pianoSounds.js";
 
 
 function Intervals(first_note, interval) {
+  // console.log(`first_note: ${first_note}, interval: ${interval}`);
+
+  let noteName = Note.notes[first_note%12] + (Math.trunc(first_note/12) + 2);
+  // console.log('noteName', noteName)
+  let rootNote = new Note(noteName);
+  let intervalMap = getIntervalMap(interval);
 
   // const synth = new Tone.Synth().toDestination();
 
@@ -13,7 +20,9 @@ function Intervals(first_note, interval) {
 
   // return find_interval(interval);
 
-  let intervalName = playRandomInterval(true);
+  let intervalName = playInterval(rootNote, intervalMap, true);
+  // let intervalName = playRandomInterval(true);
+  // let intervalName = playRandomNote();
   return intervalName;
 }
 export { Intervals };

@@ -12,10 +12,11 @@ let repeatMap; // Global variable to remember most recently played.
  * @property {string} letter - Just the letter part of `name`.
  * @property {number} octave - Just the number part of `name`.
 */
-class Note {
+export class Note {
 
   static min = 2;
   static max = 4;
+  static notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
 
   /** Create a Note object from a note name. 
    * If one isn't given, a random note is generated.
@@ -26,7 +27,7 @@ class Note {
     if (noteName === undefined) {
       this.letterIndex = getRandomInt(12); // 12 notes in western scale
       this.octave = Note.#getRandomOctave(Note.min, Note.max);
-      this.letter = notes[this.letterIndex];
+      this.letter = Note.notes[this.letterIndex];
       this.name = this.letter + this.octave;
     }
     else {
@@ -52,7 +53,7 @@ class Note {
    */
   play() {
     let newAudioElement = new Audio(Sounds[this.name]);
-    console.log(`play(${this.name}): newAudioElement: ${newAudioElement}`);
+    // console.log(`play(${this.name}): newAudioElement: ${newAudioElement}`);
     audioObjects.push(newAudioElement);
     let p = newAudioElement.play() // returning a Promise
       // .then( () => {
@@ -62,6 +63,16 @@ class Note {
       //   console.error(`play(${this.name}): uh oh \n`, err);
       // });
     return p;
+  }
+
+  /** Get the note a certain number of semitones away from the current note.
+   * @param {number} semitones
+   * @returns {Note} A new Note object.
+   */
+  nextNote(semitones) {
+    let nextIndex = this.letterIndex + semitones;
+    let noteName = Note.notes[nextIndex%12] + (this.octave + (nextIndex < 12 ? 0 : 1)).toString();
+    return new Note(noteName);
   }
 }
 
@@ -86,7 +97,12 @@ export function playRandomNote() {
   return note.name;
 }
 
-function getRandomIntervalMap() {
+/** Return an array containing the name and number of semitones in an interval. 
+ * If semitones argument isn't given, a random interval map is returned.
+ * @param {number} [semitones] - How many semitones between the interval and root note.
+ * @returns {Array<string, number>} A 2-array of the form [{string} name, {number} semitones].
+ */
+export function getIntervalMap(semitones) {
   
   // Names must match the names in ../../context/auth-context.js
   const intervals = [
@@ -104,7 +120,9 @@ function getRandomIntervalMap() {
     ["Octave", 12]
   ]
   
-  let i = getRandomInt(intervals.length);
+  let i = (semitones === undefined) 
+    ? getRandomInt(intervals.length)
+    : semitones - 1;
 
   return intervals[i];
 }
@@ -186,7 +204,7 @@ function playSoundRecursiveDescending(playing, i, delay=750) {
  * @param {boolean} ascending - When (boolean == true), whether to play the arpeggio in ascending or descending order.
  * @returns A Promise that resolves when the last note begins playing.
  */
- function playChord(rootNote, chordMap, arpeggiate=false, ascending=true) {
+ export function playChord(rootNote, chordMap, arpeggiate=false, ascending=true) {
 
   // Make sure we have a chord to play.
   if (rootNote == undefined) {
@@ -199,14 +217,15 @@ function playSoundRecursiveDescending(playing, i, delay=750) {
 
   let playing = [rootNote];
   for (let i = 1; i < chordMap.length; i++) { // Start at 1 because chordMap[0] is the chord's name.
-    let nextIndex = rootNote.letterIndex + chordMap[i];
-    let note = notes[nextIndex%12] + (rootNote.octave + (nextIndex < 12 ? 0 : 1)).toString();
-    playing.push(new Note(note));
+    let nextNote = rootNote.nextNote(chordMap[i]);
+    playing.push(nextNote);
   }
-  let display = [];
-  playing.forEach(note => {display.push(note.name)});
-  console.log(`Playing ${display} ${chordMap[0]}`);
-  
+  /** just for printing 
+  // let display = [];
+  // playing.forEach(note => {display.push(note.name)});
+  // console.log(`Playing ${display} ${chordMap[0]}`);
+  */
+ 
   // Stop any music that might already be playing.
   stopAll();
   
@@ -239,9 +258,24 @@ function getRandomKey(obj) {
 // Todo: Also, do this and playRandomChord really need to be different functions?
 export function playRandomInterval(arpeggiate=false, ascending=true) {
   let rootNote = new Note();
-  let chordMap = getRandomIntervalMap();
+  let chordMap = getIntervalMap();
   playChord(rootNote, chordMap, arpeggiate, ascending);
   return chordMap[0]; // Return the interval's name
+}
+
+/** Wrapper function for playChord() to make playing intervals more intuitive.
+ * @param {Note} rootNote - Note to build interval on.
+ * @param {string} intervalMap - 
+ * @param {*} arpeggiate 
+ * @param {*} ascending 
+ * @returns 
+ */
+export function playInterval(rootNote, intervalMap, arpeggiate=false, ascending=true) {
+  if (rootNote === undefined) {console.error(`In playInterval(): rootNote is undefined`); return;}
+  if (intervalMap === undefined) {console.error(`In playInterval(): intervalMap is undefined`); return;}
+
+  playChord(rootNote, intervalMap, arpeggiate, ascending);
+  return intervalMap[0]; // Return the interval's name
 }
 
 function getChordMapFromSymbol(chordSymbol) {
@@ -336,7 +370,7 @@ let displayChordSymbols;
  * @param {Array<Array<number,string>>} chordProgMap - An array of arrays describing chords. Should always be generated by getRandomChordProgessionMap();
  * @returns {void} void
  */
- function playChordProgression(rootNote, chordProgMap) {
+ export function playChordProgression(rootNote, chordProgMap) {
   
   // Get random root note if one isn't supplied.
   if (rootNote == undefined) rootNote = new Note();
@@ -349,11 +383,12 @@ let displayChordSymbols;
   // Generate the set of chords to play based on the progression and root note.
   let newChordProgression = [];
   chordProgMap.forEach(chordSymbolMap => {
-    let nextNoteIndex = rootNote.letterIndex + chordSymbolMap[0]; // Calculate the next chord's root note letter name and get its index in `notes`
-    let nextNote = new Note( (nextNoteIndex < 12)
-      ? notes[nextNoteIndex] + rootNote.octave
-      : notes[nextNoteIndex % 12] + (rootNote.octave + 1)
-    )
+    // let nextNoteIndex = rootNote.letterIndex + chordSymbolMap[0]; // Calculate the next chord's root note letter name and get its index in `notes`
+    // let nextNote = new Note( (nextNoteIndex < 12)
+    //   ? notes[nextNoteIndex] + rootNote.octave
+    //   : notes[nextNoteIndex % 12] + (rootNote.octave + 1)
+    // )
+    let nextNote = rootNote.nextNote(chordSymbolMap[0]);
     newChordProgression.push([nextNote, chordSymbolMap[1]]); // Add the finished chord (root note, chord map) to the chord progression
   });
 
