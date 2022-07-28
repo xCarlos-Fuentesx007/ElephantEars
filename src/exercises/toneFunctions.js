@@ -1,5 +1,6 @@
 import * as Tone from "tone";
-import {Note, playInterval, getIntervalMap, getChordMap, playChord, playChordProgression} from "./pianoSounds/pianoSounds.js";
+import { DEMO } from "../pages/Exercise.js";
+import {Note, playInterval, getIntervalMap, getChordMap, playChord, getScaleMap, playScale} from "./pianoSounds/pianoSounds.js";
 // import {playRandomNote} from "./pianoSounds/pianoSounds.js";
 
 
@@ -42,57 +43,66 @@ export { Chords };
 
 function Scales(first_note, scale_type) {
 
-  const synth = new Tone.Synth().toDestination();
-  var scale = [0, 0, 0, 0, 0, 0, 0, 0];
-  var i;
+  let rootNote = Note.numberToNote(first_note);
+  let scaleType = playScale(rootNote, scale_type);
+  // console.log(`Scales is returning playScale(rootNote, scale_type): ${scaleType}`);
 
-  switch (scale_type) {
-    //Major (Ionian)
-    case 0:
-      scale = [0,2,2,1,2,2,2,1]; // W W H W W W H
-      break;
-    //Natural Minor (Aeolian)
-    case 1:
-      scale = [0,2,1,2,2,1,2,2]; //W H W W H W W
-      break;
-    //Harmonic Minor
-    case 2:
-      scale = [0,2,1,2,2,1,3,1]; //W H W W H W+1/2 H
-      break;
-    //Dorian
-    case 3:
-      scale = [0,2,1,2,2,2,1,2]; //W H W W W H W
-      break;
-    //Phygian
-    case 4:
-      scale = [0,1,2,2,2,1,2,2]; //H W W W H W W
-      break;
-    //Lydian
-    case 5:
-      scale = [0,2,2,2,1,2,2,1]; //W W W H W W H
-      break;
-    //Mixolydian
-    case 6:
-      scale = [0,2,2,1,2,2,1,2]; //W W H W W H W
-      break;
-    //Locrian
-    case 7:
-      scale = [0,1,2,2,1,2,2,2]; //H W W H W W W
-      break;
-    //Error
-    default:
-      break;
-  }
+  return scaleType;
 
-  for (i=1; i<8; i++) {
-    scale[i] = scale[i-1] + scale[i];
-  }
+  // const synth = new Tone.Synth().toDestination();
+  // var scale = [0, 0, 0, 0, 0, 0, 0, 0];
+  // var i;
 
-  for (i=0; i<8; i++) {
-    synth.triggerAttackRelease(find_note(scale[i] + first_note), "4n", Tone.now() + (.8 * i));
-  }
+  // switch (scale_type) {
+  //   //Major (Ionian)
+  //   case 0:
+  //     scale = [0,2,2,1,2,2,2,1]; // W W H W W W H
+  //     break;
+  //   //Natural Minor (Aeolian)
+  //   case 1:
+  //     scale = [0,2,1,2,2,1,2,2]; //W H W W H W W
+  //     break;
+  //   //Harmonic Minor
+  //   case 2:
+  //     scale = [0,2,1,2,2,1,3,1]; //W H W W H W+1/2 H
+  //     break;
+  //   //Dorian
+  //   case 3:
+  //     scale = [0,2,1,2,2,2,1,2]; //W H W W W H W
+  //     break;
+  //   //Phygian
+  //   case 4:
+  //     scale = [0,1,2,2,2,1,2,2]; //H W W W H W W
+  //     break;
+  //   //Lydian
+  //   case 5:
+  //     scale = [0,2,2,2,1,2,2,1]; //W W W H W W H
+  //     break;
+  //   //Mixolydian
+  //   case 6:
+  //     scale = [0,2,2,1,2,2,1,2]; //W W H W W H W
+  //     break;
+  //   //Locrian
+  //   case 7:
+  //     scale = [0,1,2,2,1,2,2,2]; //H W W H W W W
+  //     break;
+  //   //Error
+  //   default:
+  //     break;
+  // }
 
-  return find_scale_type(scale_type);
+  // for (i=1; i<8; i++) {
+  //   scale[i] = scale[i-1] + scale[i];
+  // }
+
+  // for (i=0; i<8; i++) {
+  //   synth.triggerAttackRelease(find_note(scale[i] + first_note), "4n", Tone.now() + (.8 * i));
+  // }
+
+  // let st = find_scale_type(scale_type);
+  // console.log(`Scales is returning find_scale_type(scale_type): ${st}`);
+  // return st;
+  // return find_scale_type(scale_type);
 
 }
 export { Scales };

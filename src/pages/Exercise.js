@@ -20,7 +20,7 @@ import incorrectImg from "../img/incorrect.svg";
 
 import { Intervals, Perfect_Pitch, Chords, Scales, Scale_Degrees } from "../exercises/toneFunctions";
 
-const DEMO = true; // Use for console logging answers during demo.
+export const DEMO = true; // Use for console logging answers during demo.
 
 const DisplayErr = (errorCode, correctOption) => {
   switch (errorCode) {

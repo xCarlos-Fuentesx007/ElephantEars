@@ -1,4 +1,5 @@
 import { Sounds } from "./piano-wav/exportSounds";
+import { DEMO } from "../../pages/Exercise";
 
 // const notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B']; // Dead code: transferred this to Notes class as static object.
 // const pathToFolder = "./piano-wav/"; // Where all samples are stored. Lowest note available: C1. Highest note available: C8.
@@ -55,18 +56,6 @@ export class Note {
    * @returns {Promise} A Promise which is resolved when playback has been started, or is rejected if for any reason playback cannot be started.
    */
   play() {
-    // let newAudioElement = new Audio(Sounds[this.name]);
-    // console.log(`play(${this.name}): newAudioElement: ${newAudioElement}`);
-    // audioObjects.push(newAudioElement);
-    // let p = newAudioElement.play() // returning a Promise
-    //   // .then( () => {
-    //   //   console.log(`play(${this.name}): nice!`);
-    //   // })
-    //   // .catch( (err) => {
-    //   //   console.error(`play(${this.name}): uh oh \n`, err);
-    //   // });
-    // return p;
-
     audioObjects.push(this.audioElement);
     let p = this.audioElement.play() // returning a Promise
       // .then( () => {
@@ -76,6 +65,11 @@ export class Note {
       //   console.error(`play(${this.name}): uh oh \n`, err);
       // });
     return p;
+  }
+
+  /** Silence the note. */
+  stop() {
+    this.audioElement.pause();
   }
 
   /** Get the note a certain number of semitones away from the current note.
@@ -223,55 +217,120 @@ function getRandomChordMap() {
   return chords[i];
 }
 
+/** Given a number, return a map describing the scales's name and structure.
+ * 
+ * This function is specifically designed to be used in Scales(first_note, scale_type)
+ * in toneFunctions.js.
+ * @param {number} index - The index to access in values[] to select the scales type.
+ * @returns {Array<string, number} An array where the first element is the scales's name
+ * and the rest of the elements are the scales intervals as semitones.
+ */
+export function getScaleMap(index) {
+
+  /** Values must match the values in ../toneFunctions.js function find_scale_type(num)
+   *  Values must also match the answers for "Scales" in ../../context/auth-context.js
+  */
+  const values = [
+    "Major (Ionian)",
+    "Natural Minor (Aeolian)",
+    "Harmonic Minor",
+    "Dorian",
+    "Phygian",
+    "Lydian",
+    "Mixolydian",
+    "Locrian",
+  ];
+  
+  const scalesDictionary = {
+    "Major (Ionian)" : ["Major (Ionian)",2,4,5,7,9,11,12],
+    "Natural Minor (Aeolian)" : ["Natural Minor (Aeolian)",2,3,5,7,8,10,12],
+    "Harmonic Minor" : ["Harmonic Minor",2,3,5,7,8,11,12],
+    "Dorian" : ["Dorian",2,3,5,7,9,10,12],
+    "Phygian" : ["Phygian",1,3,5,7,9,10,12],
+    "Lydian" : ["Lydian",2,4,6,7,9,11,12],
+    "Mixolydian" : ["Mixolydian", 2,4,5,7,9,10,12] ,
+    "Locrian" : ["Locrian",1,3,5,6,8,10,12],
+  }
+
+  // If no scale type is specified, return a random scale map
+  if (index === undefined) { index = getRandomInt(values.length) }
+
+  let key = values[index];
+
+  let map = scalesDictionary[key];
+  // console.log('map: ', map)
+  return map;
+  // return scalesDictionary[key];
+}
+
 /** Play a scale or arpeggio in ascending or descending order.
- * @param {Array<string>} playing - A list of note names each in scientfic pitch notation.
+ * @param {Array<Note>} playing - A list of Note objects.
  * @param {number} delay - Time in milliseconds between each note.
  * @param {boolean} ascending - Play the notes first to last or last to first?
+ * @param {boolean} sustain - If (false): silence each note before playing the next one.
  */
-function playNotes(playing, delay=750, ascending=true) {
+function playNotes(playing, delay=750, ascending=true, sustain=true) {
+  stopAll(); // Stop all other music before playing the scale.
 
   if (ascending) {
-    playing[0].play().then( playSoundRecursiveAscending(playing, 1, delay) );
+    playing[0].play().then( () => {
+      if (!sustain) {setTimeout(() => {playing[0].stop()}, delay);}
+      playSoundRecursiveAscending(playing, 1, delay, sustain);
+    } );
   }
   else {
     let i = playing.length-1;
-    playing[i].play().then( playSoundRecursiveDescending(playing, --i, delay) );
+    playing[i].play().then( () => {
+      if (!sustain) {setTimeout(() => {playing[playing.length-1].stop()}, delay);}
+      playSoundRecursiveDescending(playing, --i, delay, sustain);
+    } );
   }
 }
 
 /** Play a list of notes in order with a delay between each note. This should never be used directly, only by playNotes().
  * @private Only playNotes() should call this function.
- * @param {Array<string>} playing - A list of note names to play e.g. ['C2','E2','G2'] 
+ * @param {Array<Note>} playing - A list of Note objects.
  * @param {number} i - Index to tell function to play playing[i]
  * @param {number} delay - Time in milliseconds to play between chords
+ * @param {boolean} sustain - If (false): silence each note before playing the next one.
  */
-function playSoundRecursiveAscending(playing, i, delay=750) {
+function playSoundRecursiveAscending(playing, i, delay=750, sustain) {
 
   if (playing[i] === undefined) { return; } // no more notes to play
   
   setTimeout( () =>
-    {playing[i].play().then(() => { 
-      playSoundRecursiveAscending(playing, ++i, delay);
-    }).catch(() => {console.log('interrupted')})},
-    delay
+    {
+      if (!sustain) stopAll();
+      // if (!sustain) playing[i-1].pause();
+      playing[i].play()
+        .then(() => {
+          playSoundRecursiveAscending(playing, ++i, delay);
+        })
+        .catch(() => {console.log('interrupted')})
+    }, delay
   )
 }
 
 /** Play a list of notes in reverse order with a delay between each note. This should never be used directly, only by playNotes().
  * @private Only playNotes() should call this function.
- * @param {Array<string>} playing - A list of note names to play e.g. ['C2','E2','G2'] 
+ * @param {Array<Note>} playing - A list of Note objects.
  * @param {number} i - Index to tell function to play playing[i]
  * @param {number} delay - Time in milliseconds to play between chords
+ * @param {boolean} sustain - If (false): silence each note before playing the next one.
  */
-function playSoundRecursiveDescending(playing, i, delay=750) {
+function playSoundRecursiveDescending(playing, i, delay=750, sustain) {
 
   if (i < 0) { return; } // no more notes to play
 
   setTimeout( () =>
-    {playing[i].play().then(() => {
-      playSoundRecursiveDescending(playing, --i, delay);
-    }).catch(() => {console.log('interrupted')})},
-    delay
+    {
+      if (!sustain) stopAll();
+      playing[i].play()
+        .then(() => {
+          playSoundRecursiveDescending(playing, --i, delay);
+        })
+        .catch(() => {console.log('interrupted')})
+    }, delay
   )
 }
 
@@ -505,44 +564,79 @@ function playChordProgressionWrapper(chordProgMap) {
   }).catch(() => {console.log('interrupted')})
 }
 
-/** Return a scale given a starting root note and scale type
+/** Return a scale given a starting root note and scale type.
  * @param {Note} rootNote - Note object
- * @param {string} scaleType - string describing the scale type
- * return {Array<Note>} List of Notes.
+//  * @param {string} scaleType - string describing the scale type
+* @param {Array<string, number>} scaleMap - A map describing the chords name and structure. Should only be generated by getScaleMap().
+ * @returns {Array<Note>} List of Note objects to form a scale.
  */
- function makeScale(rootNote, scaleType) {
-  const scales = {
-    'major' : [0,2,4,5,7,9,11,12],
-    'minor' : [0,2,3,5,7,8,10,12],
-  }
+ function makeScale(rootNote, scaleMap) {
+  // let scaleMap = getScaleMap(scaleType);
+  // console.log(`makeScale(): scaleMap = ${scaleMap}`)
 
-  let scaleMap = scales[scaleType]
-  if (scaleMap == undefined) {console.error(`invalid scale type: ${scaleType}`); return;}
+  let scale = [rootNote];
+  // scaleMap.forEach(note => {
+  //   // let index = rootNote.letterIndex + note;
+  //   // let newNote = new Note(notes[index%12] + (rootNote.octave + (index<12 ? 0 : 1)));
+  //   // scale.push(newNote);
 
-  let scale = [rootNote]
-  scaleMap.forEach(note => {
-    // let index = rootNote.letterIndex + note;
-    // let newNote = new Note(notes[index%12] + (rootNote.octave + (index<12 ? 0 : 1)));
-    // scale.push(newNote);
+  //   let nextNote = rootNote.nextNote(note);
+  //   scale.push(nextNote);
+  // });
 
-    let nextNote = rootNote.nextNote(note);
+  for (let i = 1; i < scaleMap.length; i++) { // Start at 1 because scaleMap[0] is the name.
+    let nextNote = rootNote.nextNote(scaleMap[i]);
     scale.push(nextNote);
-  });
+  }
 
   return scale;
 }
 
-/** Play a scale given a root note and scale type.
- * @param {Note} rootNote - Root of the scale.
- * @param {string} scaleType - Select either ['major', 'minor']
- * @param {boolean} ascending - Play the scale ascending or descending.
+// Old playScale() function. Not useful anymore.
+// /** Play a scale given a root note and scale type.
+//  * @param {Note} rootNote - Root of the scale.
+//  * @param {string} scaleType - Select either ['major', 'minor']
+//  * @param {boolean} ascending - Play the scale ascending or descending.
+//  */
+// function playScale(rootNote, scaleType, ascending=true) {
+//   let scale = makeScale(rootNote, scaleType);
+//   let display = [];
+//   scale.forEach(note => {
+//     display.push(note.name);
+//   });
+//   console.log(`Playing ${scaleType} scale on ${rootNote.name} -> ${display}`);
+//   playNotes(scale, 200, ascending);
+// }
+
+/** Wrapper function for playNotes() to make playing a scale more intuitive.
+ * @param {Note} rootNote - Note to build the scale on.
+ * @param {number} scaleType - An index to select from [
+    "Major (Ionian)",
+    "Natural Minor (Aeolian)",
+    "Harmonic Minor",
+    "Dorian",
+    "Phygian",
+    "Lydian",
+    "Mixolydian",
+    "Locrian",
+  ]. Must match values in getScaleMap().
+ * @param {boolean} ascending - Play the scale in ascending or descending order.
+ * @returns {string} A string describing the scale type.
  */
-function playScale(rootNote, scaleType, ascending=true) {
-  let scale = makeScale(rootNote, scaleType);
-  let display = [];
-  scale.forEach(note => {
-    display.push(note.name);
-  });
-  console.log(`Playing ${scaleType} scale on ${rootNote.name} -> ${display}`);
-  playNotes(scale, 200, ascending);
+ export function playScale(rootNote, scaleType, ascending=true) {
+  let scaleMap = getScaleMap(scaleType);
+  if (scaleMap == undefined) {console.error(`invalid scale type: ${scaleType}`); return;} // guard condition
+  let scale = makeScale(rootNote, scaleMap);
+
+  if ( DEMO ) {
+    // let display = scale.map((note) => (note.name))
+    let display = []; // Used to console.log the scale.
+    scale.forEach(note => {
+      display.push(note.name);
+    });
+    console.log(`Playing ${scaleMap[0]} scale on ${rootNote.name} -> ${display}`);
+  }
+  playNotes(scale, 500, ascending, false); // Set delay between notes here.
+  return scaleMap[0];
+  // return scaleType;
 }
