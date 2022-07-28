@@ -1,23 +1,7 @@
-// import * as piano from "./test";
-// console.log('piano', piano)
-// piano.test();
-import sound from "./piano-wav/C3.wav"
-// console.log('sound (C3): ', sound)
-console.log(`sound (C3): ${sound}, type: ${typeof sound}`)
-const C3 = new Audio(sound)
-
-// let s = "A3.wav";
-// let p = import("./piano-wav/" + s).then( (asdf) => console.log('asdf', asdf))
-// console.log('p', p)
-
-// const s = "A3.wav";
-// const p = await import("./piano-wav/" + s).then( (asdf) => console.log('asdf', asdf))
-// console.log('p', p)
-
-
+import { Sounds } from "./piano-wav/exportSounds";
 
 const notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
-const pathToFolder = "./piano-wav/"; // Where all samples are stored. Lowest note available: C1. Highest note available: C8.
+// const pathToFolder = "./piano-wav/"; // Where all samples are stored. Lowest note available: C1. Highest note available: C8.
 let audioObjects = []; // Global list to keep track of all sounds currently playing
 let repeatMap; // Global variable to remember most recently played.
 
@@ -32,7 +16,6 @@ class Note {
 
   static min = 2;
   static max = 4;
-  static #pathToFolder = "./piano-wav/";
 
   /** Create a Note object from a note name. 
    * If one isn't given, a random note is generated.
@@ -42,7 +25,7 @@ class Note {
   constructor(noteName) {
     if (noteName === undefined) {
       this.letterIndex = getRandomInt(12); // 12 notes in western scale
-      this.octave = Note.getRandomOctave(Note.min, Note.max);
+      this.octave = Note.#getRandomOctave(Note.min, Note.max);
       this.letter = notes[this.letterIndex];
       this.name = this.letter + this.octave;
     }
@@ -55,11 +38,12 @@ class Note {
   }
 
   /** Pick a random octave for a new note.
+   * @private This should only be used by the constructor.
    * @param {number} min - lowest possible octave
    * @param {number} max - highest possible octave
    * @returns {number} A number between min and max representing an octave.
    */
-  static getRandomOctave(min, max) {
+  static #getRandomOctave(min, max) {
     return Math.floor(Math.random() * max) + min;
   }
 
@@ -67,64 +51,17 @@ class Note {
    * @returns {Promise} A Promise which is resolved when playback has been started, or is rejected if for any reason playback cannot be started.
    */
   play() {
-    // let path = pathToFolder + this.name + ".wav";
-    // console.log(path);
-    // let audio = new Audio(path); // old way
-    // new way
-    
-    // let wavSrc = process.env.PUBLIC_URL + props.sounds[props.currentSoundIndex].wav;
-
-    
-    // let testing;
-    // import("./test").then()
-    // console.log('test()', );
-    // let fileName = this.name + ".wav";
-    // let audio;
-    // let pianoSounds = import(pathToFolder);
-    // console.log('pianoSounds', pianoSounds)
-    // audio = new Audio(pianoSounds.fileName)
-    // console.log('audio: ', audio)
-
-    // let audio = new Audio(sound)
-    // console.log('audio: ', audio)
-
-    // console.log("\tCalling play()")
-    return Note.#makeAudio(this.name).then( (newAudioElement) => {
-      // console.log(`play(): newAudioElement ${newAudioElement}, typeof: ${typeof newAudioElement}`)
-      let p = newAudioElement.play().then(() => {
-                console.log("play(): nice!");
-              }).catch(() => {
-                console.log('play(): uh oh');
-              });
-      audioObjects.push(newAudioElement);
-      return p;
-    } ).catch((err) => {
-          console.error(`From Note.#makeAudio(noteName): ${err}`);
-        });
-    
-
-    // let audio = this.makeAudio();
-    // console.log('audio: ', audio)
-    // let p = audio.play().then(() => {console.log("nice!")}).catch(() => {console.log('uh oh')});
-    // audioObjects.push(audio);
-    // return p;
-  }
-
-  static async #makeAudio(noteName) {
-
-    const nameInFS = await import(pathToFolder + noteName + ".wav").then( (module) => {
-      // console.log('makeAudio: returning module.default', module.default);
-      return module.default;
-    }).catch(() => {
-      console.error('In makeAudio(noteName): Path not found!');
-    });
-    // console.log('makeAudio: nameInFS', nameInFS)
-
-    const audioHTMLElement = new Audio(nameInFS);
-    // console.log(`makeAudio: audioHTMLElement ${audioHTMLElement}, typeof ${typeof audioHTMLElement}`)
-    
-    // let p = audioHTMLElement.play().then(() => {console.log("makeAudio: nice!")}).catch(() => {console.log('makeAudio: uh oh')});
-    return audioHTMLElement;
+    let newAudioElement = new Audio(Sounds[this.name]);
+    console.log(`play(${this.name}): newAudioElement: ${newAudioElement}`);
+    audioObjects.push(newAudioElement);
+    let p = newAudioElement.play() // returning a Promise
+      // .then( () => {
+      //   console.log(`play(${this.name}): nice!`);
+      // })
+      // .catch( (err) => {
+      //   console.error(`play(${this.name}): uh oh \n`, err);
+      // });
+    return p;
   }
 }
 
@@ -142,15 +79,11 @@ function stopAll() {
   }
 }
 
-// //? Convert html to this?
-// document.getElementById('stopButton').addEventListener('click', () => {
-//   stopAll();
-// });
-
-function playRandomNote() {
+export function playRandomNote() {
   let note = new Note();
   console.log(`Playing ${note.name}`);
   note.play();
+  return note.name;
 }
 
 function getRandomIntervalMap() {
