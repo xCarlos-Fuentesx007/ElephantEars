@@ -138,13 +138,31 @@ function getRandomInt(max) {
 }
 
 /** Pause and delete all Notes currently playing.
+ * 
  * This works by iterating through the global audioObjects list.
+ * @Returns {Promise} A Promise that resolves when every audio element is paused.
  */
-function stopAll() {
+export function stopAll() {
 
-  while (audioObjects.length > 0) {
-    audioObjects.pop().pause();
-  }
+  let p = new Promise( (resolve, reject) => {
+    if (audioObjects == undefined) {audioObjects = []; resolve()}
+    
+    // Stop all audio.
+    while (audioObjects.length > 0) {
+      audioObjects.pop().pause();
+    }
+
+    // Make sure there's no audio elements left.
+    if (audioObjects.length == 0) {
+      resolve();
+    }
+    else {
+      console.error('stopAll(): Unable to pause all audio elements');
+      reject();
+    }
+  })
+
+  return p; // Todo: Rewrite references to stopAll() to take advantage of returned Promise.
 }
 
 export function playRandomNote() {
@@ -540,25 +558,13 @@ function getChordProgessionMap(chordProgressionAsSymbols=['I', 'III', 'V']) {
   if (chordProgMap == undefined) chordProgMap = getChordProgessionMap();
 
   // Describe and display the chord progression during the demo.
-  if ( DEMO ) {
-    // let displayChordSymbols = [];
-    // chordProgressionAsSymbols.forEach(symbol => {
-    //   displayChordSymbols.push(symbol);
-    // });
-    // console.log(`${displayChordSymbols} on ${rootNote.name}`)
-    console.log(`${chordProgressionAsSymbols} on ${rootNote.name}`)
-  }
+  if ( DEMO ) { console.log(`${chordProgressionAsSymbols} on ${rootNote.name}`) }
 
   // Generate the set of chords to play based on the progression and root note.
-  let newChordProgression = [];
+  let newChordProgression = []; // This is a list of chords where each chord ->[Note, symbol].
   chordProgMap.forEach(chordSymbolMap => {
-    // let nextNoteIndex = rootNote.letterIndex + chordSymbolMap[0]; // Calculate the next chord's root note letter name and get its index in `notes`
-    // let nextNote = new Note( (nextNoteIndex < 12)
-    //   ? notes[nextNoteIndex] + rootNote.octave
-    //   : notes[nextNoteIndex % 12] + (rootNote.octave + 1)
-    // )
     let nextNote = rootNote.nextNote(chordSymbolMap[0]);
-    newChordProgression.push([nextNote, chordSymbolMap[1]]); // Add the finished chord (root note, chord map) to the chord progression
+    newChordProgression.push([nextNote, chordSymbolMap[1]]); // Add the finished chord (root note, chord symbol) to the chord progression
   });
 
   // Play the new chord progression.

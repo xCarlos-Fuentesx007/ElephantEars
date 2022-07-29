@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 import { DEMO } from "../pages/Exercise.js";
-import {Note, playInterval, getIntervalMap, getChordMap, playChord, getScaleMap, playScale, getRandomKey, getChordProgessionMap, playChordProgression} from "./pianoSounds/pianoSounds.js";
+import {Note, playInterval, getIntervalMap, getChordMap, playChord, getScaleMap, playScale, getRandomKey, getChordProgessionMap, playChordProgression, stopAll} from "./pianoSounds/pianoSounds.js";
 // import {playRandomNote} from "./pianoSounds/pianoSounds.js";
 
 
@@ -167,11 +167,18 @@ function Scale_Degrees(first_note, answer_note) {
   let rootNote = Note.numberToNote(first_note);
   let answerNote = Note.numberToNote(answer_note);
 
-  let chordProgressionAsSymbols = ['I', 'III', 'V', 'I']; // Play the I, III, V, and I chord. 
-  // let chordProgressionMap = getChordProgessionMap(chordProgressionAsSymbols);
+  // let chordProgressionAsSymbols = ['I', 'III', 'V', 'I']; // Play the I, III, V, and I chord. 
+  let chordProgressionAsSymbols = ['I', 'IV', 'V', 'I']; // Play the I, IV, V, and I chord. 
   let delay = 1100;
   playChordProgression(rootNote, chordProgressionAsSymbols, delay);
-  setTimeout( () => {answerNote.play()}, delay * (chordProgressionAsSymbols.length + .8)); // Wait until the chords are done playing to play the answer note.
+  setTimeout( () => {
+    stopAll().then( () => {
+      // console.log('All audio paused.')
+      answerNote.play();
+    }).catch( () => {
+      console.error('In toneFunctions.js: stopAll() failed.');
+    });    
+  }, delay * (chordProgressionAsSymbols.length + 1)); // Wait until the chords are done playing to play the answer note.
 
   // // Make the I, III, and V chord.
   // var chords1 = make_chord(first_note, 0);
