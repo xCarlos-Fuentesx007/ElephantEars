@@ -146,6 +146,8 @@ const Exercise = () => {
     percentageHandler,
     correctAnswers,
     incorrectAnswers,
+    currQuestion,
+    numQuestions,
     answersHandler,
     campaignRunning,
     runCampaign,
@@ -199,11 +201,15 @@ const Exercise = () => {
     if (correctAnswers === 0 && incorrectAnswers === 0) {
       percentageHandler(0);
     } else {
-      percentageHandler(
-        (correctAnswers / (correctAnswers + incorrectAnswers)) * 100
-      );
+      percentageHandler((currQuestion / numQuestions) * 100);
     }
-  }, [correctAnswers, incorrectAnswers, percentageHandler]);
+  }, [
+    correctAnswers,
+    incorrectAnswers,
+    percentageHandler,
+    currQuestion,
+    numQuestions,
+  ]);
 
   const exerciseMaker = () => {
     if (answerData.name === "Intervals") {
@@ -254,6 +260,7 @@ const Exercise = () => {
       setAnswer(answerValue);
     } else if (answerData.name === "Perfect Pitch") {
       const answerValue = Perfect_Pitch(first_note);
+      console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Chords") {
       const answerValue = Chords(first_note, chord_type);
@@ -690,29 +697,32 @@ const Exercise = () => {
                   <AnswerButtonGroup />
                 )}
               </Grid>
-              <Grid item xs={11}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Box sx={{ width: "100%", mr: 2 }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={percentage}
-                      sx={{
-                        height: 15,
-                        borderRadius: 5,
-                        backgroundColor: "#C4C4C4 ",
-                        "& .MuiLinearProgress-barColorPrimary": {
-                          backgroundColor: "#00B227",
-                        },
-                      }}
-                    />
+              {campaignRunning ? (
+                <Grid item xs={11}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box sx={{ width: "100%", mr: 2 }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={percentage}
+                        sx={{
+                          height: 15,
+                          borderRadius: 5,
+                          backgroundColor: "#C4C4C4 ",
+                          "& .MuiLinearProgress-barColorPrimary": {
+                            backgroundColor: "#00B227",
+                          },
+                        }}
+                      />
+                    </Box>
+                    <Box sx={{ minWidth: 35 }}>
+                      <Typography component="h1" variant="body2">
+                        {percentage.toFixed(2)}%
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Box sx={{ minWidth: 35 }}>
-                    <Typography component="h1" variant="body2">
-                      {percentage.toFixed(2)}%
-                    </Typography>
-                  </Box>
-                </Box>
-              </Grid>
+                </Grid>
+              ) : null}
+
               <Grid item xs={12} sx={{ marginTop: 2 }}>
                 <Container>
                   <Grid container alignItems="center">

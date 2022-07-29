@@ -137,9 +137,6 @@ const sampleSchedule = new Queue([
   "Intervals",
   "Chord Progressions",
   "Perfect Pitch",
-  "Intervals",
-  "Chord Progressions",
-  "Perfect Pitch",
 ]); // hard coded
 
 const sampleSchedule2 = new Queue(["Intervals", "Chords"]);
@@ -157,7 +154,10 @@ export const AuthContext = React.createContext({
   answerData: undefined,
   startedDate: undefined,
   campaignRunning: false,
+  fromCampaign: false,
   schedule: undefined,
+  currQuestion: 0,
+  numQuestions: 0,
   exerciseHandler: (exerciseValue) => {},
   percentageHandler: (percentageValue) => {},
   answersHandler: (correctAnswersValue, incorrectAnswersValue) => {},
@@ -171,6 +171,7 @@ export const AuthContext = React.createContext({
   statsData: "",
   runCampaign: () => {},
   stopCampaign: () => {},
+  resetNumQuestions: () => {},
 });
 
 const AuthContextProvider = (props) => {
@@ -186,9 +187,11 @@ const AuthContextProvider = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState();
   const [campaignRunning, setCampaignRunning] = useState(false);
+  const [fromCampaign, setFromCampaign] = useState(false);
   const [schedule, setSchedule] = useState(sampleSchedule);
-
   const [stats, set_stats] = useState("err");
+  const [currQuestion, setCurrQuestion] = useState(-1);
+  const [numQuestions, setNumQuestions] = useState(0);
 
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("userData"));
@@ -374,14 +377,31 @@ const AuthContextProvider = (props) => {
   };
 
   const runCampaign = () => {
+    if (!campaignRunning) {
+      setCurrQuestion(0);
+      setNumQuestions(schedule.getSize());
+    }
+    if (campaignRunning) {
+      setCurrQuestion(currQuestion + 1);
+    }
     setCampaignRunning(true);
     exerciseHandler(schedule.dequeue());
   };
 
   const stopCampaign = () => {
     setCampaignRunning(false);
+    setFromCampaign(true);
     // eventually needs to be newly generated schedule
     setSchedule(sampleSchedule2);
+  };
+
+  const resetNumQuestions = () => {
+    setNumQuestions(0);
+    setCurrQuestion(0);
+    setPercentage(0);
+    setCorrectAnswers(0);
+    setIncorrectAnswers(0);
+    setFromCampaign(false);
   };
 
   return (
@@ -397,7 +417,10 @@ const AuthContextProvider = (props) => {
         incorrectAnswers: incorrectAnswers,
         startedDate: startedDate,
         campaignRunning: campaignRunning,
+        fromCampagin: fromCampaign,
         schedule: schedule,
+        currQuestion: currQuestion,
+        numQuestions: numQuestions,
         answersHandler: answersHandler,
         percentageHandler: percentageHandler,
         exerciseHandler: exerciseHandler,
@@ -413,6 +436,7 @@ const AuthContextProvider = (props) => {
         statsData: stats,
         runCampaign: runCampaign,
         stopCampaign: stopCampaign,
+        resetNumQuestions: resetNumQuestions,
       }}
     >
       {props.children}
