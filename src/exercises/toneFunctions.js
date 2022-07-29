@@ -1,79 +1,105 @@
 import * as Tone from "tone";
+import {Note, playInterval, getIntervalMap, getChordMap, playChord, playScale, playChordProgression, stopAll} from "./pianoSounds/pianoSounds.js";
+
 
 function Intervals(first_note, interval) {
+  // console.log(`first_note: ${first_note}, interval: ${interval}`);
 
-  const synth = new Tone.Synth().toDestination();
+  let noteName = Note.notes[first_note%12] + (Math.trunc(first_note/12) + 2);
+  // console.log('noteName', noteName)
+  let rootNote = new Note(noteName);
+  let intervalMap = getIntervalMap(interval);
 
-  var second_note = first_note + interval;
+  // const synth = new Tone.Synth().toDestination();
 
-  synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
-  synth.triggerAttackRelease(find_note(second_note), "4n", Tone.now() + 0.8);
+  // var second_note = first_note + interval;
 
-  return find_interval(interval);
+  // synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
+  // synth.triggerAttackRelease(find_note(second_note), "4n", Tone.now() + 0.8);
+
+  // return find_interval(interval);
+
+  let intervalName = playInterval(rootNote, intervalMap, true);
+  return intervalName;
 }
 export { Intervals };
 
+
 function Chords(first_note, chord_type) {
-  const synth = new Tone.PolySynth().toDestination();
-  var chord = make_chord(first_note, chord_type);
-  synth.triggerAttackRelease(chord, "4n", Tone.now());
-  return find_chord_type(chord_type);
+  // const synth = new Tone.PolySynth().toDestination();
+  // var chord = make_chord(first_note, chord_type);
+  // synth.triggerAttackRelease(chord, "4n", Tone.now());
+  // return find_chord_type(chord_type);
+
+  let rootNote = Note.numberToNote(first_note);
+  let chordMap = getChordMap(chord_type);
+  playChord(rootNote, chordMap);
+  
+  return chordMap[0] // returning the name
 }
 export { Chords };
 
 function Scales(first_note, scale_type) {
 
-  const synth = new Tone.Synth().toDestination();
-  var scale = [0, 0, 0, 0, 0, 0, 0, 0];
-  var i;
+  let rootNote = Note.numberToNote(first_note);
+  let scaleType = playScale(rootNote, scale_type);
 
-  switch (scale_type) {
-    //Major (Ionian)
-    case 0:
-      scale = [0,2,2,1,2,2,2,1]; // W W H W W W H
-      break;
-    //Natural Minor (Aeolian)
-    case 1:
-      scale = [0,2,1,2,2,1,2,2]; //W H W W H W W
-      break;
-    //Harmonic Minor
-    case 2:
-      scale = [0,2,1,2,2,1,3,1]; //W H W W H W+1/2 H
-      break;
-    //Dorian
-    case 3:
-      scale = [0,2,1,2,2,2,1,2]; //W H W W W H W
-      break;
-    //Phrygian
-    case 4:
-      scale = [0,1,2,2,2,1,2,2]; //H W W W H W W
-      break;
-    //Lydian
-    case 5:
-      scale = [0,2,2,2,1,2,2,1]; //W W W H W W H
-      break;
-    //Mixolydian
-    case 6:
-      scale = [0,2,2,1,2,2,1,2]; //W W H W W H W
-      break;
-    //Locrian
-    case 7:
-      scale = [0,1,2,2,1,2,2,2]; //H W W H W W W
-      break;
-    //Error
-    default:
-      break;
-  }
+  return scaleType;
 
-  for (i=1; i<8; i++) {
-    scale[i] = scale[i-1] + scale[i];
-  }
+  // const synth = new Tone.Synth().toDestination();
+  // var scale = [0, 0, 0, 0, 0, 0, 0, 0];
+  // var i;
 
-  for (i=0; i<8; i++) {
-    synth.triggerAttackRelease(find_note(scale[i] + first_note), "4n", Tone.now() + (.8 * i));
-  }
+  // switch (scale_type) {
+  //   //Major (Ionian)
+  //   case 0:
+  //     scale = [0,2,2,1,2,2,2,1]; // W W H W W W H
+  //     break;
+  //   //Natural Minor (Aeolian)
+  //   case 1:
+  //     scale = [0,2,1,2,2,1,2,2]; //W H W W H W W
+  //     break;
+  //   //Harmonic Minor
+  //   case 2:
+  //     scale = [0,2,1,2,2,1,3,1]; //W H W W H W+1/2 H
+  //     break;
+  //   //Dorian
+  //   case 3:
+  //     scale = [0,2,1,2,2,2,1,2]; //W H W W W H W
+  //     break;
+  //   //Phygian
+  //   case 4:
+  //     scale = [0,1,2,2,2,1,2,2]; //H W W W H W W
+  //     break;
+  //   //Lydian
+  //   case 5:
+  //     scale = [0,2,2,2,1,2,2,1]; //W W W H W W H
+  //     break;
+  //   //Mixolydian
+  //   case 6:
+  //     scale = [0,2,2,1,2,2,1,2]; //W W H W W H W
+  //     break;
+  //   //Locrian
+  //   case 7:
+  //     scale = [0,1,2,2,1,2,2,2]; //H W W H W W W
+  //     break;
+  //   //Error
+  //   default:
+  //     break;
+  // }
 
-  return find_scale_type(scale_type);
+  // for (i=1; i<8; i++) {
+  //   scale[i] = scale[i-1] + scale[i];
+  // }
+
+  // for (i=0; i<8; i++) {
+  //   synth.triggerAttackRelease(find_note(scale[i] + first_note), "4n", Tone.now() + (.8 * i));
+  // }
+
+  // let st = find_scale_type(scale_type);
+  // console.log(`Scales is returning find_scale_type(scale_type): ${st}`);
+  // return st;
+  // return find_scale_type(scale_type);
 
 }
 export { Scales };
@@ -94,23 +120,89 @@ function Chord_Progressions(first_note, progression_types) {
 export {Chord_Progressions}
 
 function Perfect_Pitch(first_note) {
-  const synth = new Tone.Synth().toDestination();
-  synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
-  return find_pitch(first_note);
+  
+  const nameDictionary = {
+    "C3" : "C3", 
+    "C#3" : "Cs3", 
+    "D3" : "D3", 
+    "D#3" : "Ds3", 
+    "E3" : "E3", 
+    "F3" : "F3", 
+    "F#3" : "Fs3", 
+    "G3" : "G3", 
+    "G#3" : "Gs3", 
+    "A3" : "A3", 
+    "A#3" : "As3", 
+    "B3" : "B3", 
+    "C4" : "C4", 
+    "C#4" : "Cs4", 
+    "D4" : "D4", 
+    "D#4" : "Ds4", 
+    "E4" : "E4", 
+    "F4" : "F4", 
+    "F#4" : "Fs4", 
+    "G4" : "G4", 
+    "G#4" : "Gs4", 
+    "A4" : "A4", 
+    "A#4" : "As4", 
+    "B4" : "B4", 
+    "C5" : "C5", 
+    "C#5" : "Cs5", 
+    "D5" : "D5", 
+    "D#5" : "Ds5", 
+    "E5" : "E5", 
+    "F5" : "F5", 
+    "F#5" : "Fs5", 
+    "G5" : "G5", 
+    "G#5" : "Gs5", 
+    "A5" : "A5", 
+    "A#5" : "As5", 
+    "B5" : "B5",   
+  }
+
+  let key = find_pitch(first_note%12);
+  let noteName = nameDictionary[key];
+  let note = new Note(noteName);
+  note.play();
+  return key;
+
+  // const synth = new Tone.Synth().toDestination();
+  // synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
+  // return find_pitch(first_note);
 }
 export { Perfect_Pitch };
 
 function Scale_Degrees(first_note, answer_note) {
-  var chords1 = make_chord(first_note, 0);
-  var chords2 = make_chord(first_note + 4, 0);
-  var chords3 = make_chord(first_note + 7, 0);
 
-  const synth = new Tone.PolySynth().toDestination();
-  synth.triggerAttackRelease(chords1, "4n", Tone.now());
-  synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
-  synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
-  synth.triggerAttackRelease(chords1, "4n", Tone.now() + 2.4);
-  synth.triggerAttackRelease(find_note(answer_note), "4n", Tone.now() + 4);
+  let rootNote = Note.numberToNote(first_note);
+  let answerNote = Note.numberToNote(answer_note);
+
+  // let chordProgressionAsSymbols = ['I', 'III', 'V', 'I']; // Play the I, III, V, and I chord. 
+  let chordProgressionAsSymbols = ['I', 'IV', 'V', 'I']; // Play the I, IV, V, and I chord. 
+  let delay = 1100;
+  playChordProgression(rootNote, chordProgressionAsSymbols, delay);
+  setTimeout( () => {
+    stopAll().then( () => {
+      // console.log('All audio paused.')
+      answerNote.play();
+    }).catch( () => {
+      console.error('In toneFunctions.js: stopAll() failed.');
+    });    
+  }, delay * (chordProgressionAsSymbols.length + 1)); // Wait until the chords are done playing to play the answer note.
+
+  // // Make the I, III, and V chord.
+  // var chords1 = make_chord(first_note, 0);
+  // var chords2 = make_chord(first_note + 4, 0);
+  // var chords3 = make_chord(first_note + 7, 0);
+  
+  // // Play the I, III, V, and I chord. Then play the answer note.
+  // const synth = new Tone.PolySynth().toDestination();
+  // synth.triggerAttackRelease(chords1, "4n", Tone.now());
+  // synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
+  // synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
+  // synth.triggerAttackRelease(chords1, "4n", Tone.now() + 2.4);
+  // synth.triggerAttackRelease(find_note(answer_note), "4n", Tone.now() + 4);
+
   return find_scale_degree(first_note, answer_note);
 }
 export { Scale_Degrees };
