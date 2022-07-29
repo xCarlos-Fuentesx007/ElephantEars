@@ -1,4 +1,5 @@
 import { Sounds } from "./piano-wav/exportSounds";
+import Silent from "./piano-wav/silent.wav"; // Used in Note.quickPlay() hack.
 import { DEMO } from "../../pages/Exercise";
 
 // const notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B']; // Dead code: transferred this to Notes class as static object.
@@ -19,6 +20,7 @@ export class Note {
   static min = 2;
   static max = 4;
   static notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
+  static Silence = new Audio(Silent); // Used in Note.quickPlay() hack.
 
   /** Create a Note object from a note name. 
    * If one isn't given, a random note is generated.
@@ -65,6 +67,31 @@ export class Note {
       //   console.error(`play(${this.name}): uh oh \n`, err);
       // });
     return p;
+  }
+
+  /** Use this to (hopefully) avoid lag between notes when playing a chord.
+   * 
+   * This is faster is because it separates out all work besides HTMLMediaElement.play() 
+   * into a previous for-loop. This was meant to fix the lag issue between the 1st and 2nd note that 
+   * sometimes occurs when playing chords with playChord() but it didn't seem to work even though in theory this
+   * should be faster. So, I also made the first "note" silence so that the lag between the 1st and 2nd note
+   * wouldn't be noticed. Still this only works half the time.
+   * @param {Array<Note>} listOfNoteObjects
+   * @returns {Promise} A promise that resolves when the last note in the list begins playback.
+   */
+  static quickPlay(listOfNoteObjects) {
+    let chord = [Note.Silence];
+    listOfNoteObjects.forEach(note => {
+      let ele = note.audioElement;
+      chord.push(ele);
+      audioObjects.push(ele);
+    });
+    
+    let lastIndex = chord.length-1;
+    for (let i = 0; i < lastIndex; i++) {
+      chord[i].play();
+    }
+    return chord[lastIndex].play(); 
   }
 
   /** Silence the note. */
@@ -368,15 +395,10 @@ function playSoundRecursiveDescending(playing, i, delay=750, sustain) {
   
   // Play the chord.
   if (arpeggiate) {
-    // console.log("got here")
     playNotes(playing, 750, ascending);
   }
   else {
-    let p;
-    playing.forEach(note => {
-      p = note.play();
-    });
-    return p;
+    return Note.quickPlay(playing);
   }
 }
 
