@@ -29,41 +29,13 @@ const Dashboard = () => {
     set_scale_degree_data(data.scale_degrees);
     set_IIC_data(data.intervals_in_context);
     set_melodic_dictation_data(data.melodic_dictation);
-
+    
     return;
-  };
-
-  const Button1 = () => {
-    return (
-      <Button
-        variant="contained"
-        onClick={() => {
-          LoadData();
-        }}
-      >
-        Pull Data
-      </Button>
-    );
-  };
-
-  const Button2 = () => {
-    return (
-      <Button
-        variant="contained"
-        onClick={() => {
-          console.log(statsData);
-        }}
-      >
-        s Data
-      </Button>
-    );
   };
 
   return (
     <Fragment>
       <Navbar />
-      <Button1 />
-      <Button2 />
       <Container>
         <Typography
           variant="h4"
@@ -131,11 +103,7 @@ const Dashboard = () => {
               </div>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Grid
-                container
-                spacing={1}
-                sx={{ justifyContent: "center", alignItems: "center" }}
-              >
+              <Grid container spacing={1}>
                 <Grid item xs={4}>
                   <CircularProgressBar
                     percentage={intervals_data.totalAccuracy} //This will be changed to statsData.intervals.totalAccuracy
@@ -145,67 +113,57 @@ const Dashboard = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
-                    percentage={chords_data.totalAccuracy} //also changed
+                    percentage={chords_data.totalAccuracy}  //also changed
                     title="Chords"
-                    color="#05b0fa"
+                    color="#1E96FC"
                   />
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
                     percentage={scales_data.totalAccuracy}
                     title="Scales"
-                    color="#03a66d"
+                    color="#3DDC97"
                   />
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
                     percentage={pitch_data.totalAccuracy}
                     title="Pitch"
-                    color="#fa708f"
+                    color="#DA627D"
                   />
                 </Grid>
                 <Grid item xs={4}>
-                  {/* <CircularProgressBar
+                  <CircularProgressBar
                     percentage="100"
                     title="Mastery"
                     color="#00B227"
-                  /> */}
-                  <Typography
-                    component="h5"
-                    variant="h5"
-                    textAlign="center"
-                    color="primary"
-                    sx={{ mb: 4 }}
-                  >
-                    Your Total Accuracy
-                  </Typography>
+                  />
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
                     percentage={chord_progression_data.totalAccuracy}
                     title="Chords Progression"
-                    color="#FF6D33"
+                    color="#FCA17D"
                   />
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
                     percentage={scale_degree_data.totalAccuracy}
                     title="Scale Degrees"
-                    color="#009bb0"
+                    color="#00B2A8"
                   />
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
                     percentage={IIC_data.totalAccuracy}
                     title="Intervals in Context"
-                    color="#d9a300"
+                    color="#EAD637"
                   />
                 </Grid>
                 <Grid item xs={4}>
                   <CircularProgressBar
                     percentage={melodic_dictation_data.totalAccuracy}
                     title="Melodic Dictation"
-                    color="#9D70FF"
                   />
                 </Grid>
               </Grid>
