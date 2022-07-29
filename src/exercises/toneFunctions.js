@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 import { DEMO } from "../pages/Exercise.js";
-import {Note, playInterval, getIntervalMap, getChordMap, playChord, getScaleMap, playScale, getRandomKey} from "./pianoSounds/pianoSounds.js";
+import {Note, playInterval, getIntervalMap, getChordMap, playChord, getScaleMap, playScale, getRandomKey, getChordProgessionMap, playChordProgression} from "./pianoSounds/pianoSounds.js";
 // import {playRandomNote} from "./pianoSounds/pianoSounds.js";
 
 
@@ -163,16 +163,29 @@ function Perfect_Pitch(first_note) {
 export { Perfect_Pitch };
 
 function Scale_Degrees(first_note, answer_note) {
-  var chords1 = make_chord(first_note, 0);
-  var chords2 = make_chord(first_note + 4, 0);
-  var chords3 = make_chord(first_note + 7, 0);
 
-  const synth = new Tone.PolySynth().toDestination();
-  synth.triggerAttackRelease(chords1, "4n", Tone.now());
-  synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
-  synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
-  synth.triggerAttackRelease(chords1, "4n", Tone.now() + 2.4);
-  synth.triggerAttackRelease(find_note(answer_note), "4n", Tone.now() + 4);
+  let rootNote = Note.numberToNote(first_note);
+  let answerNote = Note.numberToNote(answer_note);
+
+  let chordProgressionAsSymbols = ['I', 'III', 'V', 'I']; // Play the I, III, V, and I chord. 
+  // let chordProgressionMap = getChordProgessionMap(chordProgressionAsSymbols);
+  let delay = 1100;
+  playChordProgression(rootNote, chordProgressionAsSymbols, delay);
+  setTimeout( () => {answerNote.play()}, delay * (chordProgressionAsSymbols.length + .8)); // Wait until the chords are done playing to play the answer note.
+
+  // // Make the I, III, and V chord.
+  // var chords1 = make_chord(first_note, 0);
+  // var chords2 = make_chord(first_note + 4, 0);
+  // var chords3 = make_chord(first_note + 7, 0);
+  
+  // // Play the I, III, V, and I chord. Then play the answer note.
+  // const synth = new Tone.PolySynth().toDestination();
+  // synth.triggerAttackRelease(chords1, "4n", Tone.now());
+  // synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
+  // synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
+  // synth.triggerAttackRelease(chords1, "4n", Tone.now() + 2.4);
+  // synth.triggerAttackRelease(find_note(answer_note), "4n", Tone.now() + 4);
+
   return find_scale_degree(first_note, answer_note);
 }
 export { Scale_Degrees };
