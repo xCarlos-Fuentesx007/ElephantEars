@@ -33,6 +33,9 @@ import {
   Melodic_Dictation,
 } from "../exercises/toneFunctions";
 
+import { stopAll } from "../exercises/pianoSounds/pianoSounds";
+export const DEMO = true; // Use for console logging answers during demo.
+
 const sfx = {
   correct: new Howl({
     src: Correct,
@@ -41,8 +44,6 @@ const sfx = {
     src: Wrong,
   }),
 };
-
-export const DEMO = true; // Use for console logging answers during demo.
 
 const DisplayErr = (errorCode, correctOption) => {
   switch (errorCode) {
@@ -868,6 +869,7 @@ const Exercise = () => {
                               setErrorIdx(0);
                             }
                           }
+                          stopAll();
                         }}
                       >
                         Continue
