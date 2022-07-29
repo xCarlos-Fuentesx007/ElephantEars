@@ -136,6 +136,7 @@ const Exercise = () => {
   const authCtx = useContext(AuthContext);
   const [answer, setAnswer] = useState();
   const [answers, setAnswers] = useState([]);
+  const [answers2, setAnswers2] = useState([]);
 
   const [isExitVisible, setIsExitVisible] = useState(false);
   let navigate = useNavigate();
@@ -502,6 +503,14 @@ const Exercise = () => {
 
   const IntervalsInContextAnswerButtonGroup = () => {
     const answers = answerData.answers;
+    var answers2;
+
+    if (answerData.name === "Intervals In Context") {
+      answers2 = answerData.answers2;
+    } else {
+      answers2 = answers;
+    }
+
     return (
       <Grid
         container
@@ -518,72 +527,78 @@ const Exercise = () => {
         <Grid item xs={2}>
           <Typography variant="body1">Note 1:</Typography>
         </Grid>
-        {answers.map((type) => (
-          <Grid item xs={2} key={type}>
-            <Button
-              variant={multiActive[0] === type ? "contained" : "outlined"}
-              disabled={
-                (clickCount ? true : false) && !(type === multiActive[0])
-              }
-              onClick={() => {
-                if (isSoundPlayed) {
-                  updateMultiAnswers(0, type);
-                  setIsMultiAnswerFalse([false, false, false]);
-                  setIsMultiAnswerTrue([false, false, false]);
+
+        <Grid container item columns={12}>
+          {answers.map((type) => (
+            <Grid item xs={2} key={type}>
+              <Button
+                variant={multiActive[0] === type ? "contained" : "outlined"}
+                disabled={
+                  (clickCount ? true : false) && !(type === multiActive[0])
                 }
-              }}
-              sx={{
-                textTransform: "none",
-                width: "100%",
-                bgcolor:
-                  multiActive[0] === type
-                    ? isMultiAnswerTrue[0]
-                      ? "green"
-                      : "" || isMultiAnswerFalse[0]
-                      ? "red"
-                      : ""
-                    : "white",
-              }}
-            >
-              {type}
-            </Button>
-          </Grid>
-        ))}
+                onClick={() => {
+                  if (isSoundPlayed) {
+                    updateMultiAnswers(0, type);
+                    setIsMultiAnswerFalse([false, false, false]);
+                    setIsMultiAnswerTrue([false, false, false]);
+                  }
+                }}
+                sx={{
+                  textTransform: "none",
+                  width: "100%",
+                  bgcolor:
+                    multiActive[0] === type
+                      ? isMultiAnswerTrue[0]
+                        ? "green"
+                        : "" || isMultiAnswerFalse[0]
+                        ? "red"
+                        : ""
+                      : "white",
+                }}
+              >
+                {type}
+              </Button>
+            </Grid>
+          ))}
+        </Grid>
 
         <Grid item xs={2}>
           <Typography variant="body1">Note 2:</Typography>
         </Grid>
-        {answers.map((type) => (
-          <Grid item xs={2} key={type}>
-            <Button
-              variant={multiActive[1] === type ? "contained" : "outlined"}
-              disabled={
-                (clickCount ? true : false) && !(type === multiActive[1])
-              }
-              onClick={() => {
-                if (isSoundPlayed) {
-                  updateMultiAnswers(1, type);
-                  setIsMultiAnswerFalse([false, false, false]);
-                  setIsMultiAnswerTrue([false, false, false]);
+
+        <Grid container item columns={12}>
+          {answers.map((type) => (
+            <Grid item xs={2} key={type}>
+              <Button
+                variant={multiActive[1] === type ? "contained" : "outlined"}
+                disabled={
+                  (clickCount ? true : false) && !(type === multiActive[1])
                 }
-              }}
-              sx={{
-                textTransform: "none",
-                width: "100%",
-                bgcolor:
-                  multiActive[1] === type
-                    ? isMultiAnswerTrue[1]
-                      ? "green"
-                      : "" || isMultiAnswerFalse[1]
-                      ? "red"
-                      : ""
-                    : "white",
-              }}
-            >
-              {type}
-            </Button>
-          </Grid>
-        ))}
+                onClick={() => {
+                  if (isSoundPlayed) {
+                    updateMultiAnswers(1, type);
+                    setIsMultiAnswerFalse([false, false, false]);
+                    setIsMultiAnswerTrue([false, false, false]);
+                  }
+                }}
+                sx={{
+                  textTransform: "none",
+                  width: "100%",
+                  bgcolor:
+                    multiActive[1] === type
+                      ? isMultiAnswerTrue[1]
+                        ? "green"
+                        : "" || isMultiAnswerFalse[1]
+                        ? "red"
+                        : ""
+                      : "white",
+                }}
+              >
+                {type}
+              </Button>
+            </Grid>
+          ))}
+        </Grid>
 
         <Grid item xs={2}>
           {answerData.name === "Intervals In Context" ? (
@@ -592,37 +607,40 @@ const Exercise = () => {
             <Typography variant="body1">Note 3:</Typography>
           )}
         </Grid>
-        {answers.map((type) => (
-          <Grid item xs={2} key={type}>
-            <Button
-              variant={multiActive[2] === type ? "contained" : "outlined"}
-              disabled={
-                (clickCount ? true : false) && !(type === multiActive[2])
-              }
-              onClick={() => {
-                if (isSoundPlayed) {
-                  updateMultiAnswers(2, type);
-                  setIsMultiAnswerFalse([false, false, false]);
-                  setIsMultiAnswerTrue([false, false, false]);
+
+        <Grid container item columns={12}>
+          {answers2.map((type) => (
+            <Grid item xs={2} key={type}>
+              <Button
+                variant={multiActive[2] === type ? "contained" : "outlined"}
+                disabled={
+                  (clickCount ? true : false) && !(type === multiActive[2])
                 }
-              }}
-              sx={{
-                textTransform: "none",
-                width: "100%",
-                bgcolor:
-                  multiActive[2] === type
-                    ? isMultiAnswerTrue[2]
-                      ? "green"
-                      : "" || isMultiAnswerFalse[2]
-                      ? "red"
-                      : ""
-                    : "white",
-              }}
-            >
-              {type}
-            </Button>
-          </Grid>
-        ))}
+                onClick={() => {
+                  if (isSoundPlayed) {
+                    updateMultiAnswers(2, type);
+                    setIsMultiAnswerFalse([false, false, false]);
+                    setIsMultiAnswerTrue([false, false, false]);
+                  }
+                }}
+                sx={{
+                  textTransform: "none",
+                  width: "100%",
+                  bgcolor:
+                    multiActive[2] === type
+                      ? isMultiAnswerTrue[2]
+                        ? "green"
+                        : "" || isMultiAnswerFalse[2]
+                        ? "red"
+                        : ""
+                      : "white",
+                }}
+              >
+                {type}
+              </Button>
+            </Grid>
+          ))}
+        </Grid>
       </Grid>
     );
   };
