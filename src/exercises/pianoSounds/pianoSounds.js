@@ -57,15 +57,24 @@ export class Note {
   /** Play the note.
    * @returns {Promise} A Promise which is resolved when playback has been started, or is rejected if for any reason playback cannot be started.
    */
-  play() {
+  play(duration=3000, sustain=false) {
     audioObjects.push(this.audioElement);
-    let p = this.audioElement.play() // returning a Promise
+    // let p = this.audioElement.play() // returning a Promise
       // .then( () => {
       //   console.log(`play(${this.name}): nice!`);
       // })
       // .catch( (err) => {
       //   console.error(`play(${this.name}): uh oh \n`, err);
       // });
+    let p = this.audioElement.play() // returning a Promise
+      .then( () => {
+        if (!sustain) {
+          // console.log(`Stopping Note.`)
+          this.stop(duration);
+        }
+      }).catch( () => {
+        console.error(`Couldn't play Note.`);
+      })
     return p;
   }
 
@@ -79,7 +88,7 @@ export class Note {
    * @param {Array<Note>} listOfNoteObjects
    * @returns {Promise} A promise that resolves when the last note in the list begins playback.
    */
-  static quickPlay(listOfNoteObjects) {
+  static quickPlay(listOfNoteObjects, duration=3000) {
     let chord = [Note.Silence];
     listOfNoteObjects.forEach(note => {
       let ele = note.audioElement;
@@ -91,12 +100,94 @@ export class Note {
     for (let i = 0; i < lastIndex; i++) {
       chord[i].play();
     }
-    return chord[lastIndex].play(); 
+    let p = chord[lastIndex].play();
+
+    setTimeout( () => {
+        Note.stopChord(chord, duration);
+      }, duration
+    )
+
+    return p; 
   }
 
-  /** Silence the note. */
-  stop() {
-    this.audioElement.pause();
+  /** Fade out an HTMLMediaElement. 
+   * @private This is meant to be used in Note.stopChord().
+   * @param {HTMLMediaElement} audioElement - An audio element created by new Audio().
+   * @param {number} duration - Time in milliseconds to let the note play.
+   */
+  static fadeOutAudioElement(audioElement, duration=1000) {
+    
+    // const fadeOutPoint = duration / 2; // fadeOutPoint point is when the note should start fading out (arbitrarily set at halfway)
+    const fadeOutPoint = duration; // linear fadeout from beginning to end
+    const fadeDuration = duration - fadeOutPoint; // The note should start fading out at the halfway point.
+    const changeVolume = .01; // A constant to decrease the volume by
+    const slope = changeVolume / fadeDuration; // Determines how quickly the audio fades out.
+
+    /** Fade out the audio instead of cutting it off abruptly. */
+    const fadeAudio = setInterval(() => {
+      const fadePoint = fadeOutPoint / 1000; // setTimeout is in milliseconds but audioElement.duration and audioElement.currentTime are in seconds.
+      if ((audioElement.currentTime >= fadePoint) && (audioElement.volume > 0)) {
+        let newVolume = audioElement.volume - changeVolume;
+        if (newVolume > 0) {
+          audioElement.volume = newVolume;
+        }
+        else {
+          // audioElement.pause();
+          clearInterval(fadeAudio);
+        }
+      }
+    }, slope);
+  }
+
+  /** Fade out a list of HTMLMediaElement audio sources.
+   * @private Only meant to be used by Note.quickPlay().
+   * @param {Array<HTMLMediaElement>} chord - A list of audio elements.
+   * @param {number} duration - Time in milliseconds to let the chord play.
+   */
+  static stopChord(chord, duration = 1500) { // Todo: Since this doesn't pop elements off audioObjects, find a way to remove unplayable elements from audioObjects.
+    chord.forEach(audioElement => {
+      Note.fadeOutAudioElement(audioElement, duration);
+    });
+  }
+
+  /** Fade out a note to silence.
+   * @param {number} duration - Time in milliseconds to let a note play before stopping it.
+   */
+  stop(duration=1000) { // Todo: Since this doesn't pop elements off audioObjects, find a way to remove unplayable elements from audioObjects.
+
+    // slope = y / x
+    // fadeDuration = x
+    // y = slope * fadeDuration
+    // .05 == fadeDuration / slope
+
+    const fadeOutPoint = duration / 3 * 2; // fadeOutPoint point is when the note should start fading out (arbitrarily set at halfway)
+    const fadeDuration = duration - fadeOutPoint; // The note should start fading out at the halfway point.
+    const changeVolume = .01; // A constant to decrease the volume by
+    const slope = changeVolume / fadeDuration; // Determines how quickly the audio fades out.
+
+
+    /** Fade out the audio instead of cutting it off abruptly. */
+    const sound = this.audioElement;
+    // let i = 0;
+    const fadeAudio = setInterval(() => {
+      const fadePoint = fadeOutPoint / 1000; // setTimeout is in milliseconds but sound.duration and sound.currentTime are in seconds.
+      if ((sound.currentTime >= fadePoint) && (sound.volume > 0)) {
+
+        let newVolume = sound.volume - changeVolume;
+        if (newVolume > 0) {
+          sound.volume = newVolume;
+          // console.log(`${i++}. volume = ${newVolume}`);
+        }
+        else {
+          // sound.pause();
+          clearInterval(fadeAudio);
+        }
+      }
+
+      // if (sound.volume < 0.003) {
+      //   clearInterval(fadeAudio);
+      // }
+    }, slope);
   }
 
   /** Get the note a certain number of semitones away from the current note.
@@ -146,7 +237,8 @@ export function stopAll() {
 
   let p = new Promise( (resolve, reject) => {
     if (audioObjects == undefined) {audioObjects = []; resolve()}
-    
+    if (audioObjects.length === 0) { resolve() }
+
     // Stop all audio.
     while (audioObjects.length > 0) {
       audioObjects.pop().pause();
@@ -318,15 +410,15 @@ function playNotes(playing, delay=750, ascending=true, sustain=true) {
   stopAll(); // Stop all other music before playing the scale.
 
   if (ascending) {
-    playing[0].play().then( () => {
-      if (!sustain) {setTimeout(() => {playing[0].stop()}, delay);}
+    playing[0].play(delay, sustain).then( () => {
+      // if (!sustain) {setTimeout(() => {playing[0].stop()}, delay);} // not necessary
       playSoundRecursiveAscending(playing, 1, delay, sustain);
     } );
   }
   else {
     let i = playing.length-1;
-    playing[i].play().then( () => {
-      if (!sustain) {setTimeout(() => {playing[playing.length-1].stop()}, delay);}
+    playing[i].play(delay, sustain).then( () => {
+      // if (!sustain) {setTimeout(() => {playing[playing.length-1].stop()}, delay);}
       playSoundRecursiveDescending(playing, --i, delay, sustain);
     } );
   }
@@ -347,9 +439,9 @@ function playSoundRecursiveAscending(playing, i, delay=750, sustain) {
     {
       if (!sustain) stopAll();
       // if (!sustain) playing[i-1].pause();
-      playing[i].play()
+      playing[i].play(delay, sustain)
         .then(() => {
-          playSoundRecursiveAscending(playing, ++i, delay);
+          playSoundRecursiveAscending(playing, ++i, delay, sustain);
         })
         .catch(() => {console.log('interrupted')})
     }, delay
@@ -370,9 +462,9 @@ function playSoundRecursiveDescending(playing, i, delay=750, sustain) {
   setTimeout( () =>
     {
       if (!sustain) stopAll();
-      playing[i].play()
+      playing[i].play(delay, sustain)
         .then(() => {
-          playSoundRecursiveDescending(playing, --i, delay);
+          playSoundRecursiveDescending(playing, --i, delay, sustain);
         })
         .catch(() => {console.log('interrupted')})
     }, delay
@@ -386,7 +478,7 @@ function playSoundRecursiveDescending(playing, i, delay=750, sustain) {
  * @param {boolean} ascending - When (boolean == true), whether to play the arpeggio in ascending or descending order.
  * @returns A Promise that resolves when the last note begins playing.
  */
- export function playChord(rootNote, chordMap, arpeggiate=false, ascending=true) {
+ export function playChord(rootNote, chordMap, arpeggiate=false, ascending=true, delay=1020) {
 
   // Make sure we have a chord to play.
   if (rootNote == undefined) {
@@ -413,10 +505,10 @@ function playSoundRecursiveDescending(playing, i, delay=750, sustain) {
   
   // Play the chord.
   if (arpeggiate) {
-    playNotes(playing, 750, ascending);
+    playNotes(playing, delay, ascending, false);
   }
   else {
-    return Note.quickPlay(playing);
+    return Note.quickPlay(playing, 3000);
   }
 }
 
@@ -447,11 +539,16 @@ function playRandomInterval(arpeggiate=false, ascending=true) {
  * @param {boolean} ascending - If (arpeggiate): whether to play arpeggio ascending or descending.
  * @returns {string} The name of the interval.
  */
-export function playInterval(rootNote, intervalMap, arpeggiate=false, ascending=true) {
+export function playInterval(rootNote, intervalMap, arpeggiate=false, ascending=true, delay=1110) {
   if (rootNote === undefined) {console.error(`In playInterval(): rootNote is undefined`); return;}
   if (intervalMap === undefined) {console.error(`In playInterval(): intervalMap is undefined`); return;}
 
-  playChord(rootNote, intervalMap, arpeggiate, ascending);
+  // playChord(rootNote, intervalMap, arpeggiate, ascending, 1110);
+  let nextNote = rootNote.nextNote(intervalMap[1])
+  rootNote.play(1110, false).then( () => {
+    setTimeout( () => {
+      nextNote.play(2700, false);
+    }, delay)}).catch(() => {console.error(`playInterval() failed`)});
   return intervalMap[0]; // Return the interval's name
 }
 
@@ -674,7 +771,7 @@ function playChordProgressionWrapper(chordProgMap, delay=1100) {
     });
     console.log(`Playing ${scaleMap[0]} scale on ${rootNote.name} -> ${display}`);
   }
-  playNotes(scale, 500, ascending, false); // Set delay between notes here.
+  playNotes(scale, 1020, ascending, false); // Set delay between notes here.
   return scaleMap[0];
   // return scaleType;
 }
