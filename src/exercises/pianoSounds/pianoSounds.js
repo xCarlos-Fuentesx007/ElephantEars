@@ -191,12 +191,23 @@ export class Note {
   }
 
   /** Get the note a certain number of semitones away from the current note.
-   * @param {number} semitones
+   * @param {number} semitones - Can be a positive or negative number.
    * @returns {Note} A new Note object.
    */
-  nextNote(semitones) {
+  nextNote(semitones) { // Todo: Rewrite this so it can handle very large intervals (rn can't produce anything 2 octaves away)
     let nextIndex = this.letterIndex + semitones;
-    let noteName = Note.notes[nextIndex%12] + (this.octave + (nextIndex < 12 ? 0 : 1)).toString();
+    let nextLetter = Note.notes[nextIndex%12];
+    let octaveDisplacement = (nextIndex < 12 && nextIndex >= 0) 
+                              ? 0 // same octave
+                              : ((nextIndex >= 12) 
+                                  ? 1 // 1 octave higher
+                                  : -1 // 1 octave lower
+                                )
+    let nextOctave = this.octave + octaveDisplacement;
+    let noteName = nextLetter + (nextOctave).toString();
+    if (nextOctave < 1 || (nextOctave == 8 && nextLetter !== 'C') || nextOctave > 8) {
+      console.error(`Note.nextNote() generated an out of range note: ${noteName}`);
+    } 
     return new Note(noteName);
   }
 
@@ -214,6 +225,8 @@ export class Note {
   }
 
   /** Generate a Note object from a number.
+   * 
+   * The lowest note this can generate is C2 (when i = 0).
    * @param {number} i - A non-negative integer.
    * @returns {Note} A new Note object.
    */
@@ -402,11 +415,11 @@ export function getScaleMap(index) {
 
 /** Play a scale or arpeggio in ascending or descending order.
  * @param {Array<Note>} playing - A list of Note objects.
- * @param {number} delay - Time in milliseconds between each note.
+ * @param {number} delay - Time in milliseconds between each note. Default: 750 ms.
  * @param {boolean} ascending - Play the notes first to last or last to first?
  * @param {boolean} sustain - If (false): silence each note before playing the next one.
  */
-function playNotes(playing, delay=750, ascending=true, sustain=true) {
+export function playNotes(playing, delay=750, ascending=true, sustain=true) {
   stopAll(); // Stop all other music before playing the scale.
 
   if (ascending) {
