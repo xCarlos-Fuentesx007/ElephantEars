@@ -161,7 +161,9 @@ function Perfect_Pitch(first_note) {
   }
 
   let key = find_pitch(first_note%12);
-  let noteName = nameDictionary[key];
+  let octave = Math.floor(first_note/12)+3;
+  let noteNameKey = key + octave.toString();
+  let noteName = nameDictionary[noteNameKey];
   let note = new Note(noteName);
   note.play();
   return key;
