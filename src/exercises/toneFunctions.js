@@ -210,23 +210,50 @@ function Scale_Degrees(first_note, answer_note) {
 export { Scale_Degrees };
 
 function Intervals_In_Context(start_note, first_note, second_note) {
-  var chords1 = make_chord(start_note, 0);
-  var chords2 = make_chord(start_note + 4, 0);
-  var chords3 = make_chord(start_note + 7, 0);
-  var interval = first_note - second_note;
-  if (interval < 0) {
-    interval = -1 * interval;
-  }
 
-  const synth = new Tone.PolySynth().toDestination();
-  synth.triggerAttackRelease(chords1, "4n", Tone.now());
-  synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
-  synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
-  synth.triggerAttackRelease(chords1, "4n", Tone.now() + 2.4);
-  synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now() + 4);
-  synth.triggerAttackRelease(find_note(second_note), "4n", Tone.now() + 4.8);
+  // Make sure the interval is ascending (Although I guess it doesn't matter)
+  if (first_note > second_note) {
+    let tmp = first_note;
+    first_note = second_note;
+    second_note = tmp;
+  }
+  
+  let rootNote = Note.numberToNote(start_note);
+  let firstNote = Note.numberToNote(first_note);
+  let interval = second_note - first_note;
+  let intervalMap = getIntervalMap(interval);
+
+  let chordProgressionAsSymbols = ['I', 'IV', 'V', 'I']; // Play the I, IV, V, and I chord. 
+  let delay = 1100;
+  playChordProgression(rootNote, chordProgressionAsSymbols, delay);
+  setTimeout( () => {
+    stopAll().then( () => {
+      // console.log('All audio paused.')
+      playInterval(firstNote, intervalMap, true);
+    }).catch( () => {
+      console.error('In toneFunctions.js: stopAll() failed.');
+    });    
+  }, delay * (chordProgressionAsSymbols.length + 1)); // Wait until the chords are done playing to play the answer interval.
 
   return find_intervals_in_context(start_note, first_note, second_note, interval);
+
+  // var chords1 = make_chord(start_note, 0);
+  // var chords2 = make_chord(start_note + 4, 0);
+  // var chords3 = make_chord(start_note + 7, 0);
+  // var interval = first_note - second_note;
+  // if (interval < 0) {
+  //   interval = -1 * interval;
+  // }
+
+  // const synth = new Tone.PolySynth().toDestination();
+  // synth.triggerAttackRelease(chords1, "4n", Tone.now());
+  // synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
+  // synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
+  // synth.triggerAttackRelease(chords1, "4n", Tone.now() + 2.4);
+  // synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now() + 4);
+  // synth.triggerAttackRelease(find_note(second_note), "4n", Tone.now() + 4.8);
+
+  // return find_intervals_in_context(start_note, first_note, second_note, interval);
 }
 export {Intervals_In_Context};
 
@@ -326,7 +353,7 @@ function find_pitch(num) {
 //Finds interval name using number of semitones
 function find_interval(interval) {
   const values = [
-    "Unison",
+    // "Unison",
     "Minor 2nd",
     "Major 2nd",
     "Minor 3rd",
@@ -341,7 +368,8 @@ function find_interval(interval) {
     "Octave",
   ];
 
-  return values[interval];
+  // return values[interval];
+  return values[interval-1];
 }
 
 function find_chord_type(num) {
