@@ -105,17 +105,29 @@ function Scales(first_note, scale_type) {
 export { Scales };
 
 function Chord_Progressions(first_note, progression_types) {
-  var chords1 = make_chord(first_note, 0);
-  var chords2 = make_chord(first_note + progression_types[0], 0);
-  var chords3 = make_chord(first_note + progression_types[1], 0);
-  var chords4 = make_chord(first_note + progression_types[2], 0);
 
-  const synth = new Tone.PolySynth().toDestination();
-  synth.triggerAttackRelease(chords1, "4n", Tone.now());
-  synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
-  synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
-  synth.triggerAttackRelease(chords4, "4n", Tone.now() + 2.4);
-  return find_chord_progressions(progression_types);
+  // Save the answer for later.
+  let answer = find_chord_progressions(progression_types);
+
+  // Play the chords.
+  let rootNote = Note.numberToNote(first_note);
+  let chordProgressionAsSymbols = ['I'].concat(answer);
+  playChordProgression(rootNote, chordProgressionAsSymbols);
+
+  // Return a list of chord symbols as the answer.
+  return answer;
+
+  // var chords1 = make_chord(first_note, 0);
+  // var chords2 = make_chord(first_note + progression_types[0], 0);
+  // var chords3 = make_chord(first_note + progression_types[1], 0);
+  // var chords4 = make_chord(first_note + progression_types[2], 0);
+
+  // const synth = new Tone.PolySynth().toDestination();
+  // synth.triggerAttackRelease(chords1, "4n", Tone.now());
+  // synth.triggerAttackRelease(chords2, "4n", Tone.now() + 0.8);
+  // synth.triggerAttackRelease(chords3, "4n", Tone.now() + 1.6);
+  // synth.triggerAttackRelease(chords4, "4n", Tone.now() + 2.4);
+  // return find_chord_progressions(progression_types);
 }
 export {Chord_Progressions}
 
@@ -452,6 +464,10 @@ function find_scale_degree(first_note, answer_note) {
   return values[interval];
 }
 
+/** Convert a list of integers into a list of chord symbols.
+ * @param {Array<number>} progression_types - A list of ints to specify a chord progression.
+ * @returns {Array<string>} A list of chord symbols describing a chord progression.
+ */
 function find_chord_progressions(progression_types) {
   var types = ["", "", ""];
   const values = [
@@ -461,6 +477,7 @@ function find_chord_progressions(progression_types) {
     "IV",
     "V", 
     "vi"
+    // Todo: Add diminished (vii°) chord.
   ];
 
   for (var i=0; i<3; i++) {
