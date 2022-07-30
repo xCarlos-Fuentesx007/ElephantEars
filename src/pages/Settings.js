@@ -432,7 +432,7 @@ const Settings = () => {
           )}
         </Grid>
 
-        <Typography variant="h5" sx={{ textAlign: "left", fontWeight: 600 }}>
+        {/* <Typography variant="h5" sx={{ textAlign: "left", fontWeight: 600 }}>
           Main Category Name
         </Typography>
 
@@ -471,7 +471,7 @@ const Settings = () => {
               Button
             </Button>
           </Grid>
-        </Grid>
+        </Grid> */}
         <Typography variant="h5" sx={{ textAlign: "left", fontWeight: 600 }}>
           Progress
         </Typography>
