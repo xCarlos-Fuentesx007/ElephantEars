@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from "react";
+import React, { Fragment, useContext, useEffect } from "react";
 import { AuthContext } from "../context/auth-context";
 import {
   Container,
@@ -16,7 +16,20 @@ import { Link } from "react-router-dom";
 
 const Campaign = () => {
   const authCtx = useContext(AuthContext);
-  const { runCampaign, schedule } = authCtx;
+  const {
+    runCampaign,
+    schedule,
+    userData,
+    statsData,
+    campaignData,
+    getStatsData,
+    getCampaignData,
+  } = authCtx;
+
+  useEffect(() => {
+    getStatsData(userData);
+    getCampaignData(userData);
+  }, [userData]);
 
   return (
     <Fragment>
@@ -90,7 +103,11 @@ const Campaign = () => {
                 type="submit"
                 variant="contained"
                 sx={{ my: 1 }}
-                onClick={runCampaign}
+                onClick={() => {
+                  console.log("statsData:", statsData);
+                  console.log("campaignData:", campaignData);
+                  runCampaign();
+                }}
               >
                 Lets Get Started!
               </Button>

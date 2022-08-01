@@ -4,16 +4,25 @@ import Navbar from "../components/Navbar";
 import { Container, Typography, Button, Grid, TextField } from "@mui/material";
 import { useState } from "react";
 
+const statsUrl = process.env.REACT_APP_BACKEND_STATS_URL;
+const campaignUrl = process.env.REACT_APP_BACKEND_CAMPAIGN_URL;
+
 const Settings = () => {
   const authCtx = useContext(AuthContext);
 
   const { updateUser, userData } = authCtx;
+
+  const [statsMessage, setStatsMessage] = useState("");
+  const [campaignMessage, setCampaignMessage] = useState("");
 
   const [isFirstNameShown, setIsFirstNameShown] = useState(false);
   const [isLastNameShown, setIsLastNameShown] = useState(false);
   const [isUserNameShown, setIsUserNameShown] = useState(false);
   const [isEmailShown, setIsEmailShown] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
+
+  const [isStatsBtnShown, setIsStatsBtnShow] = useState(false);
+  const [isCampaignBtnShown, setIsCampaignBtnShow] = useState(false);
 
   const [firstNameValue, setFirstNameValue] = useState(userData?.firstname);
   const [lastNameValue, setLastNameValue] = useState(userData?.lastname);
@@ -47,6 +56,38 @@ const Settings = () => {
     setIsUserNameShown(false);
     setIsEmailShown(false);
     setIsPasswordShown(false);
+  };
+
+  //function to reset the stats data by calling api when reset stats button is clicked
+  const resetStatsDataHandler = async () => {
+    const response = await fetch(`${statsUrl}/reset`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${userData.token}`,
+      },
+    });
+    const responseData = await response.json();
+    setStatsMessage(responseData.message);
+    setIsStatsBtnShow(false);
+    setTimeout(() => {
+      setStatsMessage("");
+    }, 2000);
+  };
+
+  //function to reset the campaign data by calling api when reset campaign button is clicked
+  const resetCampaignDataHandler = async () => {
+    const response = await fetch(`${campaignUrl}/reset`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${userData.token}`,
+      },
+    });
+    const responseData = await response.json();
+    setCampaignMessage(responseData.message);
+    setIsCampaignBtnShow(false);
+    setTimeout(() => {
+      setCampaignMessage("");
+    }, 2000);
   };
 
   return (
@@ -391,7 +432,7 @@ const Settings = () => {
           )}
         </Grid>
 
-        <Typography variant="h5" sx={{ textAlign: "left", fontWeight: 600 }}>
+        {/* <Typography variant="h5" sx={{ textAlign: "left", fontWeight: 600 }}>
           Main Category Name
         </Typography>
 
@@ -430,7 +471,7 @@ const Settings = () => {
               Button
             </Button>
           </Grid>
-        </Grid>
+        </Grid> */}
         <Typography variant="h5" sx={{ textAlign: "left", fontWeight: 600 }}>
           Progress
         </Typography>
@@ -445,23 +486,103 @@ const Settings = () => {
             padding: 3,
           }}
         >
-          <Grid item xs={8}>
+          <Grid item xs={4}>
             Reset Campaign Progress
           </Grid>
           <Grid item xs={4}>
-            <Button type="submit" fullWidth variant="contained">
-              Reset
-            </Button>
+            {campaignMessage}
           </Grid>
+          {!isCampaignBtnShown && (
+            <Grid item xs={4}>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                onClick={() => {
+                  setIsCampaignBtnShow(true);
+                }}
+              >
+                Reset
+              </Button>
+            </Grid>
+          )}
+          {isCampaignBtnShown && (
+            <>
+              <Grid item xs={12} md={2}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  onClick={resetCampaignDataHandler}
+                >
+                  Update
+                </Button>
+              </Grid>
 
-          <Grid item xs={8}>
-            Reset Progress
+              <Grid item xs={12} md={2}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  color="warning"
+                  variant="outlined"
+                  onClick={() => {
+                    setIsCampaignBtnShow(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </Grid>
+            </>
+          )}
+
+          <Grid item xs={4}>
+            Reset Stat Progress
           </Grid>
           <Grid item xs={4}>
-            <Button type="submit" fullWidth variant="contained">
-              Reset
-            </Button>
+            {statsMessage}
           </Grid>
+          {!isStatsBtnShown && (
+            <Grid item xs={4}>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                onClick={() => {
+                  setIsStatsBtnShow(true);
+                }}
+              >
+                Reset
+              </Button>
+            </Grid>
+          )}
+          {isStatsBtnShown && (
+            <>
+              <Grid item xs={12} md={2}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  onClick={resetStatsDataHandler}
+                >
+                  Update
+                </Button>
+              </Grid>
+
+              <Grid item xs={12} md={2}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  color="warning"
+                  variant="outlined"
+                  onClick={() => {
+                    setIsStatsBtnShow(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </Grid>
+            </>
+          )}
         </Grid>
       </Container>
     </Fragment>

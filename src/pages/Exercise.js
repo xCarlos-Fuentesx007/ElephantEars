@@ -86,6 +86,8 @@ const DisplayErr = (errorCode, correctOption) => {
 };
 
 const ExitContainer = ({ onCancel }) => {
+  const authCtx = useContext(AuthContext);
+  const { stopCampaign } = authCtx;
   return (
     <Container maxWidth="sm">
       <Paper
@@ -124,7 +126,11 @@ const ExitContainer = ({ onCancel }) => {
           </Grid>
           <Grid item xs={5}>
             <Link to="/score">
-              <Button variant="contained" fullWidth>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => stopCampaign()}
+              >
                 Yes
               </Button>
             </Link>
@@ -139,7 +145,6 @@ const Exercise = () => {
   const authCtx = useContext(AuthContext);
   const [answer, setAnswer] = useState();
   const [answers, setAnswers] = useState([]);
-  const [answers2, setAnswers2] = useState([]);
 
   const [isExitVisible, setIsExitVisible] = useState(false);
   let navigate = useNavigate();
@@ -157,6 +162,8 @@ const Exercise = () => {
     runCampaign,
     stopCampaign,
     schedule,
+    updateCampaignData,
+    updateCampaignDataMulti,
   } = authCtx;
 
   const [active, setActive] = useState("");
@@ -656,9 +663,19 @@ const Exercise = () => {
 
   return (
     <Fragment>
-      <Navbar />
       {!isExitVisible && (
         <Container maxWidth="md">
+          <Typography
+            component="h1"
+            variant="h3"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            {campaignRunning ? "Campaign" : "Gym"}
+          </Typography>
           <Paper
             elevation={2}
             sx={{
@@ -782,6 +799,9 @@ const Exercise = () => {
                         variant="contained"
                         // disabled={!isSoundPlayed ? true : false}
                         onClick={() => {
+                          if (campaignRunning && !clickCount) {
+                            schedule.dequeue();
+                          }
                           if (
                             answerData.name === "Chord Progressions" ||
                             answerData.name === "Intervals In Context" ||
@@ -822,6 +842,11 @@ const Exercise = () => {
                               set_continue(true);
                             } else {
                               if (campaignRunning) {
+                                updateCampaignDataMulti(
+                                  answerData.name,
+                                  answers,
+                                  isMultiAnswerTrue
+                                );
                                 if (schedule.isEmpty()) {
                                   stopCampaign();
                                   navigate("/score", { replace: true });
@@ -859,6 +884,11 @@ const Exercise = () => {
                               set_continue(true);
                             } else {
                               if (campaignRunning) {
+                                updateCampaignData(
+                                  answerData.name,
+                                  answer,
+                                  isAnswerTrue
+                                );
                                 if (schedule.isEmpty()) {
                                   stopCampaign();
                                   navigate("/score", { replace: true });
