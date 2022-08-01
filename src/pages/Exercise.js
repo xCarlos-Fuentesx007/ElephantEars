@@ -245,8 +245,13 @@ const Exercise = () => {
       return;
     } else if (answerData.name === "Intervals In Context") {
       setFirst_noteV2(Math.floor(Math.random() * 12));
-      set_context_num1(Math.floor(Math.random() * 12));
-      set_context_num2(Math.floor(Math.random() * 12));
+      let cn1 = Math.floor(Math.random() * 12);
+      let cn2 = Math.floor(Math.random() * 12);
+      while (cn1 === cn2) {
+        cn2 = Math.floor(Math.random() * 12);
+      }
+      set_context_num1(cn1);
+      set_context_num2(cn2);
       return;
     } else if (answerData.name === "Melodic Dictation") {
       setFirst_noteV2(Math.floor(Math.random() * 12));
