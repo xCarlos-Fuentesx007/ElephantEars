@@ -3,8 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../context/auth-context";
 
-import Navbar from "../components/Navbar";
-
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
@@ -208,6 +206,9 @@ const Exercise = () => {
     Math.floor(Math.random() * 12)
   );
 
+  const [times, set_times] = useState([0,0]);
+  const [first_click, set_first_click] = useState(true);
+
   useEffect(() => {
     if (correctAnswers === 0 && incorrectAnswers === 0) {
       percentageHandler(0);
@@ -221,6 +222,19 @@ const Exercise = () => {
     currQuestion,
     numQuestions,
   ]);
+
+  const trackTime = (type) => {
+    //type 1 = individual, type 0 = total
+    if (times[type === 0]) {
+      console.log("Error"); //Pressing continue without listening to the sound causes an error and should be excluded
+    }
+
+    var timer = Date.now() - times[type];
+    timer = Math.round(timer / 1000);
+    console.log(timer);
+    times[1] = 0;
+    return;
+  }
 
   const exerciseMaker = () => {
     if (answerData.name === "Intervals") {
@@ -265,6 +279,14 @@ const Exercise = () => {
   };
 
   const exerciseHandler = () => {
+
+    if (first_click) {
+      set_times([Date.now(), Date.now()]);
+      set_first_click(false);
+    } else if (times[1] === 0) {
+      set_times([times[0], Date.now()]);
+    }
+
     if (answerData.name === "Intervals") {
       const answerValue = Intervals(first_note, interval);
       if (DEMO) console.log(answerValue);
@@ -784,6 +806,8 @@ const Exercise = () => {
                         size="large"
                         variant="contained"
                         onClick={() => {
+                          trackTime(0);
+                          //set_times(times[0], times[1], times[2], Date.now());
                           setIsExitVisible(true);
                         }}
                       >
@@ -803,6 +827,8 @@ const Exercise = () => {
                             answerData.name === "Melodic Dictation"
                           ) {
                             if (clickCount === false) {
+                              //set_times([times[0], times[1], Date.now(), 0]);
+                              trackTime(1);
                               if (
                                 answers[0] === multiActive[0] &&
                                 answers[1] === multiActive[1] &&
@@ -858,6 +884,8 @@ const Exercise = () => {
                             }
                           } else {
                             if (clickCount === false) {
+                              //set_times([times[0], times[1], Date.now(), 0]);
+                              trackTime(1);
                               if (answer === active) {
                                 sfx.correct.play();
                                 answersHandler(
@@ -885,6 +913,8 @@ const Exercise = () => {
                                   isAnswerTrue
                                 );
                                 if (schedule.isEmpty()) {
+                                  //set_times(times[0], times[1], times[2], Date.now());
+                                  trackTime(0);
                                   stopCampaign();
                                   navigate("/score", { replace: true });
                                 } else {
