@@ -182,7 +182,7 @@ const ScoreContainer = ({ onExit }) => {
 const ExitContainer = ({ onCancel }) => {
   const authCtx = useContext(AuthContext);
 
-  const { resetNumQuestions } = authCtx;
+  const { resetCampaign } = authCtx;
   return (
     <Container maxWidth="sm">
       <Paper
@@ -224,7 +224,7 @@ const ExitContainer = ({ onCancel }) => {
               <Button
                 variant="contained"
                 fullWidth
-                onClick={() => resetNumQuestions}
+                onClick={() => resetCampaign}
               >
                 Yes
               </Button>
