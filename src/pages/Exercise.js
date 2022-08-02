@@ -160,8 +160,7 @@ const Exercise = () => {
     runCampaign,
     stopCampaign,
     schedule,
-    updateCampaignData,
-    updateCampaignDataMulti,
+    updateStatsData,
   } = authCtx;
 
   const [active, setActive] = useState("");
@@ -206,7 +205,7 @@ const Exercise = () => {
     Math.floor(Math.random() * 12)
   );
 
-  const [times, set_times] = useState([0,0]);
+  const [times, set_times] = useState([0, 0]);
   const [first_click, set_first_click] = useState(true);
 
   useEffect(() => {
@@ -231,10 +230,11 @@ const Exercise = () => {
 
     var timer = Date.now() - times[type];
     timer = Math.round(timer / 1000);
+    // logic for time
     console.log(timer);
     times[1] = 0;
     return;
-  }
+  };
 
   const exerciseMaker = () => {
     if (answerData.name === "Intervals") {
@@ -279,7 +279,6 @@ const Exercise = () => {
   };
 
   const exerciseHandler = () => {
-
     if (first_click) {
       set_times([Date.now(), Date.now()]);
       set_first_click(false);
@@ -861,10 +860,10 @@ const Exercise = () => {
                               set_continue(true);
                             } else {
                               if (campaignRunning) {
-                                updateCampaignDataMulti(
+                                updateStatsData(
                                   answerData.name,
-                                  answers,
-                                  isMultiAnswerTrue
+                                  isMultiAnswerTrue,
+                                  true
                                 );
                                 if (schedule.isEmpty()) {
                                   stopCampaign();
@@ -904,10 +903,10 @@ const Exercise = () => {
                               set_continue(true);
                             } else {
                               if (campaignRunning) {
-                                updateCampaignData(
+                                updateStatsData(
                                   answerData.name,
-                                  answer,
-                                  isAnswerTrue
+                                  isAnswerTrue,
+                                  false
                                 );
                                 if (schedule.isEmpty()) {
                                   trackTime(0);

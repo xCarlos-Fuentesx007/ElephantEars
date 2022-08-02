@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import Queue from "../components/Queue";
 
 const url = process.env.REACT_APP_BACKEND_USERS_URL;
-const campaignUrl = "https://elephantearsbackend.herokuapp.com/api/campaign";
-const statsUrl = "https://elephantearsbackend.herokuapp.com/api/stats";
+// const campaignUrl = process.env.REACT_APP_BACKEND_CAMPAIGN_URL;
+const statsUrl = process.env.REACT_APP_BACKEND_STATS_URL;
 
 const ANSWER_DATA = [
   {
@@ -141,84 +141,85 @@ const EXERCISES_MAP = new Map([
   ["Melodic Dictation", "melodic_dictation"],
 ]);
 
-const INTERVALS_MAP = new Map([
-  ["Minor 2nd", "minor2"],
-  ["Major 2nd", "major2"],
-  ["Minor 3rd", "minor3"],
-  ["Major 3rd", "major3"],
-  ["Perfect 4th", "perfect4"],
-  ["Tritone", "tritone"],
-  ["Perfect 5th", "perfect5"],
-  ["Minor 6th", "minor6"],
-  ["Major 6th", "major6"],
-  ["Minor 7th", "minor7"],
-  ["Major 7th", "major7"],
-  ["Octave", "octave"],
-]);
+// const INTERVALS_MAP = new Map([
+//   ["Minor 2nd", "minor2"],
+//   ["Major 2nd", "major2"],
+//   ["Minor 3rd", "minor3"],
+//   ["Major 3rd", "major3"],
+//   ["Perfect 4th", "perfect4"],
+//   ["Tritone", "tritone"],
+//   ["Perfect 5th", "perfect5"],
+//   ["Minor 6th", "minor6"],
+//   ["Major 6th", "major6"],
+//   ["Minor 7th", "minor7"],
+//   ["Major 7th", "major7"],
+//   ["Octave", "octave"],
+// ]);
 
-const CHORDS_MAP = new Map([
-  ["Major", "major"],
-  ["Minor", "minor"],
-  ["Diminished", "diminished"],
-  ["Augmented", "augmented"],
-  ["Dominant Seventh", "dom7"],
-  ["Major Seventh", "major7"],
-  ["Minor Seventh", "minor7"],
-]);
+// const CHORDS_MAP = new Map([
+//   ["Major", "major"],
+//   ["Minor", "minor"],
+//   ["Diminished", "diminished"],
+//   ["Augmented", "augmented"],
+//   ["Dominant Seventh", "dom7"],
+//   ["Major Seventh", "major7"],
+//   ["Minor Seventh", "minor7"],
+// ]);
 
-const SCALES_MAP = new Map([
-  ["Major (Ionian)", "major"],
-  ["Natural Minor (Aeolian)", "natMinor"],
-  ["Harmonic Minor", "harmMinor"],
-  ["Dorian", "dorian"],
-  ["Phrygian", "phrygian"],
-  ["Lydian", "lydian"],
-  ["Mixolydian", "mixolydian"],
-  ["Locrian", "locrian"],
-]);
+// const SCALES_MAP = new Map([
+//   ["Major (Ionian)", "major"],
+//   ["Natural Minor (Aeolian)", "natMinor"],
+//   ["Harmonic Minor", "harmMinor"],
+//   ["Dorian", "dorian"],
+//   ["Phrygian", "phrygian"],
+//   ["Lydian", "lydian"],
+//   ["Mixolydian", "mixolydian"],
+//   ["Locrian", "locrian"],
+// ]);
 
-const PITCH_MAP = new Map([
-  ["C", "c"],
-  ["C#", "csharp"],
-  ["D", "d"],
-  ["D#", "dharp"],
-  ["E", "e"],
-  ["F", "f"],
-  ["F#", "fsharp"],
-  ["G", "g"],
-  ["G#", "gsharp"],
-  ["A", "a"],
-  ["A#", "asharp"],
-  ["B", "b"],
-]);
+// const PITCH_MAP = new Map([
+//   ["C", "c"],
+//   ["C#", "csharp"],
+//   ["D", "d"],
+//   ["D#", "dharp"],
+//   ["E", "e"],
+//   ["F", "f"],
+//   ["F#", "fsharp"],
+//   ["G", "g"],
+//   ["G#", "gsharp"],
+//   ["A", "a"],
+//   ["A#", "asharp"],
+//   ["B", "b"],
+// ]);
 
-// also used for Intervals in Context and Melodic Dictation
-const SCALE_DEGREES_MAP = new Map([
-  ["1 (do)", "do_1"],
-  ["Raised 1 (di)", "raised1_di"],
-  ["2 (re)", "re_2"],
-  ["Raised 2 (ri)", "raised2_ri"],
-  ["3 (mi)", "mi_3"],
-  ["4 (fa)", "fa_4"],
-  ["Raised 4 (fi)", "raised4_fi"],
-  ["5 (so)", "so_5"],
-  ["Raised 5 (si)", "raised5_si"],
-  ["6 (la)", "la_6"],
-  ["Raised 6 (li)", "raised6_li"],
-  ["7 (ti)", "ti_7"],
-]);
+// // also used for Intervals in Context and Melodic Dictation
+// const SCALE_DEGREES_MAP = new Map([
+//   ["1 (do)", "do_1"],
+//   ["Raised 1 (di)", "raised1_di"],
+//   ["2 (re)", "re_2"],
+//   ["Raised 2 (ri)", "raised2_ri"],
+//   ["3 (mi)", "mi_3"],
+//   ["4 (fa)", "fa_4"],
+//   ["Raised 4 (fi)", "raised4_fi"],
+//   ["5 (so)", "so_5"],
+//   ["Raised 5 (si)", "raised5_si"],
+//   ["6 (la)", "la_6"],
+//   ["Raised 6 (li)", "raised6_li"],
+//   ["7 (ti)", "ti_7"],
+// ]);
 
-const CHORD_PROGRESSIONS_MAP = new Map([
-  ["I", "first"],
-  ["ii", "second"],
-  ["iii", "third"],
-  ["IV", "fourth"],
-  ["V", "fifth"],
-  ["vi", "sixth"],
-]);
+// const CHORD_PROGRESSIONS_MAP = new Map([
+//   ["I", "first"],
+//   ["ii", "second"],
+//   ["iii", "third"],
+//   ["IV", "fourth"],
+//   ["V", "fifth"],
+//   ["vi", "sixth"],
+// ]);
 
 const sampleSchedule = new Queue([
   "Intervals",
+  "Intervals In Context",
   "Chord Progressions",
   "Perfect Pitch",
   "Intervals",
@@ -226,7 +227,7 @@ const sampleSchedule = new Queue([
   "Perfect Pitch",
 ]); // hard coded
 
-const sampleSchedule2 = new Queue(["Intervals", "Chords"]);
+// const sampleSchedule2 = new Queue(["Intervals", "Chords"]);
 
 export const AuthContext = React.createContext({
   userData: [],
@@ -253,15 +254,12 @@ export const AuthContext = React.createContext({
   signup: (userData) => {},
   verifyEmail: (token) => {},
   logout: () => {},
-  getCampaignData: (userData) => {},
   getStatsData: (userData) => {},
   statsData: "",
-  campaignData: "",
   runCampaign: () => {},
   stopCampaign: () => {},
   resetCampaign: () => {},
-  updateCampaignData: (exercise, answer, correct) => {},
-  updateCampaignDataMulti: (exercise, answer, correct) => {},
+  updateStatsData: (exercise, correct, isMulti) => {},
 });
 
 const AuthContextProvider = (props) => {
@@ -279,8 +277,7 @@ const AuthContextProvider = (props) => {
   const [campaignRunning, setCampaignRunning] = useState(false);
   const [fromCampaign, setFromCampaign] = useState(false);
   const [schedule, setSchedule] = useState(sampleSchedule);
-  const [statsData, setStatsData] = useState("err");
-  const [campaignData, setCampaignData] = useState();
+  const [statsData, setStatsData] = useState();
   const [currQuestion, setCurrQuestion] = useState(-1);
   const [numQuestions, setNumQuestions] = useState(0);
 
@@ -373,24 +370,24 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const getCampaignData = async (userData) => {
-    setIsLoading(true);
-    setError(undefined);
-    const response = await fetch(`${campaignUrl}/all`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${userData.token}`,
-      },
-    });
-    const responseData = await response.json();
-    setIsLoading(false);
-    if (responseData.message) {
-      setError(responseData.message);
-      return;
-    }
-    setCampaignData(responseData);
-    return responseData;
-  };
+  // const getCampaignData = async (userData) => {
+  //   setIsLoading(true);
+  //   setError(undefined);
+  //   const response = await fetch(`${campaignUrl}/all`, {
+  //     method: "GET",
+  //     headers: {
+  //       Authorization: `Bearer ${userData.token}`,
+  //     },
+  //   });
+  //   const responseData = await response.json();
+  //   setIsLoading(false);
+  //   if (responseData.message) {
+  //     setError(responseData.message);
+  //     return;
+  //   }
+  //   setCampaignData(responseData);
+  //   return responseData;
+  // };
 
   const getStatsData = async (userData) => {
     setIsLoading(true);
@@ -481,6 +478,22 @@ const AuthContextProvider = (props) => {
   const stopCampaign = () => {
     setCampaignRunning(false);
     setFromCampaign(true);
+    postStatsData();
+    setStatsData(undefined);
+  };
+
+  const postStatsData = async () => {
+    setIsLoading(true);
+    setError(undefined);
+    await fetch(`${statsUrl}/update`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${userData.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(statsData),
+    });
+    setIsLoading(false);
   };
 
   const resetCampaign = () => {
@@ -492,93 +505,107 @@ const AuthContextProvider = (props) => {
     setFromCampaign(false);
   };
 
-  const updateCampaignData = (exercise, answer, correct) => {
-    console.log(
-      "exercise:",
-      exercise,
-      "\ncorrect answer:",
-      answer,
-      "\ncorrect:",
-      correct
-    );
-
+  const updateStatsData = (exercise, correct, isMulti) => {
     // map the exercise and answer to fit campaignData structure
     const exerciseMapped = EXERCISES_MAP.get(exercise);
-    var answerMapped = "";
-    switch (exerciseMapped) {
-      case "intervals":
-        answerMapped = INTERVALS_MAP.get(answer);
-        break;
-      case "chords":
-        answerMapped = CHORDS_MAP.get(answer);
-        break;
-      case "scales":
-        answerMapped = SCALES_MAP.get(answer);
-        break;
-      case "pitch":
-        answerMapped = PITCH_MAP.get(answer);
-        break;
-      default:
-        answerMapped = "";
+    let newStatsData = statsData;
+    let newStatsDataExercise = newStatsData[exerciseMapped];
+    newStatsDataExercise.totalAnswered++;
+    if (isMulti && correct[0] && correct[1] && correct[2]) {
+      newStatsDataExercise.totalCorrect++;
+    } else if (!isMulti && correct) {
+      newStatsDataExercise.totalCorrect++;
     }
-
-    var newCampaignData = campaignData[exerciseMapped][answerMapped];
-    console.log("newCampaignData for", answerMapped + ":", newCampaignData);
-    // TODO: update campaignData with newCampaignData
+    newStatsDataExercise.totalAccuracy = (
+      (newStatsDataExercise.totalCorrect / newStatsDataExercise.totalAnswered) *
+      100
+    ).toFixed(1);
+    // TODO: time
+    newStatsData[exerciseMapped] = newStatsDataExercise;
+    setStatsData(newStatsData);
   };
 
-  const updateCampaignDataMulti = (exercise, answer, correct) => {
-    console.log(
-      "exercise:",
-      exercise,
-      "\ncorrect answer:",
-      answer,
-      "\ncorrect:",
-      correct
-    );
+  // const updateCampaignDataMulti = (exercise, answer, correct) => {
+  //   console.log(
+  //     "exercise:",
+  //     exercise,
+  //     "\ncorrect answer:",
+  //     answer,
+  //     "\ncorrect:",
+  //     correct
+  //   );
 
-    // map the exercise and answers to fit campaignData structure
-    const exerciseMapped = EXERCISES_MAP.get(exercise);
-    var answerMapped1 = "";
-    var answerMapped2 = "";
-    var answerMapped3 = "";
-    switch (exerciseMapped) {
-      case "chord_progressions":
-        answerMapped1 = "ii_" + CHORD_PROGRESSIONS_MAP.get(answer[0]);
-        answerMapped2 = "iii_" + CHORD_PROGRESSIONS_MAP.get(answer[1]);
-        answerMapped3 = "iv_" + CHORD_PROGRESSIONS_MAP.get(answer[2]);
-        break;
-      case "scale_degrees":
-        answerMapped1 = SCALE_DEGREES_MAP.get(answer[0]);
-        answerMapped2 = SCALE_DEGREES_MAP.get(answer[1]);
-        answerMapped3 = SCALE_DEGREES_MAP.get(answer[2]);
-        break;
-      case "melodic_dictation":
-        answerMapped1 = "note1_" + SCALE_DEGREES_MAP.get(answer[0]);
-        answerMapped2 = "note2_" + SCALE_DEGREES_MAP.get(answer[1]);
-        answerMapped1 = "note3_" + SCALE_DEGREES_MAP.get(answer[2]);
-        break;
-      case "intervals_in_context":
-        answerMapped1 = "note1_" + SCALE_DEGREES_MAP.get(answer[0]);
-        answerMapped2 = "note2_" + SCALE_DEGREES_MAP.get(answer[1]);
-        answerMapped3 = "interval_" + INTERVALS_MAP.get(answer[2]);
-        break;
-      default:
-        answerMapped1 = "";
-        answerMapped2 = "";
-        answerMapped3 = "";
-    }
+  //   // map the exercise and answers to fit campaignData structure
+  //   const exerciseMapped = EXERCISES_MAP.get(exercise);
+  //   var answerMapped1 = "";
+  //   var answerMapped2 = "";
+  //   var answerMapped3 = "";
+  //   switch (exerciseMapped) {
+  //     case "chord_progressions":
+  //       answerMapped1 = "ii_" + CHORD_PROGRESSIONS_MAP.get(answer[0]);
+  //       answerMapped2 = "iii_" + CHORD_PROGRESSIONS_MAP.get(answer[1]);
+  //       answerMapped3 = "iv_" + CHORD_PROGRESSIONS_MAP.get(answer[2]);
+  //       break;
+  //     case "scale_degrees":
+  //       answerMapped1 = SCALE_DEGREES_MAP.get(answer[0]);
+  //       answerMapped2 = SCALE_DEGREES_MAP.get(answer[1]);
+  //       answerMapped3 = SCALE_DEGREES_MAP.get(answer[2]);
+  //       break;
+  //     case "melodic_dictation":
+  //       answerMapped1 = "note1_" + SCALE_DEGREES_MAP.get(answer[0]);
+  //       answerMapped2 = "note2_" + SCALE_DEGREES_MAP.get(answer[1]);
+  //       answerMapped1 = "note3_" + SCALE_DEGREES_MAP.get(answer[2]);
+  //       break;
+  //     case "intervals_in_context":
+  //       answerMapped1 = "note1_" + SCALE_DEGREES_MAP.get(answer[0]);
+  //       answerMapped2 = "note2_" + SCALE_DEGREES_MAP.get(answer[1]);
+  //       answerMapped3 = "interval_" + INTERVALS_MAP.get(answer[2]);
+  //       break;
+  //     default:
+  //       answerMapped1 = "";
+  //       answerMapped2 = "";
+  //       answerMapped3 = "";
+  //   }
 
-    var newCampaignData1 = campaignData[exerciseMapped][answerMapped1];
-    var newCampaignData2 = campaignData[exerciseMapped][answerMapped2];
-    var newCampaignData3 = campaignData[exerciseMapped][answerMapped3];
-    console.log("newCampaignData:", campaignData[exerciseMapped]);
-    console.log("newCampaignData1 for", answerMapped1 + ":", newCampaignData1);
-    console.log("newCampaignData2 for", answerMapped2 + ":", newCampaignData2);
-    console.log("newCampaignData3 for", answerMapped3 + ":", newCampaignData3);
+  //   var newCampaignData1 = campaignData[exerciseMapped][answerMapped1];
+  //   var newCampaignData2 = campaignData[exerciseMapped][answerMapped2];
+  //   var newCampaignData3 = campaignData[exerciseMapped][answerMapped3];
+  //   var newTime = Date.now();
 
-    // TODO: update campaignData with newCampaignData 1, 2, & 3
-  };
+  //   // newCampaignData1 updates
+  //   // familiar
+  //   newCampaignData1.attempts++;
+  //   if (correct[0]) newCampaignData1.totalCorrect++;
+  //   newCampaignData1.date = newTime;
+  //   // accuracy
+  //   // avgtime
+  //   // totalTime
+
+  //   // newCampaignData2 updates
+  //   // familiar
+  //   newCampaignData2.attempts++;
+  //   if (correct[1]) newCampaignData2.totalCorrect++;
+  //   newCampaignData2.date = newTime;
+  //   // accuracy
+  //   // avgtime
+  //   // totalTime
+
+  //   // newCampaignData3 updates
+  //   // familiar
+  //   newCampaignData3.attempts++;
+  //   if (correct[2]) newCampaignData3.totalCorrect++;
+  //   newCampaignData3.date = newTime;
+  //   // accuracy
+  //   // avgtime
+  //   // totalTime
+
+  //   console.log("newCampaignData:", campaignData[exerciseMapped]);
+  //   console.log("newCampaignData1 for", answerMapped1 + ":", newCampaignData1);
+  //   console.log("newCampaignData2 for", answerMapped2 + ":", newCampaignData2);
+  //   console.log("newCampaignData3 for", answerMapped3 + ":", newCampaignData3);
+
+  //   // TODO: update campaignData with newCampaignData 1, 2, & 3
+  // };
 
   return (
     <AuthContext.Provider
@@ -607,15 +634,12 @@ const AuthContextProvider = (props) => {
         verifyEmail: verifyEmail,
         error: error,
         isLoading: isLoading,
-        getCampaignData: getCampaignData,
         getStatsData: getStatsData,
         statsData: statsData,
-        campaignData: campaignData,
         runCampaign: runCampaign,
         stopCampaign: stopCampaign,
         resetCampaign: resetCampaign,
-        updateCampaignData: updateCampaignData,
-        updateCampaignDataMulti: updateCampaignDataMulti,
+        updateStatsData: updateStatsData,
       }}
     >
       {props.children}
