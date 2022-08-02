@@ -1,3 +1,4 @@
+// import { Sounds } from "./piano-wav/exportSounds";
 import { Sounds } from "./piano-wav/exportSounds";
 import Silent from "./piano-wav/silent.wav"; // Used in Note.quickPlay() hack.
 import { DEMO } from "../../pages/Exercise";
@@ -17,23 +18,30 @@ let repeatMap; // Global variable to remember most recently played.
 */
 export class Note {
 
+  static audioCtx; // = new AudioContext();
+
   static min = 2;
   static max = 4;
   static notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
   static Silence = new Audio(Silent); // Used in Note.quickPlay() hack.
-
+  audioBuffer;
+  // buffer = await Note.createAudioBuffer(this.name);
+  buffer;
   /** Create a Note object from a note name. 
    * If one isn't given, a random note is generated.
    * The available range of notes you can create is C1 to C8 inclusive.
    * @param {string} noteName - Note name in scientfic pitch notation e.g. "Cs4".
    */
-  constructor(noteName) {
+  constructor(noteName, audioBuffer=undefined) {
+    console.log(`constructing note: ${noteName}`)
     if (noteName === undefined) {
       this.letterIndex = getRandomInt(12); // 12 notes in western scale
       this.octave = Note.#getRandomOctave(Note.min, Note.max);
       this.letter = Note.notes[this.letterIndex];
       this.name = this.letter + this.octave;
       this.audioElement = new Audio(Sounds[this.name]);
+      this.staticPath = Sounds[this.name]; // Path to the .wav file imported from the src folder.
+      this.audioBuffer = audioBuffer;
     }
     else {
       this.name = noteName;
@@ -41,7 +49,147 @@ export class Note {
       this.octave = parseInt(noteName[noteName.length-1]);
       this.letterIndex = Note.notes.indexOf(this.letter);
       this.audioElement = new Audio(Sounds[noteName]);
+      this.staticPath = Sounds[noteName]; // Path to the .wav file imported from the src folder.
+      this.audioBuffer = audioBuffer;
     }
+  }
+
+  /** Pretty print a Note object and its properties.
+   * @param {string} callingFunction - The name of the parent function from which you're calling printNote().
+   */
+  printNote(callingFunction) {
+    
+    console.log(`Printing ${this.name} from ${callingFunction}():`)
+    // console.log(`\tthis.letter: ${this.letter}`)
+    // console.log(`\tthis.octave: ${this.octave}`)
+    // console.log(`\tthis.letterIndex: ${this.letterIndex}`)
+    // console.log(`\tthis.audioElement: ${this.audioElement}`)
+    console.log(`\tthis.staticPath: ${this.staticPath}`)
+    console.log(`\tthis.audioBuffer: ${this.audioBuffer}`)
+  }
+
+  /** Wrapper function for the Note constructor to create a factory function for new Note objects with properly initialized audio buffers.
+   * @description Asynchronous code like fetch() isn't allowed in constructors. To get around that, this factory function creates the Note with its property audioBuffer=undefined, awaits until it can store Sounds[noteName] in audioBuffer, and only then returns the new Note.
+   * @async
+   * @param {string} noteName - Name of the note to create in scientific pitch notation.
+   * @returns {Promise<Note>} A Promise that resolves to a new Note object with the audioBuffer set to Sounds[noteName].
+   */
+  static async newNote(noteName) {
+    console.log(`newNote() [starting]: noteName = ${noteName}`);
+
+    // First instantiate a new Note normally (audioBuffer will be undefined).
+    let newNote = new Note(noteName);
+    // newNote.printNote(`newNote`); // Show that newNote.audioBuffer is still undefined.
+
+    // Then, use createAudioBuffer() to set the audioBuffer property and return the new Note.
+    return await Note.createAudioBuffer(noteName)
+      .then( (buffer) => {
+        newNote.audioBuffer = buffer;
+        // console.log(`newNote(): In then(), newNote.audioBuffer = ${newNote.audioBuffer}`);
+        // newNote.printNote(`newNote`); // Show that newNote.audioBuffer is now set.
+        return newNote;
+      })
+      .catch( (err) => {
+        console.error(`newNote(): Note.createAudioBuffer(${noteName}) failed: ${err}`);
+        return undefined;
+      });
+  }
+
+  /** Syntactic sugar: await fetch(Sounds[noteName]); -> await Note.fetchSound(noteName);
+   * @param {string} noteName 
+   * @returns {Promise<Response>} A promise that resolves to the resposne after requesting the imported wav file.
+   */
+  static async fetchSound(noteName) {
+    let resp = await fetch(Sounds[noteName]);
+    // console.log(`resp url: ${resp.url}`)
+    // console.log(`resp: ${resp.status}`)
+    return resp;
+  }
+
+  /** Fetch and store the note's wav file in an audio buffer to use every time we need to create an audioBufferSourceNode. 
+   * @param {string} noteName - Name of the note to create in scientific pitch notation.
+   * @returns {AudioBuffer} An audio buffer storing the wav file.
+   */
+  static async createAudioBuffer(noteName) {
+    console.log('Note.createAudioBuffer() [starting]')
+  
+    // Create an audio context.
+    const audioCtx = new AudioContext();
+    
+    // Fetch the wav file.
+    // const resp = await Note.fetchSound(noteName); // using path to public folder
+    const resp = await fetch(Sounds[noteName]); // using path to src folder
+    console.log(`Note.createAudioBuffer(): resp: ${resp}, resp.url: ${resp.url}`);
+
+    // Create an ArrayBuffer.
+    const arrayBuffer = await resp.arrayBuffer();
+    // console.log(`Note.createAudioBuffer(): arrayBuffer: ${arrayBuffer}`);
+    
+    // Decode the ArrayBuffer into an AudioBuffer.
+    let audioBuffer = await audioCtx.decodeAudioData(
+      arrayBuffer, 
+      (buffer) => { 
+        // console.log(`then() decodeAudioData: returning ${buffer}`);
+        return buffer;
+      }, 
+      (err) => {
+        console.error(`Note.createAudioBuffer(): error decoding audio data: ${arrayBuffer}`);
+        console.error(err);
+        return undefined;
+      }
+    );
+
+    // Return new audioBuffer or undefined.
+    console.log(`Note.createAudioBuffer() [ending]: Returning audioBuffer as ${audioBuffer}`);
+    return audioBuffer;
+  }
+
+  // New play() method that uses web audio api.
+  async play() {
+    console.log(`play() [starting]: Attempting to play ${this.name}`);
+    Note.audioCtx = new AudioContext();
+
+    /** Check that this.audioBuffer isn't still undefined.
+     * Remember that the constructor doesn't set the audioBuffer, Note.newNote does.
+     */
+    if (this.audioBuffer === undefined) {
+      console.error(`In play(): this.audioBuffer is undefined and will now be initialized. Consider setting it earlier for faster playback.`)
+      this.audioBuffer = await Note.createAudioBuffer(this.name)
+        .then( (buffer) => {
+          return buffer
+        })
+        .catch((err) => {
+          console.error(`In play(): Note.createAudioBuffer(this.name) failed.`);
+          console.error(err);
+        });
+      console.log(`play(): this.audioBuffer is now ${this.audioBuffer}`);
+    }
+    const source = Note.audioCtx.createBufferSource();
+    source.buffer = this.audioBuffer;
+    // console.log(`play(): source.buffer: ${source.buffer}`) // This is now an audio buffer
+    source.connect(Note.audioCtx.destination);
+    source.start();
+  }
+
+  // New playChord() method that uses web audio api.
+  static async playChord(listOfNoteObjects, duration=4000) {
+    let chord = [];
+    Note.audioCtx = new AudioContext();
+
+    for (let i = 0; i < listOfNoteObjects.length; i++) {
+      // console.log(`note[${i}]: ${listOfNoteObjects[i].name}`);
+      const note = listOfNoteObjects[i];
+      console.log(`playChord(): note.audioBuffer: ${note.audioBuffer}`)
+      note.audioBuffer = await Note.createAudioBuffer(note.name);
+      let source = Note.audioCtx.createBufferSource();
+      source.buffer = note.audioBuffer;
+      source.connect(Note.audioCtx.destination);
+      chord.push(source);
+    }
+
+    chord.forEach(source => {
+      source.start(0, 0, duration/1000);
+    });
   }
 
   /** Pick a random octave for a new note.
@@ -54,29 +202,30 @@ export class Note {
     return Math.floor(Math.random() * max) + min;
   }
 
-  /** Play the note.
-   * @returns {Promise} A Promise which is resolved when playback has been started, or is rejected if for any reason playback cannot be started.
-   */
-  play(duration=3000, sustain=false) {
-    audioObjects.push(this.audioElement);
-    // let p = this.audioElement.play() // returning a Promise
-      // .then( () => {
-      //   console.log(`play(${this.name}): nice!`);
-      // })
-      // .catch( (err) => {
-      //   console.error(`play(${this.name}): uh oh \n`, err);
-      // });
-    let p = this.audioElement.play() // returning a Promise
-      .then( () => {
-        if (!sustain) {
-          // console.log(`Stopping Note.`)
-          this.stop(duration);
-        }
-      }).catch( () => {
-        console.error(`Couldn't play Note.`);
-      })
-    return p;
-  }
+  // Old play() method that used <audio>
+  // /** Play the note.
+  //  * @returns {Promise} A Promise which is resolved when playback has been started, or is rejected if for any reason playback cannot be started.
+  //  */
+  // play(duration=3000, sustain=false) {
+  //   audioObjects.push(this.audioElement);
+  //   // let p = this.audioElement.play() // returning a Promise
+  //     // .then( () => {
+  //     //   console.log(`play(${this.name}): nice!`);
+  //     // })
+  //     // .catch( (err) => {
+  //     //   console.error(`play(${this.name}): uh oh \n`, err);
+  //     // });
+  //   let p = this.audioElement.play() // returning a Promise
+  //     .then( () => {
+  //       if (!sustain) {
+  //         // console.log(`Stopping Note.`)
+  //         this.stop(duration);
+  //       }
+  //     }).catch( () => {
+  //       console.error(`Couldn't play Note.`);
+  //     })
+  //   return p;
+  // }
 
   /** Use this to (hopefully) avoid lag between notes when playing a chord.
    * 
@@ -208,7 +357,8 @@ export class Note {
     if (nextOctave < 1 || (nextOctave == 8 && nextLetter !== 'C') || nextOctave > 8) {
       console.error(`Note.nextNote() generated an out of range note: ${noteName}`);
     } 
-    return new Note(noteName);
+    return Note.newNote(noteName);
+    // return new Note(noteName);
   }
 
   /** Get the corresponding note name of an integer.
@@ -521,7 +671,8 @@ function playSoundRecursiveDescending(playing, i, delay=750, sustain) {
     playNotes(playing, delay, ascending, false);
   }
   else {
-    return Note.quickPlay(playing, 3000);
+    // return Note.quickPlay(playing, 3000);
+    return Note.playChord(playing);
   }
 }
 
