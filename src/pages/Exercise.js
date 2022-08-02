@@ -252,6 +252,7 @@ const Exercise = () => {
       return;
     } else if (answerData.name === "Intervals In Context") {
       setFirst_noteV2(Math.floor(Math.random() * 12));
+      // Todo: find other places where this error occurs and create a getDistinctNotes() function to fix it.
       let cn1 = Math.floor(Math.random() * 12);
       let cn2 = Math.floor(Math.random() * 12);
       while (cn1 === cn2) {
