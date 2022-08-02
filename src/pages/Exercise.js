@@ -36,14 +36,36 @@ import {
 import { stopAll } from "../exercises/pianoSounds/pianoSounds";
 export const DEMO = true; // Use for console logging answers during demo.
 
-const sfx = {
-  correct: new Howl({
-    src: Correct,
-  }),
-  wrong: new Howl({
-    src: Wrong,
-  }),
-};
+// const sfx = {
+//   correct: new Howl({
+//     src: Correct,
+//   }),
+//   wrong: new Howl({
+//     src: Wrong,
+//   }),
+// };
+
+// Any new AudioContext() should be created by an onClick event to avoid console.log errors.
+function playSFX(wasCorrect) {
+
+  if (wasCorrect === 'correct') {
+    let newHowl = new Howl({
+      src: Correct,
+    })
+    newHowl.play();
+    return;
+  }
+  if (wasCorrect === 'wrong') {
+    let newHowl = new Howl({
+      src: Wrong,
+    })
+    newHowl.play();
+    return;
+  }
+  if (wasCorrect !== 'correct' && wasCorrect !== 'wrong') {
+    console.error(`In playSFX(): You entered an invalid sound effect key: ${wasCorrect} of type ${typeof wasCorrect}`);
+  }
+}
 
 const DisplayErr = (errorCode, correctOption) => {
   switch (errorCode) {
@@ -788,7 +810,8 @@ const Exercise = () => {
                                 answers[1] === multiActive[1] &&
                                 answers[2] === multiActive[2]
                               ) {
-                                sfx.correct.play();
+                                // sfx.correct.play();
+                                playSFX('correct');
                                 answersHandler(
                                   correctAnswers + 1,
                                   incorrectAnswers
@@ -796,7 +819,8 @@ const Exercise = () => {
                                 setErrorIdx(1);
                                 setIsMultiAnswerTrue([true, true, true]);
                               } else {
-                                sfx.wrong.play();
+                                // sfx.wrong.play();
+                                playSFX('wrong');
                                 answersHandler(
                                   correctAnswers,
                                   incorrectAnswers + 1
@@ -834,7 +858,8 @@ const Exercise = () => {
                           } else {
                             if (clickCount === false) {
                               if (answer === active) {
-                                sfx.correct.play();
+                                // sfx.correct.play();
+                                playSFX('correct');
                                 answersHandler(
                                   correctAnswers + 1,
                                   incorrectAnswers
@@ -842,7 +867,8 @@ const Exercise = () => {
                                 setErrorIdx(1);
                                 setIsAnswerTrue(true);
                               } else {
-                                sfx.wrong.play();
+                                // sfx.wrong.play();
+                                playSFX('wrong');
                                 answersHandler(
                                   correctAnswers,
                                   incorrectAnswers + 1
