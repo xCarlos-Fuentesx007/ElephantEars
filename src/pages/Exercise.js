@@ -205,7 +205,9 @@ const Exercise = () => {
     Math.floor(Math.random() * 12)
   );
 
-  const [times, set_times] = useState([0, 0]);
+  const [times, set_times] = useState([0,0]);
+  const [individual_time, set_individual_time] = useState(0);
+  const [final_time, set_final_time] = useState(0);
   const [first_click, set_first_click] = useState(true);
 
   useEffect(() => {
@@ -230,8 +232,13 @@ const Exercise = () => {
 
     var timer = Date.now() - times[type];
     timer = Math.round(timer / 1000);
-    // logic for time
-    console.log(timer);
+    if (type === 1) {
+      set_individual_time(timer);
+    }
+    else if (type === 0) {
+      set_final_time(timer);
+    }
+    //console.log(timer);
     times[1] = 0;
     return;
   };
@@ -685,6 +692,7 @@ const Exercise = () => {
             component="h1"
             variant="h3"
             sx={{
+              marginTop: 4,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
