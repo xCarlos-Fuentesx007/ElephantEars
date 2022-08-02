@@ -710,7 +710,7 @@ const Exercise = () => {
               {answerData.name}
             </Typography>
 
-            <IconButton
+            {/* <IconButton
               size="large"
               sx={{ position: "absolute", top: "30px", right: "30px" }}
               onClick={() => {
@@ -728,7 +728,7 @@ const Exercise = () => {
                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
                 <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
               </svg>
-            </IconButton>
+            </IconButton> */}
             <IconButton size="large" onClick={exerciseHandler}>
               <VolumeUpRoundedIcon sx={{ fontSize: "400%" }} />
             </IconButton>
@@ -807,7 +807,6 @@ const Exercise = () => {
                         variant="contained"
                         onClick={() => {
                           trackTime(0);
-                          //set_times(times[0], times[1], times[2], Date.now());
                           setIsExitVisible(true);
                         }}
                       >
@@ -827,7 +826,6 @@ const Exercise = () => {
                             answerData.name === "Melodic Dictation"
                           ) {
                             if (clickCount === false) {
-                              //set_times([times[0], times[1], Date.now(), 0]);
                               trackTime(1);
                               if (
                                 answers[0] === multiActive[0] &&
@@ -884,7 +882,6 @@ const Exercise = () => {
                             }
                           } else {
                             if (clickCount === false) {
-                              //set_times([times[0], times[1], Date.now(), 0]);
                               trackTime(1);
                               if (answer === active) {
                                 sfx.correct.play();
@@ -913,7 +910,6 @@ const Exercise = () => {
                                   isAnswerTrue
                                 );
                                 if (schedule.isEmpty()) {
-                                  //set_times(times[0], times[1], times[2], Date.now());
                                   trackTime(0);
                                   stopCampaign();
                                   navigate("/score", { replace: true });
