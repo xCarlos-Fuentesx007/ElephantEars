@@ -161,12 +161,11 @@ const ScoreContainer = ({ onExit }) => {
 
           <Grid item xs="auto">
             <div id="fb-root"></div>
-            <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v14.0" nonce="Y9HalX2E"></script>
+            <script async defer crossOrigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v14.0" nonce="Y9HalX2E"></script>
             <IconButton aria-label="Facebook">
               <div data-href="https://elephant-ears.netlify.app/">
                 <a target="_blank" rel="noreferrer"
                   href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Felephant-ears.netlify.app%2F&amp;src=sdkpreparse" 
-                  class="fb-xfbml-parse-ignore"
                 >
                   <img src={Facebook} alt=""></img>
                 </a>
