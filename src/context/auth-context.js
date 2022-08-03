@@ -478,7 +478,7 @@ const AuthContextProvider = (props) => {
 
   //creates a new schedule of exercises based on previous performance, implements algorithm
   const createSchedule = (updated) => {
-      const accuracies = [];
+      var accuracies = [];
 
       //get accuracies of all available exercises
       userData.unlocked.forEach(exercise => {
@@ -486,25 +486,25 @@ const AuthContextProvider = (props) => {
       });
 
       const accuraciesCopy = accuracies;
-      const p = accuracies.length;
+      var p = accuracies.length;
 
       //setting priority of each exercise based on accuracy
       //priority is 1-n, where n is the number of available exercises
       //the higher the priority, the more it appears
       while (accuracies.length > 0) {
           const minimum = Math.min(...accuracies);
-          const index = accuraciesCopy.indexOf(minimum);
+          var index = accuraciesCopy.indexOf(minimum);
           statsData[userData.unlocked[index]].priority = p;
           index = accuracies.indexOf(minimum);
           accuracies.splice(index, 1);
           p -= 1;
       }
 
-      const rates = [];
+      var rates = [];
 
       //middle algorithm to determine the ratio between priority and accuracy
       userData.unlocked.forEach(exercise => {
-          rates = rates.concat((statsData[statsData.indexOf(exercise)].accuracy)*statsData[stasData.indexOf(exercise)].priority);
+          rates = rates.concat((statsData[statsData.indexOf(exercise)].accuracy)*statsData[statsData.indexOf(exercise)].priority);
       });
 
       //if a new set of exercises is unlocked, it will never appear unless hard set here
@@ -512,20 +512,20 @@ const AuthContextProvider = (props) => {
           rates[userData.unlocked.length-1] = 0.6;
       }
 
-      const totalRate = 0;
+      var totalRate = 0;
 
       rates.forEach(rate => {
           totalRate += rate;
       });
 
-      const occurances = [];
+      var occurances = [];
 
       //the algorithm, determines how many of each exercise will appear in the next schedule
       rates.forEach(rate => {
           occurances = occurances.concat((rate / totalRate) * 20);
       });
 
-      const exercisesLeft = 0;
+      var exercisesLeft = 0;
 
       //determines lenght of next schedule
       occurances.forEach(occurance => {
@@ -533,7 +533,7 @@ const AuthContextProvider = (props) => {
       });
 
       //randomly creates the schedule based on how many exercises are needed, per the algorithm
-      const schedule = [];
+      var schedule = [];
       while (exercisesLeft > 0) {
           const r = Math.random() * occurances.length;
           if (occurances[r] > 0) {
@@ -556,7 +556,7 @@ const AuthContextProvider = (props) => {
   };
   
   const scheduleComplete = () => {
-    const levelUp = true;
+    var levelUp = true;
     
     userData.unlocked.forEach(exercise => {
         if (statsData[statsData.indexOf(exercise)].accuracy < 0.8) {
