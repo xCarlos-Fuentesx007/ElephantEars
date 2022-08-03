@@ -1,5 +1,5 @@
 // import * as Tone from "tone";
-import {Note, playInterval, getIntervalMap, getChordMap, playChord, getScaleMap, playScale, playChordProgression, stopAll, playNotes} from "./pianoSounds/pianoSounds.js";
+import {Note, playInterval, getIntervalMap, getChordMap, playChord, getScaleMap, playScale, playChordProgression, stopAll, playNotes, makeScale} from "./pianoSounds/pianoSounds.js";
 
 
 function Intervals(first_note, interval) {
@@ -19,11 +19,11 @@ function Intervals(first_note, interval) {
   // return find_interval(interval);
   
   // let rootNote = new Note(noteName);
-  console.log(`In Intervals(): noteName = ${noteName}`);
+  // console.log(`In Intervals(): noteName = ${noteName}`);
   Note.newNote(noteName)
     .then( (rootNote) => {
       // console.log(`toneFunctions.js > Intervals(): About to call .play() on: ${typeof note} ${note}`)
-      rootNote.printNote(`Intervals`);
+      // rootNote.printNote(`Intervals`);
       playInterval(rootNote, intervalMap, true);
     })
     .catch( (err) => {
@@ -368,25 +368,62 @@ export {Intervals_In_Context};
 
 /////////////////////////////Melotic Dictation
 function Melodic_Dictation(start_note, first_note, second_note, third_note) {
-
-  let rootNote = Note.numberToNote(start_note);
-  let firstNote = Note.numberToNote(first_note);
-  let secondNote = Note.numberToNote(second_note);
-  let thirdNote = Note.numberToNote(third_note);
-  let notesToPlay = [firstNote, secondNote, thirdNote];
-
   let chordProgressionAsSymbols = ['I', 'IV', 'V', 'I']; // Play the I, IV, V, and I chord. 
-  let delay = 1100;
-  playChordProgression(rootNote, chordProgressionAsSymbols, delay);
-  setTimeout( () => {
-    stopAll().then( () => {
-      // console.log('All audio paused.')
-      // playInterval(firstNote, intervalMap, true);
-      playNotes(notesToPlay, 750, true, false);
-    }).catch( () => {
-      console.error('In toneFunctions.js: stopAll() failed.');
-    });    
-  }, delay * (chordProgressionAsSymbols.length + 1)); // Wait until the chords are done playing to play the answer interval.
+  let duration = 1.1;
+  let offset = (chordProgressionAsSymbols.length + 2) * duration;
+
+  let rootNoteName = Note.numberToNoteName(start_note);
+  Note.newNote(rootNoteName)
+  .then( (rootNote) => {
+    playChordProgression(rootNote, chordProgressionAsSymbols, duration);
+    // rootNote.printNote(`Melodic_Dictation`);
+    let firstNoteName = Note.numberToNoteName(first_note);
+    Note.newNote(firstNoteName)
+    .then((firstNote) => {
+          let secondNoteName = Note.numberToNoteName(second_note);
+          Note.newNote(secondNoteName)
+          .then((secondNote) => {
+                let thirdNoteName = Note.numberToNoteName(third_note);
+                Note.newNote(thirdNoteName)
+                .then((thirdNote) => {
+                      let scale = [firstNote, secondNote, thirdNote];
+                      playNotes(scale, .75, true, false, offset);
+                    })
+                    .catch((err) => {
+                      console.error(`In Melodic_Dictation(): Note.newNote(answerNoteName) failed: ${err}`);
+                    })
+              })
+              .catch((err) => {
+                console.error(`In Melodic_Dictation(): Note.newNote(answerNoteName) failed: ${err}`);
+              })
+        })
+        .catch((err) => {
+          console.error(`In Melodic_Dictation(): Note.newNote(answerNoteName) failed: ${err}`);
+        })
+    })
+    .catch((err) => {
+      console.error(`In Melodic_Dictation(): Note.newNote(noteName) failed: ${err}`);
+    });
+  
+  // Old <audio> code. //Todo: delete.
+  // let rootNote = Note.numberToNote(start_note);
+  // let firstNote = Note.numberToNote(first_note);
+  // let secondNote = Note.numberToNote(second_note);
+  // let thirdNote = Note.numberToNote(third_note);
+  // let notesToPlay = [firstNote, secondNote, thirdNote];
+
+  // let chordProgressionAsSymbols = ['I', 'IV', 'V', 'I']; // Play the I, IV, V, and I chord. 
+  // let delay = 1100;
+  // playChordProgression(rootNote, chordProgressionAsSymbols, delay);
+  // setTimeout( () => {
+  //   stopAll().then( () => {
+  //     // console.log('All audio paused.')
+  //     // playInterval(firstNote, intervalMap, true);
+  //     playNotes(notesToPlay, 750, true, false);
+  //   }).catch( () => {
+  //     console.error('In toneFunctions.js: stopAll() failed.');
+  //   });    
+  // }, delay * (chordProgressionAsSymbols.length + 1)); // Wait until the chords are done playing to play the answer interval.
 
   return find_melodic_dictation(start_note, first_note, second_note, third_note);
 
