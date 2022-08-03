@@ -217,15 +217,10 @@ const EXERCISES_MAP = new Map([
 //   ["vi", "sixth"],
 // ]);
 
-const sampleSchedule = new Queue([
-  "Intervals",
-  "Intervals In Context",
-  "Chord Progressions",
-  "Perfect Pitch",
-  "Intervals",
-  "Chord Progressions",
-  "Perfect Pitch",
-]); // hard coded
+const firstSchedule = new Queue(["Intervals", "Intervals", "Intervals", "Intervals", "Intervals", 
+                                 "Intervals", "Intervals", "Intervals", "Intervals", "Intervals", 
+                                 "Intervals", "Intervals", "Intervals", "Intervals", "Intervals", 
+                                 "Intervals", "Intervals", "Intervals", "Intervals", "Intervals"]);
 
 // const sampleSchedule2 = new Queue(["Intervals", "Chords"]);
 
@@ -257,6 +252,9 @@ export const AuthContext = React.createContext({
   getStatsData: (userData) => {},
   statsData: "",
   runCampaign: () => {},
+  createSchedule: () => {},
+  unlockNextSet: () => {},
+  scheduleComplete: () => {},
   stopCampaign: () => {},
   resetCampaign: () => {},
   updateStatsData: (exercise, correct, isMulti) => {},
@@ -276,7 +274,7 @@ const AuthContextProvider = (props) => {
   const [token, setToken] = useState();
   const [campaignRunning, setCampaignRunning] = useState(false);
   const [fromCampaign, setFromCampaign] = useState(false);
-  const [schedule, setSchedule] = useState(sampleSchedule);
+  const [schedule, setSchedule] = useState(firstSchedule);
   const [statsData, setStatsData] = useState();
   const [currQuestion, setCurrQuestion] = useState(-1);
   const [numQuestions, setNumQuestions] = useState(0);
@@ -347,6 +345,8 @@ const AuthContextProvider = (props) => {
       username: userData.username,
       email: userData.email,
       token: userData.token,
+      unlocked: userData.unlocked,
+      locked: userData.locked,
     };
     localStorage.setItem("userData", JSON.stringify(storedData));
     setUserData(storedData.userData);
@@ -475,6 +475,103 @@ const AuthContextProvider = (props) => {
     exerciseHandler(schedule.peek());
   };
 
+  //creates a new schedule of exercises based on previous performance, implements algorithm
+  const createSchedule = (updated) => {
+      var accuracies = [];
+
+      //get accuracies of all available exercises
+      userData.unlocked.forEach(exercise => {
+          accuracies = accuracies.concat(statsData[statsData.indexOf(exercise)].accuracy);
+      });
+
+      const accuraciesCopy = accuracies;
+      var p = accuracies.length;
+
+      //setting priority of each exercise based on accuracy
+      //priority is 1-n, where n is the number of available exercises
+      //the higher the priority, the more it appears
+      while (accuracies.length > 0) {
+          const minimum = Math.min(...accuracies);
+          var index = accuraciesCopy.indexOf(minimum);
+          statsData[userData.unlocked[index]].priority = p;
+          index = accuracies.indexOf(minimum);
+          accuracies.splice(index, 1);
+          p -= 1;
+      }
+
+      var rates = [];
+
+      //middle algorithm to determine the ratio between priority and accuracy
+      userData.unlocked.forEach(exercise => {
+          rates = rates.concat((statsData[statsData.indexOf(exercise)].accuracy)*statsData[statsData.indexOf(exercise)].priority);
+      });
+
+      //if a new set of exercises is unlocked, it will never appear unless hard set here
+      if (updated) {
+          rates[userData.unlocked.length-1] = 0.6;
+      }
+
+      var totalRate = 0;
+
+      rates.forEach(rate => {
+          totalRate += rate;
+      });
+
+      var occurances = [];
+
+      //the algorithm, determines how many of each exercise will appear in the next schedule
+      rates.forEach(rate => {
+          occurances = occurances.concat((rate / totalRate) * 20);
+      });
+
+      var exercisesLeft = 0;
+
+      //determines lenght of next schedule
+      occurances.forEach(occurance => {
+          exercisesLeft += occurance;
+      });
+
+      //randomly creates the schedule based on how many exercises are needed, per the algorithm
+      var schedule = [];
+      while (exercisesLeft > 0) {
+          const r = Math.random() * occurances.length;
+          if (occurances[r] > 0) {
+              schedule = schedule.concat(userData.unlocked[r]);
+              occurances[r] -= 1;
+          }
+      }
+
+      setSchedule(schedule);
+  };
+
+  //if the user reaches 80% accuracy on all previous exercises, unlocks next exercise set
+  const unlockNextSet = (user) => {
+
+      //move new exercise set from locked to unlocked
+      user.unlocked = user.unlocked.concat(user.locked[0]);
+      user.locked = user.locked.slice(1, -1);
+
+      createSchedule(true);
+  };
+  
+  const scheduleComplete = () => {
+    var levelUp = true;
+    
+    userData.unlocked.forEach(exercise => {
+        if (statsData[statsData.indexOf(exercise)].accuracy < 0.8) {
+            levelUp = false;
+        }
+    });
+
+    if (levelUp && userData.unlocked[-1].totalAnswered >= 20) {
+        unlockNextSet();
+    } else {
+        createSchedule(false);
+    }
+
+    updateUser(userData);
+  };
+  
   const stopCampaign = () => {
     setCampaignRunning(false);
     setFromCampaign(true);
@@ -637,6 +734,9 @@ const AuthContextProvider = (props) => {
         getStatsData: getStatsData,
         statsData: statsData,
         runCampaign: runCampaign,
+        createSchedule: createSchedule,
+        unlockNextSet: unlockNextSet,
+        scheduleComplete: scheduleComplete,
         stopCampaign: stopCampaign,
         resetCampaign: resetCampaign,
         updateStatsData: updateStatsData,
