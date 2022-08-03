@@ -347,6 +347,8 @@ const AuthContextProvider = (props) => {
       username: userData.username,
       email: userData.email,
       token: userData.token,
+      unlocked: userData.unlocked,
+      locked: userData.locked,
     };
     localStorage.setItem("userData", JSON.stringify(storedData));
     setUserData(storedData.userData);
