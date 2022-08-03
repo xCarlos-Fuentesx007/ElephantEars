@@ -217,15 +217,11 @@ const EXERCISES_MAP = new Map([
 //   ["vi", "sixth"],
 // ]);
 
-const sampleSchedule = new Queue([
-  "Intervals",
-  "Intervals In Context",
-  "Chord Progressions",
-  "Perfect Pitch",
-  "Intervals",
-  "Chord Progressions",
-  "Perfect Pitch",
-]); // hard coded
+const firstSchedule = new Queue();
+
+for (let i = 0; i < 20; i++) {
+  firstSchedule.enqueue("Intervals");
+}
 
 // const sampleSchedule2 = new Queue(["Intervals", "Chords"]);
 
@@ -279,7 +275,7 @@ const AuthContextProvider = (props) => {
   const [token, setToken] = useState();
   const [campaignRunning, setCampaignRunning] = useState(false);
   const [fromCampaign, setFromCampaign] = useState(false);
-  const [schedule, setSchedule] = useState(sampleSchedule);
+  const [schedule, setSchedule] = useState(firstSchedule);
   const [statsData, setStatsData] = useState();
   const [currQuestion, setCurrQuestion] = useState(-1);
   const [numQuestions, setNumQuestions] = useState(0);
