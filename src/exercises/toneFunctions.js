@@ -1,5 +1,5 @@
 // import * as Tone from "tone";
-import {Note, playInterval, getIntervalMap, getChordMap, playChord, playScale, playChordProgression, stopAll, playNotes} from "./pianoSounds/pianoSounds.js";
+import {Note, playInterval, getIntervalMap, getChordMap, playChord, getScaleMap, playScale, playChordProgression, stopAll, playNotes} from "./pianoSounds/pianoSounds.js";
 
 
 function Intervals(first_note, interval) {
@@ -61,9 +61,17 @@ export { Chords };
 
 function Scales(first_note, scale_type) {
 
-  let rootNote = Note.numberToNote(first_note);
-  let scaleType = playScale(rootNote, scale_type);
+  let noteName = Note.numberToNoteName(first_note);
+  Note.newNote(noteName)
+    .then( (rootNote) => {
+      // rootNote.printNote(`Scales`);
+      playScale(rootNote, scale_type);
+    })
+    .catch( (err) => {
+      console.error(`In Scales(): Note.newNote(noteName) failed: ${err}`);
+    });
 
+  let scaleType = getScaleMap(scale_type)[0];
   return scaleType;
 
   // const synth = new Tone.Synth().toDestination();

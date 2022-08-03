@@ -35,7 +35,7 @@ export class Note {
    * @param {string} noteName - Note name in scientfic pitch notation e.g. "Cs4".
    */
   constructor(noteName, audioBuffer=undefined) {
-    if (DEBUG) console.log(`constructing note: ${noteName}`);
+    // if (DEBUG) console.log(`constructing note: ${noteName}`);
     if (noteName === undefined) {
       this.letterIndex = getRandomInt(12); // 12 notes in western scale
       this.octave = Note.#getRandomOctave(Note.min, Note.max);
@@ -77,7 +77,7 @@ export class Note {
    * @returns {Promise<Note>} A Promise that resolves to a new Note object with the audioBuffer set to Sounds[noteName].
    */
   static async newNote(noteName) {
-    if (DEBUG) console.log(`newNote() [starting]: noteName = ${noteName}`);
+    // if (DEBUG) console.log(`newNote() [starting]: noteName = ${noteName}`);
 
     // First instantiate a new Note normally (audioBuffer will be undefined).
     let newNote = new Note(noteName);
@@ -113,14 +113,14 @@ export class Note {
    * @returns {Promise<AudioBuffer>} A Promise that resolves to an audio buffer storing the .wav file.
    */
   static async createAudioBuffer(noteName) {
-    if (DEBUG) console.log('Note.createAudioBuffer() [starting]');
+    // if (DEBUG) console.log('Note.createAudioBuffer() [starting]');
   
     // Create an audio context.
     const audioCtx = new AudioContext();
     
     // Fetch the wav file.
     const resp = await fetch(Sounds[noteName]); // using path to src folder
-    if (DEBUG) console.log(`Note.createAudioBuffer(): resp: ${resp}, resp.url: ${resp.url}`);
+    // if (DEBUG) console.log(`Note.createAudioBuffer(): resp: ${resp}, resp.url: ${resp.url}`);
 
     // Create an ArrayBuffer.
     const arrayBuffer = await resp.arrayBuffer();
@@ -141,7 +141,7 @@ export class Note {
     );
 
     // Return the new audioBuffer (or undefined).
-    console.log(`Note.createAudioBuffer() [ending]: Returning audioBuffer as ${audioBuffer}`);
+    // if (DEBUG) console.log(`Note.createAudioBuffer() [ending]: Returning audioBuffer as ${audioBuffer}`);
     return audioBuffer;
   }
 
@@ -188,9 +188,11 @@ export class Note {
    */
   static setAudioContext() {
     if (DEBUG) console.log(`SETTING AUDIO CONTEXT`); // Todo: should this be set to 'interactive' or 'playback'?
-    Note.audioCtx = new AudioContext();
-    // let str = JSON.stringify(Note.audioCtx);
-    // console.log(`New Audio Context: ${str}`);
+    let p = new Promise( (resolve, reject) => {
+      Note.audioCtx = new AudioContext();
+      resolve();
+    })
+    return p;
   }
 
   static closeAudioContext() {
@@ -204,16 +206,16 @@ export class Note {
     if (DEBUG) console.log(`RESETTING AUDIO CONTEXT`);
     if (Note.audioCtx !== undefined) {
       if (DEBUG) console.log(`CLOSING AUDIO CONTEXT`);
-      Note.audioCtx.close()
+      return Note.audioCtx.close()
         .then(() => {
-          Note.setAudioContext();
+          return Note.setAudioContext();
         })
         .catch((err) => {
           console.error(`In resetAudioContext(): Note.closeAudioContext() failed: ${err}`);
         });
     }
     else {
-      Note.setAudioContext();
+      return Note.setAudioContext();
     }
   }
 
@@ -418,7 +420,7 @@ export class Note {
         return note;
       });
 
-    finalNote.printNote(`nextNote`);
+    // if (DEBUG) finalNote.printNote(`nextNote`);
     return finalNote;
     // return new Note(noteName);
   }
@@ -460,7 +462,7 @@ function getRandomInt(max) {
  */
 export function stopAll() {
 
-  Note.resetAudioContext();
+  return Note.resetAudioContext();
 
   // let p = new Promise( (resolve, reject) => {
   //   if (audioObjects == undefined) {audioObjects = []; resolve()}
@@ -629,26 +631,40 @@ export function getScaleMap(index) {
 
 /** Play a scale or arpeggio in ascending or descending order.
  * @param {Array<Note>} playing - A list of Note objects.
- * @param {number} delay - Time in milliseconds between each note. Default: 750 ms.
+ * @param {number} duration - Time in seconds between each note. Default: .75 ms.
  * @param {boolean} ascending - Play the notes first to last or last to first?
  * @param {boolean} sustain - If (false): silence each note before playing the next one.
  */
-export function playNotes(playing, delay=750, ascending=true, sustain=true) {
-  stopAll(); // Stop all other music before playing the scale.
+export function playNotes(playing, duration=.75, ascending=true, sustain=true) {
+  stopAll() // Stop all other music before playing the scale.
+    .then( () => {
+      let startTime = Note.audioCtx.currentTime;
+      let noteDuration = duration; // .75 seconds
+      let lastIndex = playing.length-1;
+      for (let i = 0; i < lastIndex; i++) {
+        const note = playing[i];
+        note.play(noteDuration, startTime)
+        startTime += noteDuration;
+      }
+      playing[lastIndex].play(noteDuration*3, startTime);
+    })
+    .catch( (err) => {
+      console.error(`In playNotes(): stopAll() failed: ${err}`);
+    });
 
-  if (ascending) {
-    playing[0].play(delay, sustain).then( () => {
-      // if (!sustain) {setTimeout(() => {playing[0].stop()}, delay);} // not necessary
-      playSoundRecursiveAscending(playing, 1, delay, sustain);
-    } );
-  }
-  else {
-    let i = playing.length-1;
-    playing[i].play(delay, sustain).then( () => {
-      // if (!sustain) {setTimeout(() => {playing[playing.length-1].stop()}, delay);}
-      playSoundRecursiveDescending(playing, --i, delay, sustain);
-    } );
-  }
+  // if (ascending) {
+  //   playing[0].play(delay, sustain).then( () => {
+  //     // if (!sustain) {setTimeout(() => {playing[0].stop()}, delay);} // not necessary
+  //     playSoundRecursiveAscending(playing, 1, delay, sustain);
+  //   } );
+  // }
+  // else {
+  //   let i = playing.length-1;
+  //   playing[i].play(delay, sustain).then( () => {
+  //     // if (!sustain) {setTimeout(() => {playing[playing.length-1].stop()}, delay);}
+  //     playSoundRecursiveDescending(playing, --i, delay, sustain);
+  //   } );
+  // }
 }
 
 /** Play a list of notes in order with a delay between each note. This should never be used directly, only by playNotes().
@@ -980,26 +996,32 @@ function playChordProgressionWrapper(chordProgMap, delay=1100) {
 * @param {Array<string, number>} scaleMap - A map describing the chords name and structure. Should only be generated by getScaleMap().
  * @returns {Array<Note>} List of Note objects to form a scale.
  */
- function makeScale(rootNote, scaleMap) {
-  // let scaleMap = getScaleMap(scaleType);
-  // console.log(`makeScale(): scaleMap = ${scaleMap}`)
+ async function makeScale(rootNote, scaleMap) {
 
-  let scale = [rootNote];
-  // scaleMap.forEach(note => {
-  //   // let index = rootNote.letterIndex + note;
-  //   // let newNote = new Note(notes[index%12] + (rootNote.octave + (index<12 ? 0 : 1)));
-  //   // scale.push(newNote);
-
-  //   let nextNote = rootNote.nextNote(note);
-  //   scale.push(nextNote);
-  // });
-
-  for (let i = 1; i < scaleMap.length; i++) { // Start at 1 because scaleMap[0] is the name.
-    let nextNote = rootNote.nextNote(scaleMap[i]);
-    scale.push(nextNote);
-  }
+  let scale = await chordMapToChord(rootNote, scaleMap);
 
   return scale;
+
+
+  // // let scaleMap = getScaleMap(scaleType);
+  // // console.log(`makeScale(): scaleMap = ${scaleMap}`)
+
+  // let scale = [rootNote];
+  // // scaleMap.forEach(note => {
+  // //   // let index = rootNote.letterIndex + note;
+  // //   // let newNote = new Note(notes[index%12] + (rootNote.octave + (index<12 ? 0 : 1)));
+  // //   // scale.push(newNote);
+
+  // //   let nextNote = rootNote.nextNote(note);
+  // //   scale.push(nextNote);
+  // // });
+
+  // for (let i = 1; i < scaleMap.length; i++) { // Start at 1 because scaleMap[0] is the name.
+  //   let nextNote = rootNote.nextNote(scaleMap[i]);
+  //   scale.push(nextNote);
+  // }
+
+  // return scale;
 }
 
 // Old playScale() function. Not useful anymore.
@@ -1033,10 +1055,10 @@ function playChordProgressionWrapper(chordProgMap, delay=1100) {
  * @param {boolean} ascending - Play the scale in ascending or descending order.
  * @returns {string} A string describing the scale type.
  */
- export function playScale(rootNote, scaleType, ascending=true) {
+ export async function playScale(rootNote, scaleType, ascending=true) {
   let scaleMap = getScaleMap(scaleType);
   if (scaleMap == undefined) {console.error(`invalid scale type: ${scaleType}`); return;} // guard condition
-  let scale = makeScale(rootNote, scaleMap);
+  let scale = await makeScale(rootNote, scaleMap);
 
   if ( DEMO ) {
     // let display = scale.map((note) => (note.name))
@@ -1046,7 +1068,9 @@ function playChordProgressionWrapper(chordProgMap, delay=1100) {
     });
     console.log(`Playing ${scaleMap[0]} scale on ${rootNote.name} -> ${display}`);
   }
-  playNotes(scale, 1020, ascending, false); // Set delay between notes here.
+
+
+  playNotes(scale, .75, ascending, false); // Set delay between notes here.
   return scaleMap[0];
   // return scaleType;
 }
