@@ -141,6 +141,18 @@ const ExitContainer = ({ onCancel }) => {
   );
 };
 
+function getDistinctNumbers(n, max=12) {
+  let distinctNumbers = [];
+  for (let i = 0; i < n; i++) {
+    let nextNumber = Math.floor(Math.random() * max);
+    while(distinctNumbers.includes(nextNumber)) {
+      nextNumber = Math.floor(Math.random() * max);
+    }
+    distinctNumbers.push(nextNumber);
+  }
+  return distinctNumbers;
+}
+
 const Exercise = () => {
   const authCtx = useContext(AuthContext);
   const [answer, setAnswer] = useState();
@@ -253,11 +265,12 @@ const Exercise = () => {
     } else if (answerData.name === "Intervals In Context") {
       setFirst_noteV2(Math.floor(Math.random() * 12));
       // Todo: find other places where this error occurs and create a getDistinctNotes() function to fix it.
-      let cn1 = Math.floor(Math.random() * 12);
-      let cn2 = Math.floor(Math.random() * 12);
-      while (cn1 === cn2) {
-        cn2 = Math.floor(Math.random() * 12);
-      }
+      // let cn1 = Math.floor(Math.random() * 12);
+      // let cn2 = Math.floor(Math.random() * 12);
+      // while (cn1 === cn2) {
+      //   cn2 = Math.floor(Math.random() * 12);
+      // }
+      let [cn1, cn2] = getDistinctNumbers(2);
       set_context_num1(cn1);
       set_context_num2(cn2);
       return;
