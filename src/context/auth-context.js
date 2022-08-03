@@ -217,11 +217,10 @@ const EXERCISES_MAP = new Map([
 //   ["vi", "sixth"],
 // ]);
 
-const firstSchedule = new Queue();
-
-for (let i = 0; i < 20; i++) {
-  firstSchedule.enqueue("Intervals");
-}
+const firstSchedule = new Queue(["Intervals", "Intervals", "Intervals", "Intervals", "Intervals", 
+                                 "Intervals", "Intervals", "Intervals", "Intervals", "Intervals", 
+                                 "Intervals", "Intervals", "Intervals", "Intervals", "Intervals", 
+                                 "Intervals", "Intervals", "Intervals", "Intervals", "Intervals"]);
 
 // const sampleSchedule2 = new Queue(["Intervals", "Chords"]);
 
