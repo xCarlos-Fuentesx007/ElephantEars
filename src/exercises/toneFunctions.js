@@ -1,4 +1,4 @@
-import * as Tone from "tone";
+// import * as Tone from "tone";
 import {Note, playInterval, getIntervalMap, getChordMap, playChord, playScale, playChordProgression, stopAll, playNotes} from "./pianoSounds/pianoSounds.js";
 
 
@@ -7,20 +7,32 @@ function Intervals(first_note, interval) {
 
   let noteName = Note.notes[first_note%12] + (Math.trunc(first_note/12) + 2);
   // console.log('noteName', noteName)
-  let rootNote = new Note(noteName);
   let intervalMap = getIntervalMap(interval);
-
+  
   // const synth = new Tone.Synth().toDestination();
-
+  
   // var second_note = first_note + interval;
-
+  
   // synth.triggerAttackRelease(find_note(first_note), "4n", Tone.now());
   // synth.triggerAttackRelease(find_note(second_note), "4n", Tone.now() + 0.8);
-
+  
   // return find_interval(interval);
-
-  let intervalName = playInterval(rootNote, intervalMap, true);
-  return intervalName;
+  
+  // let rootNote = new Note(noteName);
+  console.log(`In Intervals(): noteName = ${noteName}`);
+  Note.newNote(noteName)
+    .then( (rootNote) => {
+      // console.log(`toneFunctions.js > Intervals(): About to call .play() on: ${typeof note} ${note}`)
+      rootNote.printNote(`Intervals`);
+      playInterval(rootNote, intervalMap, true);
+    })
+    .catch( (err) => {
+      console.error(`In Intervals(): Note.newNote(noteName) failed: ${err}`);
+    });
+  
+  // let intervalName = playInterval(rootNote, intervalMap, true);
+  // return intervalName;
+  return find_interval(interval);
 }
 export { Intervals };
 
@@ -176,8 +188,18 @@ function Perfect_Pitch(first_note) {
   let octave = Math.floor(first_note/12)+3;
   let noteNameKey = key + octave.toString();
   let noteName = nameDictionary[noteNameKey];
-  let note = new Note(noteName);
-  note.play();
+
+  /** Using async/await isn't allowed because then Perfect_Pitch() returns a Promise<string> instead of a string. So we must handle the async code (playing the Note) here. */
+  Note.newNote(noteName)
+    .then( (note) => {
+      // console.log(`toneFunctions.js > Perfect_Pitch(): About to call .play() on: ${typeof note} ${note}`)
+      // note.printNote(`Perfect_Pitch`);
+      note.play();
+    })
+    .catch( (err) => {
+      console.error(`In Perfect_Pitch(): Note.newNote(noteName) failed: ${err}`);
+    });
+  
   return key;
 
   // const synth = new Tone.Synth().toDestination();

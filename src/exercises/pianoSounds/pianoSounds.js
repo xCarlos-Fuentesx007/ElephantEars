@@ -3,6 +3,8 @@ import { Sounds } from "./piano-wav/exportSounds";
 import Silent from "./piano-wav/silent.wav"; // Used in Note.quickPlay() hack.
 import { DEMO } from "../../pages/Exercise";
 
+const DEBUG = true;
+
 // const notes = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B']; // Dead code: transferred this to Notes class as static object.
 // const pathToFolder = "./piano-wav/"; // Where all samples are stored. Lowest note available: C1. Highest note available: C8.
 let audioObjects = []; // Global list to keep track of all sounds currently playing
@@ -33,7 +35,7 @@ export class Note {
    * @param {string} noteName - Note name in scientfic pitch notation e.g. "Cs4".
    */
   constructor(noteName, audioBuffer=undefined) {
-    console.log(`constructing note: ${noteName}`)
+    if (DEBUG) console.log(`constructing note: ${noteName}`);
     if (noteName === undefined) {
       this.letterIndex = getRandomInt(12); // 12 notes in western scale
       this.octave = Note.#getRandomOctave(Note.min, Note.max);
@@ -68,14 +70,14 @@ export class Note {
     console.log(`\tthis.audioBuffer: ${this.audioBuffer}`)
   }
 
-  /** Wrapper function for the Note constructor to create a factory function for new Note objects with properly initialized audio buffers.
+  /** Wrapper function for the Note constructor to create new Note objects with properly initialized audio buffers.
    * @description Asynchronous code like fetch() isn't allowed in constructors. To get around that, this factory function creates the Note with its property audioBuffer=undefined, awaits until it can store Sounds[noteName] in audioBuffer, and only then returns the new Note.
    * @async
    * @param {string} noteName - Name of the note to create in scientific pitch notation.
    * @returns {Promise<Note>} A Promise that resolves to a new Note object with the audioBuffer set to Sounds[noteName].
    */
   static async newNote(noteName) {
-    console.log(`newNote() [starting]: noteName = ${noteName}`);
+    if (DEBUG) console.log(`newNote() [starting]: noteName = ${noteName}`);
 
     // First instantiate a new Note normally (audioBuffer will be undefined).
     let newNote = new Note(noteName);
@@ -95,8 +97,8 @@ export class Note {
       });
   }
 
-  /** Syntactic sugar: await fetch(Sounds[noteName]); -> await Note.fetchSound(noteName);
-   * @param {string} noteName 
+  /** Syntactic sugar: `await fetch(Sounds[noteName]);` -> `await Note.fetchSound(noteName);`
+   * @param {string} noteName - Name of the note to create in scientific pitch notation.
    * @returns {Promise<Response>} A promise that resolves to the resposne after requesting the imported wav file.
    */
   static async fetchSound(noteName) {
@@ -108,18 +110,17 @@ export class Note {
 
   /** Fetch and store the note's wav file in an audio buffer to use every time we need to create an audioBufferSourceNode. 
    * @param {string} noteName - Name of the note to create in scientific pitch notation.
-   * @returns {AudioBuffer} An audio buffer storing the wav file.
+   * @returns {Promise<AudioBuffer>} A Promise that resolves to an audio buffer storing the .wav file.
    */
   static async createAudioBuffer(noteName) {
-    console.log('Note.createAudioBuffer() [starting]')
+    if (DEBUG) console.log('Note.createAudioBuffer() [starting]');
   
     // Create an audio context.
     const audioCtx = new AudioContext();
     
     // Fetch the wav file.
-    // const resp = await Note.fetchSound(noteName); // using path to public folder
     const resp = await fetch(Sounds[noteName]); // using path to src folder
-    console.log(`Note.createAudioBuffer(): resp: ${resp}, resp.url: ${resp.url}`);
+    if (DEBUG) console.log(`Note.createAudioBuffer(): resp: ${resp}, resp.url: ${resp.url}`);
 
     // Create an ArrayBuffer.
     const arrayBuffer = await resp.arrayBuffer();
@@ -139,48 +140,85 @@ export class Note {
       }
     );
 
-    // Return new audioBuffer or undefined.
+    // Return the new audioBuffer (or undefined).
     console.log(`Note.createAudioBuffer() [ending]: Returning audioBuffer as ${audioBuffer}`);
     return audioBuffer;
   }
 
-  // New play() method that uses web audio api.
-  async play() {
-    console.log(`play() [starting]: Attempting to play ${this.name}`);
-    Note.audioCtx = new AudioContext();
+  // ? This function is only asynchronous when `this.audioBuffer == undefined`. Can we pull out that guard condition so this function can be called sychronously?
+  // * Solution: new call `new Note()`. Only call `await Note.newNote()`.
+  /** New play() method that uses web audio api.
+   */
+  // async play() {
+  play(duration=2, when=0) {
+    if (Note.audioCtx === undefined) {
+      Note.setAudioContext();
+    }
 
-    /** Check that this.audioBuffer isn't still undefined.
-     * Remember that the constructor doesn't set the audioBuffer, Note.newNote does.
-     */
+    if (DEBUG) console.log(`play() [starting]: Attempting to play ${this.name}`);
+    // Make sure `this.audioBuffer` isn't still undefined, since the constructor doesn't set the audioBuffer, Note.newNote() does.
     if (this.audioBuffer === undefined) {
-      console.error(`In play(): this.audioBuffer is undefined and will now be initialized. Consider setting it earlier for faster playback.`)
-      this.audioBuffer = await Note.createAudioBuffer(this.name)
-        .then( (buffer) => {
-          return buffer
-        })
-        .catch((err) => {
-          console.error(`In play(): Note.createAudioBuffer(this.name) failed.`);
-          console.error(err);
-        });
-      console.log(`play(): this.audioBuffer is now ${this.audioBuffer}`);
+      /** If we wanted to the audioBuffer here we could, but that would make this function asynchronous which makes the code more complex. */
+      // console.error(`In play(): this.audioBuffer is undefined and will now be initialized. Consider setting it earlier for faster playback.`)
+      // this.audioBuffer = await Note.createAudioBuffer(this.name)
+      //   .then( (buffer) => {
+      //     return buffer
+      //   })
+      //   .catch((err) => {
+      //     console.error(`In play(): Note.createAudioBuffer(this.name) failed.`);
+      //     console.error(err);
+      //   });
+      // console.log(`play(): this.audioBuffer is now ${this.audioBuffer}`);
+      console.error("In play(): this.audioBuffer is undefined. Remember to use `await Note.newNote(noteName)` not `new Note(noteName)`");
+      return;
     }
     const source = Note.audioCtx.createBufferSource();
+    // if (DEBUG) console.log(`play() AUDIO CONTEXT: ${source.context}`);
     source.buffer = this.audioBuffer;
     // console.log(`play(): source.buffer: ${source.buffer}`) // This is now an audio buffer
     source.connect(Note.audioCtx.destination);
-    source.start();
+    source.start(Note.audioCtx.currentTime + when, 0, duration); // Todo: start(when, offset, duration): set when for scales/intervals and duration for cutoff?
   }
 
-  // New playChord() method that uses web audio api.
-  static async playChord(listOfNoteObjects, duration=4000) {
-    let chord = [];
+  /** Set or reset the Audio Context for all Notes.
+   * 
+   * @description This method should be called outside of pianoSounds.js or inside of a guard condition
+   * for when Note.audioCtx is undefined. Since pianoSounds.js is a library now, setting Note.audioCtx 
+   * from outside the library is an efficient way to generate 1 shared audio context.
+   */
+  static setAudioContext() {
+    if (DEBUG) console.log(`SETTING AUDIO CONTEXT`); // Todo: should this be set to 'interactive' or 'playback'?
     Note.audioCtx = new AudioContext();
+    // let str = JSON.stringify(Note.audioCtx);
+    // console.log(`New Audio Context: ${str}`);
+  }
+
+  static closeAudioContext() {
+    console.log(`CLOSING AUDIO CONTEXT`)
+    if (Note.audioCtx !== undefined) {
+      Note.audioCtx.close();
+    }
+  }
+
+  /** New Note.quickPlay() method that uses the web audio api.
+   * 
+   * @description In order for this function to be synchronous, it's important that the audioBuffer property of each Note is already initialized to encode a .wav file.
+   * @param {Array<Note>} listOfNoteObjects - A list of Note objects with their audioBuffers already initialized.
+   * @param {number} duration - Time in milliseconds to let the chord play.
+   */
+  // static async playChord(listOfNoteObjects, duration=3000) {
+  static playChord(listOfNoteObjects, duration=3000) {
+    if (Note.audioCtx === undefined) {
+      Note.setAudioContext();
+    }
+
+    let chord = [];
 
     for (let i = 0; i < listOfNoteObjects.length; i++) {
       // console.log(`note[${i}]: ${listOfNoteObjects[i].name}`);
       const note = listOfNoteObjects[i];
-      console.log(`playChord(): note.audioBuffer: ${note.audioBuffer}`)
-      note.audioBuffer = await Note.createAudioBuffer(note.name);
+      console.log(`playChord(): listOfNoteObjects[${i}].audioBuffer: ${note.audioBuffer}`)
+      // note.audioBuffer = await Note.createAudioBuffer(note.name);
       let source = Note.audioCtx.createBufferSource();
       source.buffer = note.audioBuffer;
       source.connect(Note.audioCtx.destination);
@@ -340,10 +378,11 @@ export class Note {
   }
 
   /** Get the note a certain number of semitones away from the current note.
+   * @async
    * @param {number} semitones - Can be a positive or negative number.
-   * @returns {Note} A new Note object.
+   * @returns {Promise<Note>} A Promise that resolves to a new Note object.
    */
-  nextNote(semitones) { // Todo: Rewrite this so it can handle very large intervals (rn can't produce anything 2 octaves away)
+  async nextNote(semitones) { // Todo: Rewrite this so it can handle very large intervals (rn can't produce anything 2 octaves away)
     let nextIndex = this.letterIndex + semitones;
     let nextLetter = Note.notes[nextIndex%12];
     let octaveDisplacement = (nextIndex < 12 && nextIndex >= 0) 
@@ -357,7 +396,14 @@ export class Note {
     if (nextOctave < 1 || (nextOctave == 8 && nextLetter !== 'C') || nextOctave > 8) {
       console.error(`Note.nextNote() generated an out of range note: ${noteName}`);
     } 
-    return Note.newNote(noteName);
+    let finalNote = await Note.newNote(noteName)
+      .then( (note) => {
+        note.printNote(`then of nextNote`); 
+        return note;
+      });
+
+    finalNote.printNote(`nextNote`);
+    return finalNote;
     // return new Note(noteName);
   }
 
@@ -708,11 +754,21 @@ export function playInterval(rootNote, intervalMap, arpeggiate=false, ascending=
   if (intervalMap === undefined) {console.error(`In playInterval(): intervalMap is undefined`); return;}
 
   // playChord(rootNote, intervalMap, arpeggiate, ascending, 1110);
-  let nextNote = rootNote.nextNote(intervalMap[1])
-  rootNote.play(1110, false).then( () => {
-    setTimeout( () => {
-      nextNote.play(2700, false);
-    }, delay)}).catch(() => {console.error(`playInterval() failed`)});
+  // let nextNote = rootNote.nextNote(intervalMap[1])
+  // rootNote.play(1110, false).then( () => {
+  //   setTimeout( () => {
+  //     nextNote.play(2700, false);
+  //   }, delay)}).catch(() => {console.error(`playInterval() failed`)});
+  // return intervalMap[0]; // Return the interval's name
+
+  // Todo: rewrite doc string.
+  rootNote.nextNote(intervalMap[1])
+    .then( (secondNote) => {
+      // rootNote.play(1110, false).then( () => { // Todo: .play() doesn't return a promise anymore!!!!
+      let duration = 1;
+      rootNote.play(duration);
+      secondNote.play(2, duration);
+    })
   return intervalMap[0]; // Return the interval's name
 }
 
