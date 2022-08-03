@@ -16,7 +16,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import StarIcon from "@mui/icons-material/Star";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import Facebook from "../img/Facebook.png";
-import Instagram from "../img/Instagram.png";
 import Twitter from "../img/Twitter.png";
 import { Link } from "react-router-dom";
 
@@ -45,11 +44,20 @@ const data = [
 const ScoreContainer = ({ onExit }) => {
   const authCtx = useContext(AuthContext);
 
-  const { percentage, correctAnswers, incorrectAnswers, startedDate } = authCtx;
+  const {
+    correctAnswers,
+    incorrectAnswers,
+    startedDate,
+    numQuestions,
+    fromCampaign,
+  } = authCtx;
 
   const [activeData, setActiveData] = useState(data[0]);
   const [timeSpent, setTimeSpent] = useState();
   const [timeSpentPerQuestion, setTimeSpentPerQuestion] = useState();
+  const accuracy = fromCampaign
+    ? (correctAnswers / numQuestions) * 100
+    : (correctAnswers / (correctAnswers + incorrectAnswers)) * 100;
 
   function msToTime(ms) {
     let seconds = (ms / 1000).toFixed(1);
@@ -74,14 +82,14 @@ const ScoreContainer = ({ onExit }) => {
       );
     }
 
-    if (percentage === 100) {
+    if (accuracy === 100) {
       setActiveData(data[0]);
-    } else if (percentage >= 80) {
+    } else if (accuracy >= 80) {
       setActiveData(data[1]);
     } else {
       setActiveData(data[2]);
     }
-  }, [percentage, startedDate, correctAnswers, incorrectAnswers]);
+  }, [accuracy, startedDate, correctAnswers, incorrectAnswers]);
   return (
     <Container maxWidth="sm">
       <Paper
@@ -104,8 +112,8 @@ const ScoreContainer = ({ onExit }) => {
           style={{ height: 100, width: 100, margin: "auto", marginTop: "20px" }}
         >
           <CircularProgressbar
-            value={percentage}
-            text={`${percentage.toFixed(1)}%`}
+            value={accuracy}
+            text={`${accuracy.toFixed(1)}%`}
             strokeWidth={12}
             styles={buildStyles({
               textColor: "#111",
@@ -149,21 +157,33 @@ const ScoreContainer = ({ onExit }) => {
           <Grid item xs="auto">
             Share your results:
           </Grid>
+
+
           <Grid item xs="auto">
+            <div id="fb-root"></div>
+            <script async defer crossOrigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v14.0" nonce="Y9HalX2E"></script>
             <IconButton aria-label="Facebook">
-              <img src={Facebook} alt=""></img>
+              <div data-href="https://elephant-ears.netlify.app/">
+                <a target="_blank" rel="noreferrer"
+                  href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Felephant-ears.netlify.app%2F&amp;src=sdkpreparse" 
+                >
+                  <img src={Facebook} alt=""></img>
+                </a>
+              </div>
             </IconButton>
           </Grid>
+
           <Grid item xs="auto">
             <IconButton aria-label="Twitter">
-              <img src={Twitter} alt=""></img>
+              <a target="_blank" rel="noreferrer" 
+                href="https://twitter.com/intent/tweet?text=Check%20out%20Elephant%20Ears%20at&url=https://elephant-ears.netlify.app/&hashtags=ElephantEars"
+              >
+                <img src={Twitter} alt=""></img>
+              </a>
             </IconButton>
           </Grid>
-          <Grid item xs="auto">
-            <IconButton aria-label="Instagram">
-              <img src={Instagram} alt=""></img>
-            </IconButton>
-          </Grid>
+
+
         </Grid>
       </Paper>
     </Container>
@@ -171,6 +191,9 @@ const ScoreContainer = ({ onExit }) => {
 };
 
 const ExitContainer = ({ onCancel }) => {
+  const authCtx = useContext(AuthContext);
+
+  const { resetCampaign } = authCtx;
   return (
     <Container maxWidth="sm">
       <Paper
@@ -209,7 +232,11 @@ const ExitContainer = ({ onCancel }) => {
           </Grid>
           <Grid item xs={5}>
             <Link to="/dashboard">
-              <Button variant="contained" fullWidth>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => resetCampaign}
+              >
                 Yes
               </Button>
             </Link>

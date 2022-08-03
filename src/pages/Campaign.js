@@ -1,20 +1,27 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useContext, useEffect } from "react";
+import { AuthContext } from "../context/auth-context";
 import {
   Container,
+  Divider,
   Paper,
   Typography,
-  TextField,
   Button,
-  Alert,
   List,
   ListItem,
   ListItemText,
-  Divider,
 } from "@mui/material";
 
 import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom";
 
 const Campaign = () => {
+  const authCtx = useContext(AuthContext);
+  const { runCampaign, schedule, userData, statsData, getStatsData } = authCtx;
+
+  useEffect(() => {
+    getStatsData(userData);
+  }, [userData]);
+
   return (
     <Fragment>
       <Navbar />
@@ -65,30 +72,14 @@ const Campaign = () => {
                 },
               }}
             >
-              <ListItem>
-                <ListItemText primary="Intervals" secondary="All" />
-              </ListItem>
-              <ListItem>
-                <ListItemText primary="Scale Degrees" secondary="Chromatic" />
-              </ListItem>
-              <ListItem>
-                <ListItemText primary="Scales" secondary="All" />
-              </ListItem>
-              <ListItem>
-                <ListItemText
-                  primary="Intervals in Context"
-                  secondary="Diatonic"
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText primary="Pitch" secondary="C Sale" />
-              </ListItem>
-              <ListItem>
-                <ListItemText
-                  primary="Chord Progressions"
-                  secondary="All Triads and Sevenths"
-                />
-              </ListItem>
+              {schedule.exercises.map((exercise, index) => (
+                <Container key={index}>
+                  <ListItem>
+                    <ListItemText primary={exercise} />
+                  </ListItem>
+                  {index !== schedule.getSize() - 1 ? <Divider /> : null}
+                </Container>
+              ))}
             </List>
           </Container>
           <Container
@@ -98,9 +89,16 @@ const Campaign = () => {
               alignItems: "center",
             }}
           >
-            <Button type="submit" variant="contained" sx={{ my: 1 }}>
-              Lets Get Started!
-            </Button>
+            <Link to="/exercise">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ my: 1 }}
+                onClick={() => runCampaign()}
+              >
+                Lets Get Started!
+              </Button>
+            </Link>
           </Container>
         </Paper>
       </Container>

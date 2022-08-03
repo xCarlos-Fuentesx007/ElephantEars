@@ -1,14 +1,59 @@
-import React, { Fragment, useContext } from "react";
+import React, { Fragment, useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth-context";
-import { Container, Paper, Typography, Button, Grid } from "@mui/material";
+import {
+  Container,
+  Paper,
+  Typography,
+  Button,
+  Grid,
+  CircularProgress,
+} from "@mui/material";
 
 import Navbar from "../components/Navbar";
 import CircularProgressBar from "../components/CircularProgressBar";
+import { useEffect } from "react";
+
+//getting the stats base url form the env files
+const statsUrl = process.env.REACT_APP_BACKEND_STATS_URL;
 
 const Dashboard = () => {
   const authCtx = useContext(AuthContext);
-  const userData = authCtx.userData;
+  const [statsData, setStatsData] = useState();
+  const { userData } = authCtx;
+
+  const token = userData.token;
+
+  //variable to find the mastery progress value by using the fetched data
+  const masteryValue =
+    ((statsData?.intervals?.totalAccuracy +
+      statsData?.chords?.totalAccuracy +
+      statsData?.scales?.totalAccuracy +
+      statsData?.pitch?.totalAccuracy +
+      statsData?.chord_progressions?.totalAccuracy +
+      statsData?.scale_degrees?.totalAccuracy +
+      statsData?.intervals_in_context?.totalAccuracy +
+      statsData?.melodic_dictation?.totalAccuracy) /
+      800) *
+    100;
+
+  //fetching stats data when the component loads or when the token is changed
+
+  useEffect(() => {
+    const fetchStatsData = async () => {
+      const response = await fetch(`${statsUrl}/all`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      setStatsData(data);
+    };
+    if (token) {
+      fetchStatsData();
+    }
+  }, [token]);
+
   return (
     <Fragment>
       <Navbar />
@@ -42,109 +87,132 @@ const Dashboard = () => {
             An overview of your progress
           </Typography>
 
-          <Grid
-            container
-            spacing={3}
-            justifyContent="center"
-            alignItems="center"
-            paddingX={4}
-          >
-            <Grid
-              item
-              xs={12}
-              md={6}
-              paddingY={8}
+          {/* showing spinner if stats data is being fetched */}
+          {!statsData && (
+            <Container
               sx={{
-                bgcolor: "#fff",
-                borderRadius: "25px",
-                boxShadow: "1px 1px 20px rgba(0,0,0,0.2)",
+                height: "40vh",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <h2 style={{ margin: "20px 0" }}>Lifetime Stats</h2>
-              <div style={{ margin: "10px 0" }}>
-                <h4>Sessions completed:</h4>
-                <h6>24</h6>
-              </div>
-              <div style={{ margin: "10px 0" }}>
-                <h4>Overall accuracy:</h4>
-                <h6>89%</h6>
-              </div>
-              <div style={{ margin: "10px 0" }}>
-                <h4>Total time:</h4>
-                <h6>4hr 34m 22s</h6>
-              </div>
-              <div style={{ margin: "10px 0" }}>
-                <h4>Average time/question:</h4>
-                <h6>10.02s</h6>
-              </div>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Grid container spacing={1}>
-                <Grid item xs={4}>
-                  <CircularProgressBar
-                    percentage="80"
-                    title="Intervals"
-                    color="#6F2DBD"
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <CircularProgressBar
-                    percentage="73"
-                    title="Chords"
-                    color="#1E96FC"
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <CircularProgressBar
-                    percentage="85"
-                    title="Scales"
-                    color="#3DDC97"
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <CircularProgressBar
-                    percentage="40"
-                    title="Pitch"
-                    color="#DA627D"
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <CircularProgressBar
-                    percentage="100"
-                    title="Mastery"
-                    color="#00B227"
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <CircularProgressBar
-                    percentage="42"
-                    title="Chords Progression"
-                    color="#FCA17D"
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <CircularProgressBar
-                    percentage="25"
-                    title="Scale Degrees"
-                    color="#00B2A8"
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <CircularProgressBar
-                    percentage="37"
-                    title="Intervals in Context"
-                    color="#EAD637"
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <CircularProgressBar
-                    percentage="13"
-                    title="Melodic Dictation"
-                  />
+              <CircularProgress />
+            </Container>
+          )}
+          {statsData && (
+            <Grid
+              container
+              spacing={3}
+              justifyContent="center"
+              alignItems="center"
+              paddingX={4}
+            >
+              <Grid
+                item
+                xs={12}
+                md={6}
+                paddingY={8}
+                sx={{
+                  bgcolor: "#fff",
+                  borderRadius: "25px",
+                  boxShadow: "1px 1px 20px rgba(0,0,0,0.2)",
+                }}
+              >
+                <h2 style={{ margin: "20px 0" }}>Lifetime Stats</h2>
+                <div style={{ margin: "10px 0" }}>
+                  <h4>Sessions completed:</h4>
+                  <h6>{statsData?.sessionsCompleted}</h6>
+                </div>
+                <div style={{ margin: "10px 0" }}>
+                  <h4>Overall accuracy:</h4>
+                  <h6>{statsData?.overallAccuracy}</h6>
+                </div>
+                <div style={{ margin: "10px 0" }}>
+                  <h4>Total time:</h4>
+                  <h6>
+                    {statsData?.totalTime === null ? "-" : statsData?.totalTime}
+                  </h6>
+                </div>
+                <div style={{ margin: "10px 0" }}>
+                  <h4>Average time/question:</h4>
+                  <h6>
+                    {statsData?.averageTimePerQuestion === null
+                      ? "-"
+                      : statsData?.averageTimePerQuestion}
+                  </h6>
+                </div>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Grid container spacing={1}>
+                  <Grid item xs={4}>
+                    <CircularProgressBar
+                      percentage={statsData?.intervals?.totalAccuracy} //This will be changed to statsData.intervals.totalAccuracy
+                      title="Intervals"
+                      color="#6F2DBD"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <CircularProgressBar
+                      percentage={statsData?.chords?.totalAccuracy} //also changed
+                      title="Chords"
+                      color="#1E96FC"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <CircularProgressBar
+                      percentage={statsData?.scales?.totalAccuracy}
+                      title="Scales"
+                      color="#00B227"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <CircularProgressBar
+                      percentage={statsData?.pitch?.totalAccuracy}
+                      title="Pitch"
+                      color="#DA627D"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <CircularProgressBar
+                      percentage={masteryValue.toFixed(1)}
+                      title="Overall"
+                      color="#111"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <CircularProgressBar
+                      percentage={statsData?.chord_progressions?.totalAccuracy}
+                      title="Chords Progression"
+                      color="#FCA17D"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <CircularProgressBar
+                      percentage={statsData?.scale_degrees?.totalAccuracy}
+                      title="Scale Degrees"
+                      color="#00B2A8"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <CircularProgressBar
+                      percentage={
+                        statsData?.intervals_in_context?.totalAccuracy
+                      }
+                      title="Intervals in Context"
+                      color="#EAD637"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <CircularProgressBar
+                      percentage={statsData?.melodic_dictation?.totalAccuracy}
+                      title="Melodic Dictation"
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
+          )}
         </Paper>
         <Container>
           <Grid container spacing={3}>

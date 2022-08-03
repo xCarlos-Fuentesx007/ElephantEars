@@ -1,9 +1,7 @@
 import React, { Fragment, useState, useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../context/auth-context";
-
-import Navbar from "../components/Navbar";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -14,6 +12,9 @@ import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { IconButton } from "@mui/material";
+
+import Navbar from "../components/Navbar";
+import NavbarSimpler from "../components/NavbarSimpler";
 
 import correctImg from "../img/correct.svg";
 import incorrectImg from "../img/incorrect.svg";
@@ -30,17 +31,42 @@ import {
   Scale_Degrees,
   Chord_Progressions,
   Intervals_In_Context,
-  Melodic_Dictation
+  Melodic_Dictation,
 } from "../exercises/toneFunctions";
 
-const sfx = {
-  correct: new Howl({
-    src: Correct,
-  }),
-  wrong: new Howl({
-    src: Wrong,
-  }),
-};
+import { stopAll } from "../exercises/pianoSounds/pianoSounds";
+export const DEMO = true; // Use for console logging answers during demo.
+
+// const sfx = {
+//   correct: new Howl({
+//     src: Correct,
+//   }),
+//   wrong: new Howl({
+//     src: Wrong,
+//   }),
+// };
+
+// Any new AudioContext() should be created by an onClick event to avoid console.log errors.
+function playSFX(wasCorrect) {
+
+  if (wasCorrect === 'correct') {
+    let newHowl = new Howl({
+      src: Correct,
+    })
+    newHowl.play();
+    return;
+  }
+  if (wasCorrect === 'wrong') {
+    let newHowl = new Howl({
+      src: Wrong,
+    })
+    newHowl.play();
+    return;
+  }
+  if (wasCorrect !== 'correct' && wasCorrect !== 'wrong') {
+    console.error(`In playSFX(): You entered an invalid sound effect key: ${wasCorrect} of type ${typeof wasCorrect}`);
+  }
+}
 
 const DisplayErr = (errorCode, correctOption) => {
   switch (errorCode) {
@@ -83,6 +109,8 @@ const DisplayErr = (errorCode, correctOption) => {
 };
 
 const ExitContainer = ({ onCancel }) => {
+  const authCtx = useContext(AuthContext);
+  const { stopCampaign } = authCtx;
   return (
     <Container maxWidth="sm">
       <Paper
@@ -121,7 +149,11 @@ const ExitContainer = ({ onCancel }) => {
           </Grid>
           <Grid item xs={5}>
             <Link to="/score">
-              <Button variant="contained" fullWidth>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => stopCampaign()}
+              >
                 Yes
               </Button>
             </Link>
@@ -132,12 +164,25 @@ const ExitContainer = ({ onCancel }) => {
   );
 };
 
+function getDistinctNumbers(n, max=12) {
+  let distinctNumbers = [];
+  for (let i = 0; i < n; i++) {
+    let nextNumber = Math.floor(Math.random() * max);
+    while(distinctNumbers.includes(nextNumber)) {
+      nextNumber = Math.floor(Math.random() * max);
+    }
+    distinctNumbers.push(nextNumber);
+  }
+  return distinctNumbers;
+}
+
 const Exercise = () => {
   const authCtx = useContext(AuthContext);
   const [answer, setAnswer] = useState();
   const [answers, setAnswers] = useState([]);
 
   const [isExitVisible, setIsExitVisible] = useState(false);
+  let navigate = useNavigate();
 
   const {
     answerData,
@@ -145,7 +190,14 @@ const Exercise = () => {
     percentageHandler,
     correctAnswers,
     incorrectAnswers,
+    currQuestion,
+    numQuestions,
     answersHandler,
+    campaignRunning,
+    runCampaign,
+    stopCampaign,
+    schedule,
+    updateStatsData,
   } = authCtx;
 
   const [active, setActive] = useState("");
@@ -166,7 +218,6 @@ const Exercise = () => {
   const [isSoundPlayed, setIsSoundPlayed] = useState(false);
 
   const [clickCount, set_continue] = useState(false);
-  const [correct, set_correct] = useState(0);
 
   const [first_note, setFirst_note] = useState(Math.floor(Math.random() * 24));
   const [first_noteV2, setFirst_noteV2] = useState(
@@ -181,19 +232,53 @@ const Exercise = () => {
     Math.floor(Math.random() * 6),
     Math.floor(Math.random() * 6),
   ]);
-  const [context_num1, set_context_num1] = useState(Math.floor(Math.random() * 12));
-  const [context_num2, set_context_num2] = useState(Math.floor(Math.random() * 12));
-  const [melodic_num, set_melodic_num] = useState(Math.floor(Math.random() * 12));
+  const [context_num1, set_context_num1] = useState(
+    Math.floor(Math.random() * 12)
+  );
+  const [context_num2, set_context_num2] = useState(
+    Math.floor(Math.random() * 12)
+  );
+  const [melodic_num, set_melodic_num] = useState(
+    Math.floor(Math.random() * 12)
+  );
+
+  const [times, set_times] = useState([0,0]);
+  const [individual_time, set_individual_time] = useState(0);
+  const [final_time, set_final_time] = useState(0);
+  const [first_click, set_first_click] = useState(true);
 
   useEffect(() => {
     if (correctAnswers === 0 && incorrectAnswers === 0) {
       percentageHandler(0);
     } else {
-      percentageHandler(
-        (correctAnswers / (correctAnswers + incorrectAnswers)) * 100
-      );
+      percentageHandler((currQuestion / numQuestions) * 100);
     }
-  }, [correctAnswers, incorrectAnswers, percentageHandler]);
+  }, [
+    correctAnswers,
+    incorrectAnswers,
+    percentageHandler,
+    currQuestion,
+    numQuestions,
+  ]);
+
+  const trackTime = (type) => {
+    //type 1 = individual, type 0 = total
+    if (times[type === 0]) {
+      console.log("Error"); //Pressing continue without listening to the sound causes an error and should be excluded
+    }
+
+    var timer = Date.now() - times[type];
+    timer = Math.round(timer / 1000);
+    if (type === 1) {
+      set_individual_time(timer);
+    }
+    else if (type === 0) {
+      set_final_time(timer);
+    }
+    //console.log(timer);
+    times[1] = 0;
+    return;
+  };
 
   const exerciseMaker = () => {
     if (answerData.name === "Intervals") {
@@ -225,8 +310,15 @@ const Exercise = () => {
       return;
     } else if (answerData.name === "Intervals In Context") {
       setFirst_noteV2(Math.floor(Math.random() * 12));
-      set_context_num1(Math.floor(Math.random() * 12));
-      set_context_num2(Math.floor(Math.random() * 12));
+      // Todo: find other places where this error occurs and create a getDistinctNotes() function to fix it.
+      // let cn1 = Math.floor(Math.random() * 12);
+      // let cn2 = Math.floor(Math.random() * 12);
+      // while (cn1 === cn2) {
+      //   cn2 = Math.floor(Math.random() * 12);
+      // }
+      let [cn1, cn2] = getDistinctNumbers(2);
+      set_context_num1(cn1);
+      set_context_num2(cn2);
       return;
     } else if (answerData.name === "Melodic Dictation") {
       setFirst_noteV2(Math.floor(Math.random() * 12));
@@ -238,19 +330,28 @@ const Exercise = () => {
   };
 
   const exerciseHandler = () => {
+    if (first_click) {
+      set_times([Date.now(), Date.now()]);
+      set_first_click(false);
+    } else if (times[1] === 0) {
+      set_times([times[0], Date.now()]);
+    }
+
     if (answerData.name === "Intervals") {
       const answerValue = Intervals(first_note, interval);
-      console.log(answerValue);
+      if (DEMO) console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Perfect Pitch") {
       const answerValue = Perfect_Pitch(first_note);
+      if (DEMO) console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Chords") {
       const answerValue = Chords(first_note, chord_type);
+      if (DEMO) console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Scales") {
       const answerValue = Scales(first_note, scale_type);
-      console.log(answerValue);
+      if (DEMO) console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Scale Degrees") {
       while (
@@ -265,18 +366,27 @@ const Exercise = () => {
         }
       }
       const answerValue = Scale_Degrees(first_note, answer_note);
-      console.log(answerValue);
+      if (DEMO) console.log(answerValue);
       setAnswer(answerValue);
     } else if (answerData.name === "Chord Progressions") {
       const answerValue = Chord_Progressions(first_noteV2, progression_types);
       console.log(answerValue);
       setAnswers(answerValue);
     } else if (answerData.name === "Intervals In Context") {
-      const answerValue = Intervals_In_Context(first_noteV2, context_num1, context_num2);
+      const answerValue = Intervals_In_Context(
+        first_noteV2,
+        context_num1,
+        context_num2
+      );
       console.log(answerValue);
       setAnswers(answerValue);
     } else if (answerData.name === "Melodic Dictation") {
-      const answerValue = Melodic_Dictation(first_noteV2, context_num1, context_num2, melodic_num);
+      const answerValue = Melodic_Dictation(
+        first_noteV2,
+        context_num1,
+        context_num2,
+        melodic_num
+      );
       console.log(answerValue);
       setAnswers(answerValue);
     }
@@ -352,7 +462,7 @@ const Exercise = () => {
         }}
       >
         <Grid item xs={2}>
-          <Typography component="body1">Chord 1:</Typography>
+          <Typography variant="body1">Chord 1:</Typography>
         </Grid>
         <Grid item xs={2}>
           <Button variant="contained" sx={{ width: "100%" }}>
@@ -360,14 +470,14 @@ const Exercise = () => {
           </Button>
         </Grid>
         <Grid item xs={10}>
-          <Typography component="body1">
+          <Typography variant="body1">
             This is the first chord you heard and will always be the tonic
             chord.
           </Typography>
         </Grid>
 
         <Grid item xs={2}>
-          <Typography component="body1">Chord 2:</Typography>
+          <Typography variant="body1">Chord 2:</Typography>
         </Grid>
         {answers.map((type) => (
           <Grid item xs={2} key={type}>
@@ -402,7 +512,7 @@ const Exercise = () => {
         ))}
 
         <Grid item xs={2}>
-          <Typography component="body1">Chord 3:</Typography>
+          <Typography variant="body1">Chord 3:</Typography>
         </Grid>
         {answers.map((type) => (
           <Grid item xs={2} key={type}>
@@ -437,7 +547,7 @@ const Exercise = () => {
         ))}
 
         <Grid item xs={2}>
-          <Typography component="body1">Chord 4:</Typography>
+          <Typography variant="body1">Chord 4:</Typography>
         </Grid>
         {answers.map((type) => (
           <Grid item xs={2} key={type}>
@@ -476,6 +586,14 @@ const Exercise = () => {
 
   const IntervalsInContextAnswerButtonGroup = () => {
     const answers = answerData.answers;
+    var answers2;
+
+    if (answerData.name === "Intervals In Context") {
+      answers2 = answerData.answers2;
+    } else {
+      answers2 = answers;
+    }
+
     return (
       <Grid
         container
@@ -490,122 +608,143 @@ const Exercise = () => {
         }}
       >
         <Grid item xs={2}>
-          <Typography component="body1">Note 1:</Typography>
+          <Typography variant="body1">Note 1:</Typography>
         </Grid>
-        {answers.map((type) => (
-          <Grid item xs={2} key={type}>
-            <Button
-              variant={multiActive[0] === type ? "contained" : "outlined"}
-              disabled={
-                (clickCount ? true : false) && !(type === multiActive[0])
-              }
-              onClick={() => {
-                if (isSoundPlayed) {
-                  updateMultiAnswers(0, type);
-                  setIsMultiAnswerFalse([false, false, false]);
-                  setIsMultiAnswerTrue([false, false, false]);
+
+        <Grid container item columns={12}>
+          {answers.map((type) => (
+            <Grid item xs={2} key={type}>
+              <Button
+                variant={multiActive[0] === type ? "contained" : "outlined"}
+                disabled={
+                  (clickCount ? true : false) && !(type === multiActive[0])
                 }
-              }}
-              sx={{
-                textTransform: "none",
-                width: "100%",
-                bgcolor:
-                  multiActive[0] === type
-                    ? isMultiAnswerTrue[0]
-                      ? "green"
-                      : "" || isMultiAnswerFalse[0]
-                      ? "red"
-                      : ""
-                    : "white",
-              }}
-            >
-              {type}
-            </Button>
-          </Grid>
-        ))}
+                onClick={() => {
+                  if (isSoundPlayed) {
+                    updateMultiAnswers(0, type);
+                    setIsMultiAnswerFalse([false, false, false]);
+                    setIsMultiAnswerTrue([false, false, false]);
+                  }
+                }}
+                sx={{
+                  textTransform: "none",
+                  width: "100%",
+                  bgcolor:
+                    multiActive[0] === type
+                      ? isMultiAnswerTrue[0]
+                        ? "green"
+                        : "" || isMultiAnswerFalse[0]
+                        ? "red"
+                        : ""
+                      : "white",
+                }}
+              >
+                {type}
+              </Button>
+            </Grid>
+          ))}
+        </Grid>
 
         <Grid item xs={2}>
-          <Typography component="body1">Note 2:</Typography>
+          <Typography variant="body1">Note 2:</Typography>
         </Grid>
-        {answers.map((type) => (
-          <Grid item xs={2} key={type}>
-            <Button
-              variant={multiActive[1] === type ? "contained" : "outlined"}
-              disabled={
-                (clickCount ? true : false) && !(type === multiActive[1])
-              }
-              onClick={() => {
-                if (isSoundPlayed) {
-                  updateMultiAnswers(1, type);
-                  setIsMultiAnswerFalse([false, false, false]);
-                  setIsMultiAnswerTrue([false, false, false]);
+
+        <Grid container item columns={12}>
+          {answers.map((type) => (
+            <Grid item xs={2} key={type}>
+              <Button
+                variant={multiActive[1] === type ? "contained" : "outlined"}
+                disabled={
+                  (clickCount ? true : false) && !(type === multiActive[1])
                 }
-              }}
-              sx={{
-                textTransform: "none",
-                width: "100%",
-                bgcolor:
-                  multiActive[1] === type
-                    ? isMultiAnswerTrue[1]
-                      ? "green"
-                      : "" || isMultiAnswerFalse[1]
-                      ? "red"
-                      : ""
-                    : "white",
-              }}
-            >
-              {type}
-            </Button>
-          </Grid>
-        ))}
-        
+                onClick={() => {
+                  if (isSoundPlayed) {
+                    updateMultiAnswers(1, type);
+                    setIsMultiAnswerFalse([false, false, false]);
+                    setIsMultiAnswerTrue([false, false, false]);
+                  }
+                }}
+                sx={{
+                  textTransform: "none",
+                  width: "100%",
+                  bgcolor:
+                    multiActive[1] === type
+                      ? isMultiAnswerTrue[1]
+                        ? "green"
+                        : "" || isMultiAnswerFalse[1]
+                        ? "red"
+                        : ""
+                      : "white",
+                }}
+              >
+                {type}
+              </Button>
+            </Grid>
+          ))}
+        </Grid>
+
         <Grid item xs={2}>
           {answerData.name === "Intervals In Context" ? (
-            <Typography component="body1">Interval:</Typography>
+            <Typography variant="body1">Interval:</Typography>
           ) : (
-            <Typography component="body1">Note 3:</Typography>
+            <Typography variant="body1">Note 3:</Typography>
           )}
         </Grid>
-        {answers.map((type) => (
-          <Grid item xs={2} key={type}>
-            <Button
-              variant={multiActive[2] === type ? "contained" : "outlined"}
-              disabled={
-                (clickCount ? true : false) && !(type === multiActive[2])
-              }
-              onClick={() => {
-                if (isSoundPlayed) {
-                  updateMultiAnswers(2, type);
-                  setIsMultiAnswerFalse([false, false, false]);
-                  setIsMultiAnswerTrue([false, false, false]);
+
+        <Grid container item columns={12}>
+          {answers2.map((type) => (
+            <Grid item xs={2} key={type}>
+              <Button
+                variant={multiActive[2] === type ? "contained" : "outlined"}
+                disabled={
+                  (clickCount ? true : false) && !(type === multiActive[2])
                 }
-              }}
-              sx={{
-                textTransform: "none",
-                width: "100%",
-                bgcolor:
-                  multiActive[2] === type
-                    ? isMultiAnswerTrue[2]
-                      ? "green"
-                      : "" || isMultiAnswerFalse[2]
-                      ? "red"
-                      : ""
-                    : "white",
-              }}
-            >
-              {type}
-            </Button>
-          </Grid>
-        ))}
+                onClick={() => {
+                  if (isSoundPlayed) {
+                    updateMultiAnswers(2, type);
+                    setIsMultiAnswerFalse([false, false, false]);
+                    setIsMultiAnswerTrue([false, false, false]);
+                  }
+                }}
+                sx={{
+                  textTransform: "none",
+                  width: "100%",
+                  bgcolor:
+                    multiActive[2] === type
+                      ? isMultiAnswerTrue[2]
+                        ? "green"
+                        : "" || isMultiAnswerFalse[2]
+                        ? "red"
+                        : ""
+                      : "white",
+                }}
+              >
+                {type}
+              </Button>
+            </Grid>
+          ))}
+        </Grid>
       </Grid>
     );
   };
 
   return (
     <Fragment>
-      <Navbar />
+      {campaignRunning ? <NavbarSimpler/> : <Navbar/>}
       {!isExitVisible && (
         <Container maxWidth="md">
+          <Typography
+            component="h1"
+            variant="h3"
+            sx={{
+              marginTop: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            {campaignRunning ? "Campaign" : "Gym"}
+          </Typography>
           <Paper
             elevation={2}
             sx={{
@@ -623,7 +762,7 @@ const Exercise = () => {
               {answerData.name}
             </Typography>
 
-            <IconButton
+            {/* <IconButton
               size="large"
               sx={{ position: "absolute", top: "30px", right: "30px" }}
               onClick={() => {
@@ -641,7 +780,7 @@ const Exercise = () => {
                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
                 <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
               </svg>
-            </IconButton>
+            </IconButton> */}
             <IconButton size="large" onClick={exerciseHandler}>
               <VolumeUpRoundedIcon sx={{ fontSize: "400%" }} />
             </IconButton>
@@ -671,35 +810,40 @@ const Exercise = () => {
                   <AnswerButtonGroup />
                 )}
               </Grid>
-              <Grid item xs={11}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Box sx={{ width: "100%", mr: 2 }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={percentage}
-                      sx={{
-                        height: 15,
-                        borderRadius: 5,
-                        backgroundColor: "#C4C4C4 ",
-                        "& .MuiLinearProgress-barColorPrimary": {
-                          backgroundColor: "#00B227",
-                        },
-                      }}
-                    />
+              {campaignRunning ? (
+                <Grid item xs={11}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box sx={{ width: "100%", mr: 2 }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={percentage}
+                        sx={{
+                          height: 15,
+                          borderRadius: 5,
+                          backgroundColor: "#C4C4C4 ",
+                          "& .MuiLinearProgress-barColorPrimary": {
+                            backgroundColor: "#00B227",
+                          },
+                        }}
+                      />
+                    </Box>
+                    <Box sx={{ minWidth: 35 }}>
+                      <Typography component="h1" variant="body2">
+                        {percentage.toFixed(2)}%
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Box sx={{ minWidth: 35 }}>
-                    <Typography component="h1" variant="body2">
-                      {percentage.toFixed(2)}%
-                    </Typography>
-                  </Box>
-                </Box>
-              </Grid>
+                </Grid>
+              ) : null}
+
               <Grid item xs={12} sx={{ marginTop: 2 }}>
                 <Container>
                   <Grid container alignItems="center">
                     <Grid item xs={6}>
-                      {(answerData.name === "Chord Progressions" || answerData.name === "Intervals In Context" || answerData.name === "Melodic Dictation") ?
-                        DisplayErr(errorIdx, answers.join(", "))
+                      {answerData.name === "Chord Progressions" ||
+                      answerData.name === "Intervals In Context" ||
+                      answerData.name === "Melodic Dictation"
+                        ? DisplayErr(errorIdx, answers.join(", "))
                         : DisplayErr(errorIdx, answer)}
                     </Grid>
                     <Grid
@@ -714,6 +858,7 @@ const Exercise = () => {
                         size="large"
                         variant="contained"
                         onClick={() => {
+                          trackTime(0);
                           setIsExitVisible(true);
                         }}
                       >
@@ -724,27 +869,32 @@ const Exercise = () => {
                         variant="contained"
                         // disabled={!isSoundPlayed ? true : false}
                         onClick={() => {
+                          if (campaignRunning && !clickCount) {
+                            schedule.dequeue();
+                          }
                           if (
-                            answerData.name === "Chord Progressions" || 
-                            answerData.name === "Intervals In Context" || 
+                            answerData.name === "Chord Progressions" ||
+                            answerData.name === "Intervals In Context" ||
                             answerData.name === "Melodic Dictation"
                           ) {
                             if (clickCount === false) {
+                              trackTime(1);
                               if (
                                 answers[0] === multiActive[0] &&
                                 answers[1] === multiActive[1] &&
                                 answers[2] === multiActive[2]
                               ) {
-                                sfx.correct.play();
+                                // sfx.correct.play();
+                                playSFX('correct');
                                 answersHandler(
                                   correctAnswers + 1,
                                   incorrectAnswers
                                 );
                                 setErrorIdx(1);
                                 setIsMultiAnswerTrue([true, true, true]);
-                                set_correct(1);
                               } else {
-                                sfx.wrong.play();
+                                // sfx.wrong.play();
+                                playSFX('wrong');
                                 answersHandler(
                                   correctAnswers,
                                   incorrectAnswers + 1
@@ -760,11 +910,23 @@ const Exercise = () => {
                                   answers[1] !== multiActive[1],
                                   answers[2] !== multiActive[2],
                                 ]);
-                                set_correct(0);
                               }
                               setIsSoundPlayed(false);
                               set_continue(true);
                             } else {
+                              if (campaignRunning) {
+                                updateStatsData(
+                                  answerData.name,
+                                  isMultiAnswerTrue,
+                                  true
+                                );
+                                if (schedule.isEmpty()) {
+                                  stopCampaign();
+                                  navigate("/score", { replace: true });
+                                } else {
+                                  runCampaign();
+                                }
+                              }
                               exerciseMaker();
                               set_continue(false);
                               setIsMultiAnswerTrue([false, false, false]);
@@ -774,28 +936,43 @@ const Exercise = () => {
                             }
                           } else {
                             if (clickCount === false) {
+                              trackTime(1);
                               if (answer === active) {
-                                sfx.correct.play();
+                                // sfx.correct.play();
+                                playSFX('correct');
                                 answersHandler(
                                   correctAnswers + 1,
                                   incorrectAnswers
                                 );
                                 setErrorIdx(1);
                                 setIsAnswerTrue(true);
-                                set_correct(1);
                               } else {
-                                sfx.wrong.play();
+                                // sfx.wrong.play();
+                                playSFX('wrong');
                                 answersHandler(
                                   correctAnswers,
                                   incorrectAnswers + 1
                                 );
                                 setErrorIdx(2);
                                 setIsAnswerFalse(true);
-                                set_correct(0);
                               }
                               setIsSoundPlayed(false);
                               set_continue(true);
                             } else {
+                              if (campaignRunning) {
+                                updateStatsData(
+                                  answerData.name,
+                                  isAnswerTrue,
+                                  false
+                                );
+                                if (schedule.isEmpty()) {
+                                  trackTime(0);
+                                  stopCampaign();
+                                  navigate("/score", { replace: true });
+                                } else {
+                                  runCampaign();
+                                }
+                              }
                               exerciseMaker();
                               set_continue(false);
                               setIsAnswerFalse(false);
@@ -804,6 +981,7 @@ const Exercise = () => {
                               setErrorIdx(0);
                             }
                           }
+                          stopAll();
                         }}
                       >
                         Continue
