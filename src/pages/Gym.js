@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography';
 import Navbar from '../components/Navbar';
 import { Link } from 'react-router-dom';
 
+import { Note } from '../exercises/pianoSounds/pianoSounds';
+
 const Gym = () => {
   const authCtx = useContext(AuthContext);
 
@@ -94,7 +96,7 @@ const Gym = () => {
             </Button>
           )}
           {active && (
-            <Link to="/exercise">
+            <Link to="/exercise" onClick={()=>{Note.setAudioContext();}}>
               <Button size="large" variant="contained">
                 Hit the Gym
               </Button>
