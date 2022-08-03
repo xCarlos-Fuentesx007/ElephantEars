@@ -228,17 +228,9 @@ const firstSchedule = new Queue([
   "Intervals",
   "Intervals",
   "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
 ]);
+
+// const sampleSchedule2 = new Queue(["Intervals", "Chords"]);
 
 export const AuthContext = React.createContext({
   userData: [],
@@ -562,14 +554,61 @@ const AuthContextProvider = (props) => {
       }
     }
 
-    setSchedule(schedule);
+    var rates = [];
+
+    //middle algorithm to determine the ratio between priority and accuracy
+    userData.unlocked.forEach((exercise) => {
+      rates = rates.concat(
+        statsData[statsData.indexOf(exercise)].accuracy *
+          statsData[statsData.indexOf(exercise)].priority
+      );
+    });
+
+    //if a new set of exercises is unlocked, it will never appear unless hard set here
+    if (updated) {
+      rates[userData.unlocked.length - 1] = 0.6;
+    }
+
+    var totalRate = 0;
+
+    rates.forEach((rate) => {
+      totalRate += rate;
+    });
+
+    var occurances = [];
+
+    //the algorithm, determines how many of each exercise will appear in the next schedule
+    rates.forEach((rate) => {
+      occurances = occurances.concat((rate / totalRate) * 20);
+    });
+
+    var exercisesLeft = 0;
+
+    //determines lenght of next schedule
+    occurances.forEach((occurance) => {
+      exercisesLeft += occurance;
+    });
+
+    //randomly creates the schedule based on how many exercises are needed, per the algorithm
+    var scheduleBuilder = [];
+    while (exercisesLeft > 0) {
+      const r = Math.random() * occurances.length;
+      if (occurances[r] > 0) {
+        scheduleBuilder = scheduleBuilder.concat(userData.unlocked[r]);
+        occurances[r] -= 1;
+      }
+    }
+
+    const newSchedule = new Queue(scheduleBuilder);
+
+    setSchedule(newSchedule);
   };
 
   //if the user reaches 80% accuracy on all previous exercises, unlocks next exercise set
-  const unlockNextSet = (user) => {
+  const unlockNextSet = () => {
     //move new exercise set from locked to unlocked
-    user.unlocked = user.unlocked.concat(user.locked[0]);
-    user.locked = user.locked.slice(1, -1);
+    userData.unlocked = userData.unlocked.concat(userData.locked[0]);
+    userData.locked = userData.locked.slice(1, -1);
 
     createSchedule(true);
   };
