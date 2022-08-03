@@ -481,8 +481,8 @@ const AuthContextProvider = (props) => {
       const accuracies = [];
 
       //get accuracies of all available exercises
-      user.unlocked.forEach(exercise => {
-          accuracies = accuracies.concat(statsData[stasData.indexOf(exercise)].accuracy);
+      userData.unlocked.forEach(exercise => {
+          accuracies = accuracies.concat(statsData[statsData.indexOf(exercise)].accuracy);
       });
 
       const accuraciesCopy = accuracies;
@@ -494,7 +494,7 @@ const AuthContextProvider = (props) => {
       while (accuracies.length > 0) {
           const minimum = Math.min(...accuracies);
           const index = accuraciesCopy.indexOf(minimum);
-          statsData[user.unlocked[index]].priority = p;
+          statsData[userData.unlocked[index]].priority = p;
           index = accuracies.indexOf(minimum);
           accuracies.splice(index, 1);
           p -= 1;
@@ -503,13 +503,13 @@ const AuthContextProvider = (props) => {
       const rates = [];
 
       //middle algorithm to determine the ratio between priority and accuracy
-      user.unlocked.forEach(exercise => {
-          rates = rates.concat((statsData[stasData.indexOf(exercise)].accuracy)*statsData[stasData.indexOf(exercise)].priority);
+      userData.unlocked.forEach(exercise => {
+          rates = rates.concat((statsData[statsData.indexOf(exercise)].accuracy)*statsData[stasData.indexOf(exercise)].priority);
       });
 
       //if a new set of exercises is unlocked, it will never appear unless hard set here
       if (updated) {
-          rates[user.unlocked.length-1] = 0.6;
+          rates[userData.unlocked.length-1] = 0.6;
       }
 
       const totalRate = 0;
@@ -537,7 +537,7 @@ const AuthContextProvider = (props) => {
       while (exercisesLeft > 0) {
           const r = Math.random() * occurances.length;
           if (occurances[r] > 0) {
-              schedule = schedule.concat(user.unlocked[r]);
+              schedule = schedule.concat(userData.unlocked[r]);
               occurances[r] -= 1;
           }
       }
@@ -559,18 +559,18 @@ const AuthContextProvider = (props) => {
     const levelUp = true;
     
     userData.unlocked.forEach(exercise => {
-        if (statsData[stasData.indexOf(exercise)].accuracy < 0.8) {
+        if (statsData[statsData.indexOf(exercise)].accuracy < 0.8) {
             levelUp = false;
         }
     });
 
-    if (levelUp && user.unlocked[-1].totalAnswered >= 20) {
+    if (levelUp && userData.unlocked[-1].totalAnswered >= 20) {
         unlockNextSet();
     } else {
         createSchedule(false);
     }
 
-    updateUser(user);
+    updateUser(userData);
   };
   
   const stopCampaign = () => {
