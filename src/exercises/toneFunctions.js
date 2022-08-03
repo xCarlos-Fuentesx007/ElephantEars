@@ -288,30 +288,61 @@ function Scale_Degrees(first_note, answer_note) {
 export { Scale_Degrees };
 
 function Intervals_In_Context(start_note, first_note, second_note) {
-
   // Make sure the interval is ascending (Although I guess it doesn't matter)
   if (first_note > second_note) {
     let tmp = first_note;
     first_note = second_note;
     second_note = tmp;
   }
-  
-  let rootNote = Note.numberToNote(start_note);
-  let firstNote = Note.numberToNote(first_note);
-  let interval = second_note - first_note;
-  let intervalMap = getIntervalMap(interval);
 
   let chordProgressionAsSymbols = ['I', 'IV', 'V', 'I']; // Play the I, IV, V, and I chord. 
-  let delay = 1100;
-  playChordProgression(rootNote, chordProgressionAsSymbols, delay);
-  setTimeout( () => {
-    stopAll().then( () => {
-      // console.log('All audio paused.')
-      playInterval(firstNote, intervalMap, true);
-    }).catch( () => {
-      console.error('In toneFunctions.js: stopAll() failed.');
-    });    
-  }, delay * (chordProgressionAsSymbols.length + 1)); // Wait until the chords are done playing to play the answer interval.
+  let duration = 1.1;
+  let interval = second_note - first_note;
+  let intervalMap = getIntervalMap(interval);
+  
+  let rootNoteName = Note.numberToNoteName(start_note);
+  Note.newNote(rootNoteName)
+  .then( (rootNote) => {
+    // rootNote.printNote(`Scale_Degrees`);
+    playChordProgression(rootNote, chordProgressionAsSymbols, duration);
+    let firstNoteName = Note.numberToNoteName(first_note);
+    let offset = (chordProgressionAsSymbols.length + 2) * duration;
+    Note.newNote(firstNoteName)
+    .then((firstNote) => {
+          playInterval(firstNote, intervalMap, true, true, 1, offset);
+        })
+        .catch((err) => {
+          console.error(`In Scale_Degrees(): Note.newNote(answerNoteName) failed: ${err}`);
+        })
+    })
+    .catch((err) => {
+      console.error(`In Scale_Degrees(): Note.newNote(noteName) failed: ${err}`);
+    });
+
+  // Old <audio> code. // Todo: delete.
+  // Make sure the interval is ascending (Although I guess it doesn't matter)
+  // if (first_note > second_note) {
+  //   let tmp = first_note;
+  //   first_note = second_note;
+  //   second_note = tmp;
+  // }
+  
+  // let rootNote = Note.numberToNote(start_note);
+  // let firstNote = Note.numberToNote(first_note);
+  // let interval = second_note - first_note;
+  // let intervalMap = getIntervalMap(interval);
+
+  // let chordProgressionAsSymbols = ['I', 'IV', 'V', 'I']; // Play the I, IV, V, and I chord. 
+  // let delay = 1100;
+  // playChordProgression(rootNote, chordProgressionAsSymbols, delay);
+  // setTimeout( () => {
+  //   stopAll().then( () => {
+  //     // console.log('All audio paused.')
+  //     playInterval(firstNote, intervalMap, true);
+  //   }).catch( () => {
+  //     console.error('In toneFunctions.js: stopAll() failed.');
+  //   });    
+  // }, delay * (chordProgressionAsSymbols.length + 1)); // Wait until the chords are done playing to play the answer interval.
 
   return find_intervals_in_context(start_note, first_note, second_note, interval);
 

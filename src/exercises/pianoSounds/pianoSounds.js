@@ -821,7 +821,7 @@ function playRandomInterval(arpeggiate=false, ascending=true) {
  * @param {boolean} ascending - If (arpeggiate): whether to play arpeggio ascending or descending.
  * @returns {string} The name of the interval.
  */
-export function playInterval(rootNote, intervalMap, arpeggiate=false, ascending=true, delay=1110) {
+export function playInterval(rootNote, intervalMap, arpeggiate=false, ascending=true, delay=1110, when=0) {
   if (rootNote === undefined) {console.error(`In playInterval(): rootNote is undefined`); return;}
   if (intervalMap === undefined) {console.error(`In playInterval(): intervalMap is undefined`); return;}
 
@@ -838,8 +838,8 @@ export function playInterval(rootNote, intervalMap, arpeggiate=false, ascending=
     .then( (secondNote) => {
       // rootNote.play(1110, false).then( () => { // Todo: .play() doesn't return a promise anymore!!!!
       let duration = 1;
-      rootNote.play(duration);
-      secondNote.play(2, duration);
+      rootNote.play(duration, when);
+      secondNote.play(2, when+duration);
     })
   return intervalMap[0]; // Return the interval's name
 }
