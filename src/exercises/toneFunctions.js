@@ -43,9 +43,17 @@ function Chords(first_note, chord_type) {
   // synth.triggerAttackRelease(chord, "4n", Tone.now());
   // return find_chord_type(chord_type);
 
-  let rootNote = Note.numberToNote(first_note);
   let chordMap = getChordMap(chord_type);
-  playChord(rootNote, chordMap);
+  
+  let noteName = Note.numberToNoteName(first_note);
+  Note.newNote(noteName)
+    .then( (rootNote) => {
+      // rootNote.printNote(`Chords`);
+      playChord(rootNote, chordMap);
+    })
+    .catch( (err) => {
+      console.error(`In Chords(): Note.newNote(noteName) failed: ${err}`);
+    });
   
   return chordMap[0] // returning the name
 }

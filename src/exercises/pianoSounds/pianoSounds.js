@@ -194,9 +194,26 @@ export class Note {
   }
 
   static closeAudioContext() {
-    console.log(`CLOSING AUDIO CONTEXT`)
     if (Note.audioCtx !== undefined) {
-      Note.audioCtx.close();
+      if (DEBUG) console.log(`CLOSING AUDIO CONTEXT`);
+      return Note.audioCtx.close();
+    }
+  }
+
+  static resetAudioContext() {
+    if (DEBUG) console.log(`RESETTING AUDIO CONTEXT`);
+    if (Note.audioCtx !== undefined) {
+      if (DEBUG) console.log(`CLOSING AUDIO CONTEXT`);
+      Note.audioCtx.close()
+        .then(() => {
+          Note.setAudioContext();
+        })
+        .catch((err) => {
+          console.error(`In resetAudioContext(): Note.closeAudioContext() failed: ${err}`);
+        });
+    }
+    else {
+      Note.setAudioContext();
     }
   }
 
@@ -204,29 +221,28 @@ export class Note {
    * 
    * @description In order for this function to be synchronous, it's important that the audioBuffer property of each Note is already initialized to encode a .wav file.
    * @param {Array<Note>} listOfNoteObjects - A list of Note objects with their audioBuffers already initialized.
-   * @param {number} duration - Time in milliseconds to let the chord play.
+   * @param {number} duration - Time in seconds to let the chord play.
    */
-  // static async playChord(listOfNoteObjects, duration=3000) {
-  static playChord(listOfNoteObjects, duration=3000) {
+  static playChord(listOfNoteObjects, duration=3) {
     if (Note.audioCtx === undefined) {
       Note.setAudioContext();
     }
 
     let chord = [];
 
-    for (let i = 0; i < listOfNoteObjects.length; i++) {
-      // console.log(`note[${i}]: ${listOfNoteObjects[i].name}`);
-      const note = listOfNoteObjects[i];
-      console.log(`playChord(): listOfNoteObjects[${i}].audioBuffer: ${note.audioBuffer}`)
-      // note.audioBuffer = await Note.createAudioBuffer(note.name);
+    listOfNoteObjects.forEach(note => {
+      if (note.audioBuffer === undefined) { 
+        console.error(`playChord(): note.audioBuffer is undefined for ${note.name}`);
+        return;
+      }
       let source = Note.audioCtx.createBufferSource();
       source.buffer = note.audioBuffer;
       source.connect(Note.audioCtx.destination);
       chord.push(source);
-    }
+    });
 
     chord.forEach(source => {
-      source.start(0, 0, duration/1000);
+      source.start(Note.audioCtx.currentTime, 0, duration);
     });
   }
 
@@ -396,9 +412,9 @@ export class Note {
     if (nextOctave < 1 || (nextOctave == 8 && nextLetter !== 'C') || nextOctave > 8) {
       console.error(`Note.nextNote() generated an out of range note: ${noteName}`);
     } 
-    let finalNote = await Note.newNote(noteName)
+    let finalNote = await Note.newNote(noteName) // Todo: now that you know this works, delete unnecessary variable.
       .then( (note) => {
-        note.printNote(`then of nextNote`); 
+        // note.printNote(`then of nextNote`); 
         return note;
       });
 
@@ -444,26 +460,28 @@ function getRandomInt(max) {
  */
 export function stopAll() {
 
-  let p = new Promise( (resolve, reject) => {
-    if (audioObjects == undefined) {audioObjects = []; resolve()}
-    if (audioObjects.length === 0) { resolve() }
+  Note.resetAudioContext();
 
-    // Stop all audio.
-    while (audioObjects.length > 0) {
-      audioObjects.pop().pause();
-    }
+  // let p = new Promise( (resolve, reject) => {
+  //   if (audioObjects == undefined) {audioObjects = []; resolve()}
+  //   if (audioObjects.length === 0) { resolve() }
 
-    // Make sure there's no audio elements left.
-    if (audioObjects.length == 0) {
-      resolve();
-    }
-    else {
-      console.error('stopAll(): Unable to pause all audio elements');
-      reject();
-    }
-  })
+  //   // Stop all audio.
+  //   while (audioObjects.length > 0) {
+  //     audioObjects.pop().pause();
+  //   }
 
-  return p; // Todo: Rewrite references to stopAll() to take advantage of returned Promise.
+  //   // Make sure there's no audio elements left.
+  //   if (audioObjects.length == 0) {
+  //     resolve();
+  //   }
+  //   else {
+  //     console.error('stopAll(): Unable to pause all audio elements');
+  //     reject();
+  //   }
+  // })
+
+  //// return p; // Todo: Rewrite references to stopAll() to take advantage of returned Promise.
 }
 
 export function playRandomNote() {
@@ -680,6 +698,37 @@ function playSoundRecursiveDescending(playing, i, delay=750, sustain) {
   )
 }
 
+/** Wrapper for a recursive function that turns a starting note and chord map into a chord (array of Notes).
+ * @param {Note} rootNote - A Note object to specify the root to build the chord on.
+ * @param {Array<string|number>} chordMap - An array from chords[] where chordMap[0] is the chord's name and the rest of the list describes the semitones to build the chord.
+ * @returns {Promise<Array<Note>>} A Promise that resolves to an array of Notes (chord).
+ */
+async function chordMapToChord(rootNote, chordMap) {
+  let chord = [rootNote];
+  // if (DEBUG) console.log(`chordMapToChord(): rootNote.audioBuffer = ${rootNote.audioBuffer}`);
+  let newChord = await chordMapToChordRecursive(chord, rootNote, chordMap, 1); // Start at 1 because chordMap[0] is the chord's name.
+  // if (DEBUG) console.log(`newChord: ${newChord}, type = ${typeof newChord}`);
+  return newChord;
+}
+
+/** Recursive function to turn a starting note and chord map into a chord (array of Notes).
+ * @param {Note} rootNote - A Note object to specify the root to build the chord on.
+ * @param {Array<string|number>} chordMap - An array from chords[] where chordMap[0] is the chord's name and the rest of the list describes the semitones to build the chord.
+ * @param {number} i - Which Note in chordMap to generate.
+ * @returns {Promise<Array<Note>>} A Promise that resolves to an array of Notes (chord).
+ */
+async function chordMapToChordRecursive(chord, rootNote, chordMap, i) {
+  if (chordMap[i] === undefined) return chord;
+  return await rootNote.nextNote(chordMap[i])
+    .then((note) => {
+      chord.push(note);
+      return chordMapToChordRecursive(chord, rootNote, chordMap, i+1);
+    })
+    .catch((err) => {
+      console.error(`In chordMapToChordRecursive(): ${err}`);
+    })
+}
+
 /** Play the chord decided by a root note and chord map.
  * @param {Note} rootNote - A Note object to specify the root to build the chord on.
  * @param {Array<string|number>} chordMap - An array from chords[] where chordMap[0] is the chord's name and the rest of the list describes the semitones to build the chord.
@@ -687,22 +736,27 @@ function playSoundRecursiveDescending(playing, i, delay=750, sustain) {
  * @param {boolean} ascending - When (boolean == true), whether to play the arpeggio in ascending or descending order.
  * @returns A Promise that resolves when the last note begins playing.
  */
- export function playChord(rootNote, chordMap, arpeggiate=false, ascending=true, delay=1020) {
+ export async function playChord(rootNote, chordMap, arpeggiate=false, ascending=true, delay=1020) {
 
   // Make sure we have a chord to play.
   if (rootNote == undefined) {
-    rootNote = new Note();
+    // rootNote = new Note();
+    rootNote = await Note.newNote();
     chordMap = getRandomChordMap(); // If rootNote is undefined, chordMap would be too.
   }
   
   // Store the chord in case we want to replay it. // Todo: edit repeat() and repeatMap so first argument is name of the function to replay
   repeatMap = [rootNote, chordMap, arpeggiate, ascending];
 
-  let playing = [rootNote];
-  for (let i = 1; i < chordMap.length; i++) { // Start at 1 because chordMap[0] is the chord's name.
-    let nextNote = rootNote.nextNote(chordMap[i]);
-    playing.push(nextNote);
-  }
+  let playing = await chordMapToChord(rootNote, chordMap);
+  console.log(`playChord(): playing: ${playing}`);
+
+  // old <audio> code
+  // let playing = [rootNote];
+  // for (let i = 1; i < chordMap.length; i++) { // Start at 1 because chordMap[0] is the chord's name.
+  //   let nextNote = rootNote.nextNote(chordMap[i]);
+  //   playing.push(nextNote);
+  // }
   /** just for printing 
   // let display = [];
   // playing.forEach(note => {display.push(note.name)});
@@ -710,7 +764,7 @@ function playSoundRecursiveDescending(playing, i, delay=750, sustain) {
   */
 
   // Stop any music that might already be playing.
-  stopAll();
+  await stopAll(); // Todo: redefine stopAll()
   
   // Play the chord.
   if (arpeggiate) {
@@ -718,7 +772,8 @@ function playSoundRecursiveDescending(playing, i, delay=750, sustain) {
   }
   else {
     // return Note.quickPlay(playing, 3000);
-    return Note.playChord(playing);
+    Note.playChord(playing);
+    // return Note.playChord(playing);
   }
 }
 
