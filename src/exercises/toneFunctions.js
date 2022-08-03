@@ -232,22 +232,43 @@ function Perfect_Pitch(first_note) {
 export { Perfect_Pitch };
 
 function Scale_Degrees(first_note, answer_note) {
-
-  let rootNote = Note.numberToNote(first_note);
-  let answerNote = Note.numberToNote(answer_note);
-
-  // let chordProgressionAsSymbols = ['I', 'III', 'V', 'I']; // Play the I, III, V, and I chord. 
   let chordProgressionAsSymbols = ['I', 'IV', 'V', 'I']; // Play the I, IV, V, and I chord. 
-  let delay = 1100;
-  playChordProgression(rootNote, chordProgressionAsSymbols, delay);
-  setTimeout( () => {
-    stopAll().then( () => {
-      // console.log('All audio paused.')
-      answerNote.play();
-    }).catch( () => {
-      console.error('In toneFunctions.js: stopAll() failed.');
-    });    
-  }, delay * (chordProgressionAsSymbols.length + 1)); // Wait until the chords are done playing to play the answer note.
+  let duration = 1.1;
+  
+  let rootNoteName = Note.numberToNoteName(first_note);
+  Note.newNote(rootNoteName)
+    .then( (rootNote) => {
+      // rootNote.printNote(`Scale_Degrees`);
+      playChordProgression(rootNote, chordProgressionAsSymbols, duration);
+      let answerNoteName = Note.numberToNoteName(answer_note);
+      Note.newNote(answerNoteName)
+        .then((answerNote) => {
+          answerNote.play(duration*3, duration*(chordProgressionAsSymbols.length+2)); // play each chord and the last chord for 3x the duration.
+        })
+        .catch((err) => {
+          console.error(`In Scale_Degrees(): Note.newNote(answerNoteName) failed: ${err}`);
+        })
+    })
+    .catch((err) => {
+      console.error(`In Scale_Degrees(): Note.newNote(noteName) failed: ${err}`);
+    });
+
+  // Old <audio> code. //Todo: delete.
+  // let rootNote = Note.numberToNote(first_note);
+  // let answerNote = Note.numberToNote(answer_note);
+
+  // // let chordProgressionAsSymbols = ['I', 'III', 'V', 'I']; // Play the I, III, V, and I chord. 
+  // // let chordProgressionAsSymbols = ['I', 'IV', 'V', 'I']; // Play the I, IV, V, and I chord. 
+  // // let delay = 1100;
+  // playChordProgression(rootNote, chordProgressionAsSymbols, delay);
+  // setTimeout( () => {
+  //   stopAll().then( () => {
+  //     // console.log('All audio paused.')
+  //     answerNote.play();
+  //   }).catch( () => {
+  //     console.error('In toneFunctions.js: stopAll() failed.');
+  //   });    
+  // }, delay * (chordProgressionAsSymbols.length + 1)); // Wait until the chords are done playing to play the answer note.
 
   // // Make the I, III, and V chord.
   // var chords1 = make_chord(first_note, 0);
