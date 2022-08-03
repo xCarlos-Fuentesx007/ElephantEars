@@ -13,6 +13,9 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { IconButton } from "@mui/material";
 
+import Navbar from "../components/Navbar";
+import NavbarSimpler from "../components/NavbarSimpler";
+
 import correctImg from "../img/correct.svg";
 import incorrectImg from "../img/incorrect.svg";
 
@@ -686,13 +689,14 @@ const Exercise = () => {
 
   return (
     <Fragment>
+      {campaignRunning ? <NavbarSimpler/> : <Navbar/>}
       {!isExitVisible && (
         <Container maxWidth="md">
           <Typography
             component="h1"
             variant="h3"
             sx={{
-              marginTop: 4,
+              marginTop: 1,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
