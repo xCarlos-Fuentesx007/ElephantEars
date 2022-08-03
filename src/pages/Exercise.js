@@ -3,8 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../context/auth-context";
 
-import Navbar from "../components/Navbar";
-
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
@@ -174,8 +172,7 @@ const Exercise = () => {
     runCampaign,
     stopCampaign,
     schedule,
-    updateCampaignData,
-    updateCampaignDataMulti,
+    updateStatsData,
   } = authCtx;
 
   const [active, setActive] = useState("");
@@ -220,6 +217,11 @@ const Exercise = () => {
     Math.floor(Math.random() * 12)
   );
 
+  const [times, set_times] = useState([0,0]);
+  const [individual_time, set_individual_time] = useState(0);
+  const [final_time, set_final_time] = useState(0);
+  const [first_click, set_first_click] = useState(true);
+
   useEffect(() => {
     if (correctAnswers === 0 && incorrectAnswers === 0) {
       percentageHandler(0);
@@ -233,6 +235,25 @@ const Exercise = () => {
     currQuestion,
     numQuestions,
   ]);
+
+  const trackTime = (type) => {
+    //type 1 = individual, type 0 = total
+    if (times[type === 0]) {
+      console.log("Error"); //Pressing continue without listening to the sound causes an error and should be excluded
+    }
+
+    var timer = Date.now() - times[type];
+    timer = Math.round(timer / 1000);
+    if (type === 1) {
+      set_individual_time(timer);
+    }
+    else if (type === 0) {
+      set_final_time(timer);
+    }
+    //console.log(timer);
+    times[1] = 0;
+    return;
+  };
 
   const exerciseMaker = () => {
     if (answerData.name === "Intervals") {
@@ -284,6 +305,13 @@ const Exercise = () => {
   };
 
   const exerciseHandler = () => {
+    if (first_click) {
+      set_times([Date.now(), Date.now()]);
+      set_first_click(false);
+    } else if (times[1] === 0) {
+      set_times([times[0], Date.now()]);
+    }
+
     if (answerData.name === "Intervals") {
       const answerValue = Intervals(first_note, interval);
       if (DEMO) console.log(answerValue);
@@ -683,6 +711,7 @@ const Exercise = () => {
             component="h1"
             variant="h3"
             sx={{
+              marginTop: 4,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -707,7 +736,7 @@ const Exercise = () => {
               {answerData.name}
             </Typography>
 
-            <IconButton
+            {/* <IconButton
               size="large"
               sx={{ position: "absolute", top: "30px", right: "30px" }}
               onClick={() => {
@@ -725,7 +754,7 @@ const Exercise = () => {
                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
                 <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
               </svg>
-            </IconButton>
+            </IconButton> */}
             <IconButton size="large" onClick={exerciseHandler}>
               <VolumeUpRoundedIcon sx={{ fontSize: "400%" }} />
             </IconButton>
@@ -803,6 +832,7 @@ const Exercise = () => {
                         size="large"
                         variant="contained"
                         onClick={() => {
+                          trackTime(0);
                           setIsExitVisible(true);
                         }}
                       >
@@ -822,6 +852,7 @@ const Exercise = () => {
                             answerData.name === "Melodic Dictation"
                           ) {
                             if (clickCount === false) {
+                              trackTime(1);
                               if (
                                 answers[0] === multiActive[0] &&
                                 answers[1] === multiActive[1] &&
@@ -856,10 +887,10 @@ const Exercise = () => {
                               set_continue(true);
                             } else {
                               if (campaignRunning) {
-                                updateCampaignDataMulti(
+                                updateStatsData(
                                   answerData.name,
-                                  answers,
-                                  isMultiAnswerTrue
+                                  isMultiAnswerTrue,
+                                  true
                                 );
                                 if (schedule.isEmpty()) {
                                   stopCampaign();
@@ -877,6 +908,7 @@ const Exercise = () => {
                             }
                           } else {
                             if (clickCount === false) {
+                              trackTime(1);
                               if (answer === active) {
                                 sfx.correct.play();
                                 answersHandler(
@@ -898,12 +930,13 @@ const Exercise = () => {
                               set_continue(true);
                             } else {
                               if (campaignRunning) {
-                                updateCampaignData(
+                                updateStatsData(
                                   answerData.name,
-                                  answer,
-                                  isAnswerTrue
+                                  isAnswerTrue,
+                                  false
                                 );
                                 if (schedule.isEmpty()) {
+                                  trackTime(0);
                                   stopCampaign();
                                   navigate("/score", { replace: true });
                                 } else {

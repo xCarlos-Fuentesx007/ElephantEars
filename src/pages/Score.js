@@ -16,7 +16,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import StarIcon from "@mui/icons-material/Star";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import Facebook from "../img/Facebook.png";
-import Instagram from "../img/Instagram.png";
 import Twitter from "../img/Twitter.png";
 import { Link } from "react-router-dom";
 
@@ -158,21 +157,33 @@ const ScoreContainer = ({ onExit }) => {
           <Grid item xs="auto">
             Share your results:
           </Grid>
+
+
           <Grid item xs="auto">
+            <div id="fb-root"></div>
+            <script async defer crossOrigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v14.0" nonce="Y9HalX2E"></script>
             <IconButton aria-label="Facebook">
-              <img src={Facebook} alt=""></img>
+              <div data-href="https://elephant-ears.netlify.app/">
+                <a target="_blank" rel="noreferrer"
+                  href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Felephant-ears.netlify.app%2F&amp;src=sdkpreparse" 
+                >
+                  <img src={Facebook} alt=""></img>
+                </a>
+              </div>
             </IconButton>
           </Grid>
+
           <Grid item xs="auto">
             <IconButton aria-label="Twitter">
-              <img src={Twitter} alt=""></img>
+              <a target="_blank" rel="noreferrer" 
+                href="https://twitter.com/intent/tweet?text=Check%20out%20Elephant%20Ears%20at&url=https://elephant-ears.netlify.app/&hashtags=ElephantEars"
+              >
+                <img src={Twitter} alt=""></img>
+              </a>
             </IconButton>
           </Grid>
-          <Grid item xs="auto">
-            <IconButton aria-label="Instagram">
-              <img src={Instagram} alt=""></img>
-            </IconButton>
-          </Grid>
+
+
         </Grid>
       </Paper>
     </Container>

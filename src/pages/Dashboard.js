@@ -176,7 +176,7 @@ const Dashboard = () => {
                   <Grid item xs={4}>
                     <CircularProgressBar
                       percentage={masteryValue.toFixed(1)}
-                      title="Mastery"
+                      title="Overall"
                       color="#111"
                     />
                   </Grid>

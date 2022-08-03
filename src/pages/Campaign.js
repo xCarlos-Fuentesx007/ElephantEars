@@ -16,19 +16,10 @@ import { Link } from "react-router-dom";
 
 const Campaign = () => {
   const authCtx = useContext(AuthContext);
-  const {
-    runCampaign,
-    schedule,
-    userData,
-    statsData,
-    campaignData,
-    getStatsData,
-    getCampaignData,
-  } = authCtx;
+  const { runCampaign, schedule, userData, statsData, getStatsData } = authCtx;
 
   useEffect(() => {
     getStatsData(userData);
-    getCampaignData(userData);
   }, [userData]);
 
   return (
@@ -103,11 +94,7 @@ const Campaign = () => {
                 type="submit"
                 variant="contained"
                 sx={{ my: 1 }}
-                onClick={() => {
-                  console.log("statsData:", statsData);
-                  console.log("campaignData:", campaignData);
-                  runCampaign();
-                }}
+                onClick={() => runCampaign()}
               >
                 Lets Get Started!
               </Button>
