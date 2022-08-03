@@ -530,16 +530,18 @@ const AuthContextProvider = (props) => {
       });
 
       //randomly creates the schedule based on how many exercises are needed, per the algorithm
-      var schedule = [];
+      var scheduleBuilder = [];
       while (exercisesLeft > 0) {
           const r = Math.random() * occurances.length;
           if (occurances[r] > 0) {
-              schedule = schedule.concat(userData.unlocked[r]);
+              scheduleBuilder = scheduleBuilder.concat(userData.unlocked[r]);
               occurances[r] -= 1;
           }
       }
-
-      setSchedule(schedule);
+      
+      const newSchedule = new Queue(scheduleBuilder);
+    
+      setSchedule(newSchedule);
   };
 
   //if the user reaches 80% accuracy on all previous exercises, unlocks next exercise set
