@@ -218,8 +218,6 @@ const EXERCISES_MAP = new Map([
 // ]);
 
 const firstSchedule = new Queue(["Intervals", "Intervals", "Intervals", "Intervals", "Intervals", 
-                                 "Intervals", "Intervals", "Intervals", "Intervals", "Intervals", 
-                                 "Intervals", "Intervals", "Intervals", "Intervals", "Intervals", 
                                  "Intervals", "Intervals", "Intervals", "Intervals", "Intervals"]);
 
 // const sampleSchedule2 = new Queue(["Intervals", "Chords"]);
@@ -545,11 +543,11 @@ const AuthContextProvider = (props) => {
   };
 
   //if the user reaches 80% accuracy on all previous exercises, unlocks next exercise set
-  const unlockNextSet = (user) => {
+  const unlockNextSet = () => {
 
       //move new exercise set from locked to unlocked
-      user.unlocked = user.unlocked.concat(user.locked[0]);
-      user.locked = user.locked.slice(1, -1);
+      userData.unlocked = userData.unlocked.concat(userData.locked[0]);
+      userData.locked = userData.locked.slice(1, -1);
 
       createSchedule(true);
   };
