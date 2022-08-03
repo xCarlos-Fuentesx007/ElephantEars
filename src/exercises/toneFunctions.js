@@ -136,11 +136,18 @@ function Chord_Progressions(first_note, progression_types) {
 
   // Save the answer for later.
   let answer = find_chord_progressions(progression_types);
+  let chordProgressionAsSymbols = ['I'].concat(answer);
 
   // Play the chords.
-  let rootNote = Note.numberToNote(first_note);
-  let chordProgressionAsSymbols = ['I'].concat(answer);
-  playChordProgression(rootNote, chordProgressionAsSymbols);
+  let noteName = Note.numberToNoteName(first_note);
+  Note.newNote(noteName)
+    .then( (rootNote) => {
+      // rootNote.printNote(`Chord_Progressions`);
+      playChordProgression(rootNote, chordProgressionAsSymbols);
+    })
+    .catch( (err) => {
+      console.error(`In Chord_Progressions(): Note.newNote(noteName) failed: ${err}`);
+    });
 
   // Return a list of chord symbols as the answer.
   return answer;
