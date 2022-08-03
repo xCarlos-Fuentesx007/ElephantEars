@@ -48,23 +48,24 @@ export const DEMO = true; // Use for console logging answers during demo.
 
 // Any new AudioContext() should be created by an onClick event to avoid console.log errors.
 function playSFX(wasCorrect) {
-
-  if (wasCorrect === 'correct') {
+  if (wasCorrect === "correct") {
     let newHowl = new Howl({
       src: Correct,
-    })
+    });
     newHowl.play();
     return;
   }
-  if (wasCorrect === 'wrong') {
+  if (wasCorrect === "wrong") {
     let newHowl = new Howl({
       src: Wrong,
-    })
+    });
     newHowl.play();
     return;
   }
-  if (wasCorrect !== 'correct' && wasCorrect !== 'wrong') {
-    console.error(`In playSFX(): You entered an invalid sound effect key: ${wasCorrect} of type ${typeof wasCorrect}`);
+  if (wasCorrect !== "correct" && wasCorrect !== "wrong") {
+    console.error(
+      `In playSFX(): You entered an invalid sound effect key: ${wasCorrect} of type ${typeof wasCorrect}`
+    );
   }
 }
 
@@ -164,11 +165,11 @@ const ExitContainer = ({ onCancel }) => {
   );
 };
 
-function getDistinctNumbers(n, max=12) {
+function getDistinctNumbers(n, max = 12) {
   let distinctNumbers = [];
   for (let i = 0; i < n; i++) {
     let nextNumber = Math.floor(Math.random() * max);
-    while(distinctNumbers.includes(nextNumber)) {
+    while (distinctNumbers.includes(nextNumber)) {
       nextNumber = Math.floor(Math.random() * max);
     }
     distinctNumbers.push(nextNumber);
@@ -197,7 +198,7 @@ const Exercise = () => {
     runCampaign,
     stopCampaign,
     schedule,
-    updateStatsData,
+    updateStatsDataExercise,
   } = authCtx;
 
   const [active, setActive] = useState("");
@@ -242,9 +243,8 @@ const Exercise = () => {
     Math.floor(Math.random() * 12)
   );
 
-  const [times, set_times] = useState([0,0]);
+  const [times, set_times] = useState([0, 0]);
   const [individual_time, set_individual_time] = useState(0);
-  const [final_time, set_final_time] = useState(0);
   const [first_click, set_first_click] = useState(true);
 
   useEffect(() => {
@@ -261,23 +261,13 @@ const Exercise = () => {
     numQuestions,
   ]);
 
-  const trackTime = (type) => {
-    //type 1 = individual, type 0 = total
-    if (times[type === 0]) {
-      console.log("Error"); //Pressing continue without listening to the sound causes an error and should be excluded
-    }
-
-    var timer = Date.now() - times[type];
+  const trackTime = () => {
+    var timer = Date.now() - times[1];
     timer = Math.round(timer / 1000);
-    if (type === 1) {
-      set_individual_time(timer);
-    }
-    else if (type === 0) {
-      set_final_time(timer);
-    }
+    set_individual_time(timer);
     //console.log(timer);
     times[1] = 0;
-    return;
+    return timer;
   };
 
   const exerciseMaker = () => {
@@ -730,7 +720,7 @@ const Exercise = () => {
 
   return (
     <Fragment>
-      {campaignRunning ? <NavbarSimpler/> : <Navbar/>}
+      {campaignRunning ? <NavbarSimpler /> : <Navbar />}
       {!isExitVisible && (
         <Container maxWidth="md">
           <Typography
@@ -858,7 +848,6 @@ const Exercise = () => {
                         size="large"
                         variant="contained"
                         onClick={() => {
-                          trackTime(0);
                           setIsExitVisible(true);
                         }}
                       >
@@ -878,14 +867,14 @@ const Exercise = () => {
                             answerData.name === "Melodic Dictation"
                           ) {
                             if (clickCount === false) {
-                              trackTime(1);
+                              trackTime();
                               if (
                                 answers[0] === multiActive[0] &&
                                 answers[1] === multiActive[1] &&
                                 answers[2] === multiActive[2]
                               ) {
                                 // sfx.correct.play();
-                                playSFX('correct');
+                                playSFX("correct");
                                 answersHandler(
                                   correctAnswers + 1,
                                   incorrectAnswers
@@ -894,7 +883,7 @@ const Exercise = () => {
                                 setIsMultiAnswerTrue([true, true, true]);
                               } else {
                                 // sfx.wrong.play();
-                                playSFX('wrong');
+                                playSFX("wrong");
                                 answersHandler(
                                   correctAnswers,
                                   incorrectAnswers + 1
@@ -915,10 +904,11 @@ const Exercise = () => {
                               set_continue(true);
                             } else {
                               if (campaignRunning) {
-                                updateStatsData(
+                                updateStatsDataExercise(
                                   answerData.name,
                                   isMultiAnswerTrue,
-                                  true
+                                  true,
+                                  individual_time
                                 );
                                 if (schedule.isEmpty()) {
                                   stopCampaign();
@@ -936,10 +926,10 @@ const Exercise = () => {
                             }
                           } else {
                             if (clickCount === false) {
-                              trackTime(1);
+                              trackTime();
                               if (answer === active) {
                                 // sfx.correct.play();
-                                playSFX('correct');
+                                playSFX("correct");
                                 answersHandler(
                                   correctAnswers + 1,
                                   incorrectAnswers
@@ -948,7 +938,7 @@ const Exercise = () => {
                                 setIsAnswerTrue(true);
                               } else {
                                 // sfx.wrong.play();
-                                playSFX('wrong');
+                                playSFX("wrong");
                                 answersHandler(
                                   correctAnswers,
                                   incorrectAnswers + 1
@@ -960,13 +950,13 @@ const Exercise = () => {
                               set_continue(true);
                             } else {
                               if (campaignRunning) {
-                                updateStatsData(
+                                updateStatsDataExercise(
                                   answerData.name,
                                   isAnswerTrue,
-                                  false
+                                  false,
+                                  individual_time
                                 );
                                 if (schedule.isEmpty()) {
-                                  trackTime(0);
                                   stopCampaign();
                                   navigate("/score", { replace: true });
                                 } else {
