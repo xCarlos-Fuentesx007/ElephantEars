@@ -126,12 +126,14 @@ const Dashboard = () => {
                 </div>
                 <div style={{ margin: "10px 0" }}>
                   <h4>Overall accuracy:</h4>
-                  <h6>{statsData?.overallAccuracy}</h6>
+                  <h6>{masteryValue.toFixed(1) + "%"}</h6>
                 </div>
                 <div style={{ margin: "10px 0" }}>
                   <h4>Total time:</h4>
                   <h6>
-                    {statsData?.totalTime === null ? "-" : statsData?.totalTime}
+                    {statsData?.totalTime === null
+                      ? "-"
+                      : statsData?.totalTime + " seconds"}
                   </h6>
                 </div>
                 <div style={{ margin: "10px 0" }}>
@@ -139,7 +141,7 @@ const Dashboard = () => {
                   <h6>
                     {statsData?.averageTimePerQuestion === null
                       ? "-"
-                      : statsData?.averageTimePerQuestion}
+                      : statsData?.averageTimePerQuestion + " seconds"}
                   </h6>
                 </div>
               </Grid>

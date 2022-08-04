@@ -3,6 +3,7 @@ import { AuthContext } from "../context/auth-context";
 import Navbar from "../components/Navbar";
 import { Container, Typography, Button, Grid, TextField } from "@mui/material";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const statsUrl = process.env.REACT_APP_BACKEND_STATS_URL;
 const campaignUrl = process.env.REACT_APP_BACKEND_CAMPAIGN_URL;
@@ -19,7 +20,7 @@ const Settings = () => {
   const [isLastNameShown, setIsLastNameShown] = useState(false);
   const [isUserNameShown, setIsUserNameShown] = useState(false);
   const [isEmailShown, setIsEmailShown] = useState(false);
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
+  //const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const [isStatsBtnShown, setIsStatsBtnShow] = useState(false);
   const [isCampaignBtnShown, setIsCampaignBtnShow] = useState(false);
@@ -55,7 +56,7 @@ const Settings = () => {
     setIsLastNameShown(false);
     setIsUserNameShown(false);
     setIsEmailShown(false);
-    setIsPasswordShown(false);
+    //setIsPasswordShown(false);
   };
 
   //function to reset the stats data by calling api when reset stats button is clicked
@@ -372,7 +373,7 @@ const Settings = () => {
             Password
           </Grid>
           <Grid item xs={12} md={4}>
-            {isPasswordShown && (
+            {/* {isPasswordShown && (
               <TextField
                 size="small"
                 margin="none"
@@ -386,23 +387,21 @@ const Settings = () => {
                 }}
                 autoFocus
               />
-            )}
+            )} */}
           </Grid>
-          {!isPasswordShown && (
-            <Grid item xs={12} md={4}>
+          {/* {!isPasswordShown && ( */}
+          <Grid item xs={12} md={4}>
+            <Link to="/reset1">
               <Button
-                type="submit"
                 fullWidth
                 variant="contained"
-                onClick={() => {
-                  setIsPasswordShown(true);
-                }}
               >
                 Change
               </Button>
-            </Grid>
-          )}
-          {isPasswordShown && (
+            </Link>
+          </Grid>
+          {/* )} */}
+          {/* {isPasswordShown && (
             <>
               <Grid item xs={12} md={2}>
                 <Button
@@ -429,7 +428,7 @@ const Settings = () => {
                 </Button>
               </Grid>
             </>
-          )}
+          )} */}
         </Grid>
 
         {/* <Typography variant="h5" sx={{ textAlign: "left", fontWeight: 600 }}>

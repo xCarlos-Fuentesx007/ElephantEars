@@ -21,6 +21,7 @@ let repeatMap; // Global variable to remember most recently played.
 export class Note {
 
   static audioCtx; // = new AudioContext();
+  static audioBuffers = {};
 
   static min = 2;
   static max = 4;
@@ -84,17 +85,34 @@ export class Note {
     // newNote.printNote(`newNote`); // Show that newNote.audioBuffer is still undefined.
 
     // Then, use createAudioBuffer() to set the audioBuffer property and return the new Note.
-    return await Note.createAudioBuffer(noteName)
-      .then( (buffer) => {
-        newNote.audioBuffer = buffer;
-        // console.log(`newNote(): In then(), newNote.audioBuffer = ${newNote.audioBuffer}`);
-        // newNote.printNote(`newNote`); // Show that newNote.audioBuffer is now set.
+    if (Note.audioBuffers.hasOwnProperty(noteName)) {
+
+      // If it has a .then(), it's still a Promise
+      if (typeof Note.audioBuffers[noteName] === 'object' && typeof Note.audioBuffers[noteName].then === 'function') {
+        if (DEBUG) console.log(`Note.audioBuffers[${newNote.name}] is a promise.`)
+        newNote.audioBuffer = await Note.audioBuffers[noteName];
         return newNote;
-      })
-      .catch( (err) => {
-        console.error(`newNote(): Note.createAudioBuffer(${noteName}) failed: ${err}`);
-        return undefined;
-      });
+      }
+      else { // Otherwise, it's already an audio buffer
+        if (DEBUG) console.log(`Note.audioBuffers[${newNote.name}] is an audio buffer.`)
+        newNote.audioBuffer = Note.audioBuffers[noteName];
+        return newNote;
+      }
+    }
+    else {
+      if (DEBUG) console.log(`Note.audioBuffers[${newNote.name}] is undefined.`)
+        return await Note.createAudioBuffer(noteName)
+        .then( (buffer) => {
+          newNote.audioBuffer = buffer;
+          // console.log(`newNote(): In then(), newNote.audioBuffer = ${newNote.audioBuffer}`);
+          // newNote.printNote(`newNote`); // Show that newNote.audioBuffer is now set.
+          return newNote;
+        })
+        .catch( (err) => {
+          console.error(`newNote(): Note.createAudioBuffer(${noteName}) failed: ${err}`);
+          return undefined;
+        });
+    }
   }
 
   /** Syntactic sugar: `await fetch(Sounds[noteName]);` -> `await Note.fetchSound(noteName);`
@@ -116,7 +134,11 @@ export class Note {
     // if (DEBUG) console.log('Note.createAudioBuffer() [starting]');
   
     // Create an audio context.
-    const audioCtx = new AudioContext();
+      // Setting the audio context once and reusing is faster than creating 79 different audio contexts.
+      if (Note.audioCtx === undefined) {
+        await Note.setAudioContext();
+      }
+      // const audioCtx = new AudioContext();
     
     // Fetch the wav file.
     const resp = await fetch(Sounds[noteName]); // using path to src folder
@@ -127,7 +149,7 @@ export class Note {
     // console.log(`Note.createAudioBuffer(): arrayBuffer: ${arrayBuffer}`);
     
     // Decode the ArrayBuffer into an AudioBuffer.
-    let audioBuffer = await audioCtx.decodeAudioData(
+    let audioBuffer = await Note.audioCtx.decodeAudioData(
       arrayBuffer, 
       (buffer) => { 
         // console.log(`then() decodeAudioData: returning ${buffer}`);
@@ -143,6 +165,33 @@ export class Note {
     // Return the new audioBuffer (or undefined).
     // if (DEBUG) console.log(`Note.createAudioBuffer() [ending]: Returning audioBuffer as ${audioBuffer}`);
     return audioBuffer;
+  }
+
+  /** Create all the wave file audio buffers up front and store them as a dictionary in a static field.
+   * @private This should only be called by setAudioContext() in order to be sure that Note.audioCtx is already set.
+   */
+  static setAudioBuffers() {
+    // Setting the audio context once and reusing is faster than creating 79 different audio contexts.
+    // if (Note.audioCtx === undefined) {
+    //   await Note.setAudioContext();
+    // }
+    // Actually, we don't have to check if Note.audioCtx is defined because we only call this function after defining it.
+
+    let keys = Object.keys(Sounds);
+    keys.forEach(key => {
+      if (!(Note.audioBuffers.hasOwnProperty(key)) || Note.audioBuffers[key] === undefined) { // make sure we're not unnecessarily recreating the same buffer 
+        if (DEBUG) console.log(`Turning ${key} into audio buffer.`);
+        Note.createAudioBuffer(key)
+          .then( (buffer) => {
+            Note.audioBuffers[key] = buffer;
+          })
+          .catch( (err) => {
+            console.error(`Note.setAudioBufers(): error decoding audio data from key: ${key}`);
+            console.error(err);
+            return undefined;
+          })
+      }
+    });
   }
 
   // ? This function is only asynchronous when `this.audioBuffer == undefined`. Can we pull out that guard condition so this function can be called sychronously?
@@ -185,11 +234,13 @@ export class Note {
    * @description This method should be called outside of pianoSounds.js or inside of a guard condition
    * for when Note.audioCtx is undefined. Since pianoSounds.js is a library now, setting Note.audioCtx 
    * from outside the library is an efficient way to generate 1 shared audio context.
+   * @returns {Promise<void>} A promise that resolves when the new audio context is created.
    */
-  static setAudioContext() {
+  static async setAudioContext() {
     if (DEBUG) console.log(`SETTING AUDIO CONTEXT`); // Todo: should this be set to 'interactive' or 'playback'?
     let p = new Promise( (resolve, reject) => {
       Note.audioCtx = new AudioContext();
+      Note.setAudioBuffers();
       resolve();
     })
     return p;
@@ -202,6 +253,11 @@ export class Note {
     }
   }
 
+  /** Close the Note class's current audio context and create a new one.
+   * 
+   * @description Useful for stopping all playing sounds or just making sure that the audio context isn't undefined.
+   * @returns {Promise<void>} The promise returned by setAudioContext().
+   */
   static resetAudioContext() {
     if (DEBUG) console.log(`RESETTING AUDIO CONTEXT`);
     if (Note.audioCtx !== undefined) {
