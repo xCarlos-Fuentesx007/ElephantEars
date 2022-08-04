@@ -251,7 +251,7 @@ export const AuthContext = React.createContext({
   stopCampaign: () => {},
   resetCampaign: () => {},
   updateStatsDataExercise: (exercise, correct, isMulti) => {},
-  getSchedule: (userData) => (),
+  getSchedule: (userData) => {},
 });
 
 const AuthContextProvider = (props) => {
