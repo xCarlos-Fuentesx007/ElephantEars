@@ -16,10 +16,11 @@ import { Link } from "react-router-dom";
 
 const Campaign = () => {
   const authCtx = useContext(AuthContext);
-  const { runCampaign, schedule, userData, statsData, getStatsData } = authCtx;
+  const { runCampaign, schedule, userData, statsData, getStatsData, getSchedule } = authCtx;
 
   useEffect(() => {
     getStatsData(userData);
+    getSchedule(userData);
   }, [userData]);
 
   return (

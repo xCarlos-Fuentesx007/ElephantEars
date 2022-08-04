@@ -156,7 +156,7 @@ const ScoreContainer = ({ onExit }) => {
           spacing={1}
         >
           <Grid item xs="auto">
-            Share your results:
+            Share our app:
           </Grid>
 
           <Grid item xs="auto">

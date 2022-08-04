@@ -135,6 +135,7 @@ const EXERCISES_MAP = new Map([
   ["Chords", "chords"],
   ["Scales", "scales"],
   ["Perfect Pitch", "pitch"],
+  ["Pitch", "pitch"],
   ["Scale Degrees", "scale_degrees"],
   ["Chord Progressions", "chord_progressions"],
   ["Intervals In Context", "intervals_in_context"],
@@ -217,21 +218,6 @@ const EXERCISES_MAP = new Map([
 //   ["vi", "sixth"],
 // ]);
 
-const firstSchedule = new Queue([
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-  "Intervals",
-]);
-
-// const sampleSchedule2 = new Queue(["Intervals", "Chords"]);
-
 export const AuthContext = React.createContext({
   userData: [],
   isLoggedIn: false,
@@ -260,12 +246,13 @@ export const AuthContext = React.createContext({
   getStatsData: (userData) => {},
   statsData: "",
   runCampaign: () => {},
-  createSchedule: () => {},
-  unlockNextSet: () => {},
-  scheduleComplete: () => {},
+  createSchedule: (statsData) => {},
+  unlockNextSet: (statsData) => {},
+  scheduleComplete: (statsData) => {},
   stopCampaign: () => {},
   resetCampaign: () => {},
   updateStatsDataExercise: (exercise, correct, isMulti) => {},
+  getSchedule: (statsData) => {},
 });
 
 const AuthContextProvider = (props) => {
@@ -282,7 +269,7 @@ const AuthContextProvider = (props) => {
   const [token, setToken] = useState();
   const [campaignRunning, setCampaignRunning] = useState(false);
   const [fromCampaign, setFromCampaign] = useState(false);
-  const [schedule, setSchedule] = useState(firstSchedule);
+  const [schedule, setSchedule] = useState(new Queue(["Pitch"]));
   const [statsData, setStatsData] = useState();
   const [currQuestion, setCurrQuestion] = useState(-1);
   const [numQuestions, setNumQuestions] = useState(0);
@@ -355,6 +342,7 @@ const AuthContextProvider = (props) => {
       token: userData.token,
       unlocked: userData.unlocked,
       locked: userData.locked,
+      schedule: userData.schedule,
     };
     localStorage.setItem("userData", JSON.stringify(storedData));
     setUserData(storedData.userData);
@@ -413,6 +401,7 @@ const AuthContextProvider = (props) => {
       return;
     }
     setStatsData(responseData);
+    setSchedule(new Queue(responseData.schedule));
     return responseData;
   };
 
@@ -482,153 +471,130 @@ const AuthContextProvider = (props) => {
     setCampaignRunning(true);
     exerciseHandler(schedule.peek());
   };
-
+  
+  const getSchedule = (statsData) => {
+    //setSchedule(new Queue(statsData.schedule));
+  };
+  
   //creates a new schedule of exercises based on previous performance, implements algorithm
-  const createSchedule = (updated) => {
-    var accuracies = [];
+  const createSchedule = (statsData, updated) => {
 
-    //get accuracies of all available exercises
-    userData.unlocked.forEach((exercise) => {
-      accuracies = accuracies.concat(
-        statsData[statsData.indexOf(exercise)].accuracy
-      );
-    });
+      var accuracies = [];
 
-    const accuraciesCopy = accuracies;
-    var p = accuracies.length;
+      //get accuracies of all available exercises
+      statsData.unlocked.forEach(exercise => {
+          exercise = EXERCISES_MAP.get(exercise);
+          accuracies = accuracies.concat(parseFloat(statsData[exercise].totalAccuracy));
+      });
+      //console.log("accuracies: " + accuracies);
+      const accuraciesCopy = [];
 
-    //setting priority of each exercise based on accuracy
-    //priority is 1-n, where n is the number of available exercises
-    //the higher the priority, the more it appears
-    while (accuracies.length > 0) {
-      const minimum = Math.min(...accuracies);
-      var index = accuraciesCopy.indexOf(minimum);
-      statsData[userData.unlocked[index]].priority = p;
-      index = accuracies.indexOf(minimum);
-      accuracies.splice(index, 1);
-      p -= 1;
-    }
-
-    var rates = [];
-
-    //middle algorithm to determine the ratio between priority and accuracy
-    userData.unlocked.forEach((exercise) => {
-      rates = rates.concat(
-        statsData[statsData.indexOf(exercise)].accuracy *
-          statsData[statsData.indexOf(exercise)].priority
-      );
-    });
-
-    //if a new set of exercises is unlocked, it will never appear unless hard set here
-    if (updated) {
-      rates[userData.unlocked.length - 1] = 0.6;
-    }
-
-    var totalRate = 0;
-
-    rates.forEach((rate) => {
-      totalRate += rate;
-    });
-
-    var occurances = [];
-
-    //the algorithm, determines how many of each exercise will appear in the next schedule
-    rates.forEach((rate) => {
-      occurances = occurances.concat((rate / totalRate) * 20);
-    });
-
-    var exercisesLeft = 0;
-
-    //determines lenght of next schedule
-    occurances.forEach((occurance) => {
-      exercisesLeft += occurance;
-    });
-
-    //randomly creates the schedule based on how many exercises are needed, per the algorithm
-    var schedule = [];
-    while (exercisesLeft > 0) {
-      const r = Math.random() * occurances.length;
-      if (occurances[r] > 0) {
-        schedule = schedule.concat(userData.unlocked[r]);
-        occurances[r] -= 1;
+      for (i = 0; i < accuracies.length; i++) {
+        accuraciesCopy[i] = accuracies[i];
       }
-    }
-
-    var rates = [];
-
-    //middle algorithm to determine the ratio between priority and accuracy
-    userData.unlocked.forEach((exercise) => {
-      rates = rates.concat(
-        statsData[statsData.indexOf(exercise)].accuracy *
-          statsData[statsData.indexOf(exercise)].priority
-      );
-    });
-
-    //if a new set of exercises is unlocked, it will never appear unless hard set here
-    if (updated) {
-      rates[userData.unlocked.length - 1] = 0.6;
-    }
-
-    var totalRate = 0;
-
-    rates.forEach((rate) => {
-      totalRate += rate;
-    });
-
-    var occurances = [];
-
-    //the algorithm, determines how many of each exercise will appear in the next schedule
-    rates.forEach((rate) => {
-      occurances = occurances.concat((rate / totalRate) * 20);
-    });
-
-    var exercisesLeft = 0;
-
-    //determines lenght of next schedule
-    occurances.forEach((occurance) => {
-      exercisesLeft += occurance;
-    });
-
-    //randomly creates the schedule based on how many exercises are needed, per the algorithm
-    var scheduleBuilder = [];
-    while (exercisesLeft > 0) {
-      const r = Math.random() * occurances.length;
-      if (occurances[r] > 0) {
-        scheduleBuilder = scheduleBuilder.concat(userData.unlocked[r]);
-        occurances[r] -= 1;
+      var p = accuracies.length;
+      var index = 0;
+      //setting priority of each exercise based on accuracy
+      //priority is 1-n, where n is the number of available exercises
+      //the higher the priority, the more it appears
+      while (accuracies.length > 1) {
+          var minimum = Math.min(...accuracies);
+          //console.log("minimum: " + minimum);
+          index = accuraciesCopy.indexOf(minimum);
+          statsData[EXERCISES_MAP.get(statsData.unlocked[index])].priority = p;
+          index = accuracies.indexOf(minimum);
+          accuracies.splice(index, 1);
+          p -= 1;
       }
-    }
 
-    const newSchedule = new Queue(scheduleBuilder);
+      index = accuraciesCopy.indexOf(accuracies[0]);
+      statsData[EXERCISES_MAP.get(statsData.unlocked[index])].priority = p;
 
-    setSchedule(newSchedule);
+      var rates = [];
+
+      //middle algorithm to determine the ratio between priority and accuracy
+      var i = 0;
+      statsData.unlocked.forEach(exercise => {
+          exercise = EXERCISES_MAP.get(exercise);
+          rates = rates.concat((100 - statsData[exercise].totalAccuracy)*(statsData[exercise].priority));
+
+          if (rates[rates.length-1] == 0) {
+            rates[rates.length-1] = 10;
+          } 
+      });
+
+      //if a new set of exercises is unlocked, it will never appear unless hard set here
+      if (updated) {
+          rates[rates.length-1] = 60;
+      }
+      
+      //console.log("rates: " + rates);
+
+      var totalRate = 0;
+
+      rates.forEach(rate => {
+          totalRate += rate;
+      });
+      //console.log("totalRate: " + totalRate);
+
+      var occurances = [];
+
+      //the algorithm, determines how many of each exercise will appear in the next schedule
+      rates.forEach(rate => {
+          occurances = occurances.concat(Math.floor((rate / totalRate) * 10));
+      });
+      //console.log("occurances: " + occurances);
+      var exercisesLeft = 0;
+
+      //determines lenght of next schedule
+      occurances.forEach(occurance => {
+          exercisesLeft += occurance;
+      });
+
+      //randomly creates the schedule based on how many exercises are needed, per the algorithm
+      var scheduleBuilder = [];
+      while (exercisesLeft > 0) {
+          var r = Math.floor(Math.random() * (occurances.length));
+          if (occurances[r] > 0) {
+              scheduleBuilder = scheduleBuilder.concat(statsData.unlocked[r]);
+              occurances[r] -= 1;
+              exercisesLeft -= 1;
+          }
+      }
+      //console.log("scheduleBuilder: " + scheduleBuilder);
+      const newSchedule = new Queue(scheduleBuilder);
+      statsData.schedule = scheduleBuilder;
   };
 
   //if the user reaches 80% accuracy on all previous exercises, unlocks next exercise set
-  const unlockNextSet = () => {
+  const unlockNextSet = (statsData) => {
     //move new exercise set from locked to unlocked
-    userData.unlocked = userData.unlocked.concat(userData.locked[0]);
-    userData.locked = userData.locked.slice(1, -1);
+    statsData.unlocked = statsData.unlocked.concat(statsData.locked[0]);
+    statsData.locked = statsData.locked.slice(1);
 
-    createSchedule(true);
+    createSchedule(statsData, true);
   };
 
-  const scheduleComplete = () => {
+  const scheduleComplete = (statsData) => {
     var levelUp = true;
+    
+    statsData.unlocked.forEach(exercise => {
+      exercise = EXERCISES_MAP.get(exercise);
 
-    userData.unlocked.forEach((exercise) => {
-      if (statsData[statsData.indexOf(exercise)].accuracy < 0.8) {
-        levelUp = false;
+      if (statsData[exercise].totalAccuracy < 70) {
+          levelUp = false;
       }
+      
     });
 
-    if (levelUp && userData.unlocked[-1].totalAnswered >= 20) {
-      unlockNextSet();
+    if (levelUp) {
+        unlockNextSet(statsData);
     } else {
-      createSchedule(false);
+        createSchedule(statsData, false);
     }
 
-    updateUser(userData);
+    //console.log(statsData);
+    postStatsData();
   };
 
   const stopCampaign = () => {
@@ -638,15 +604,26 @@ const AuthContextProvider = (props) => {
     var finalTime = Number(
       ((date.getTime().toFixed(1) - startedDate.getTime()) / 1000).toFixed(1)
     );
-
     let newStatsData = statsData;
     newStatsData.sessionsCompleted++;
-    newStatsData.totalAnswered = correctAnswers + incorrectAnswers;
-    newStatsData.totalTime = Number(newStatsData.totalTime) + finalTime;
-    newStatsData.averageTimePerQuestion =
-      newStatsData.totalTime / newStatsData.totalAnswered;
+    newStatsData.totalAnswered =
+      newStatsData.intervals.totalAnswered +
+      newStatsData.chords.totalAnswered +
+      newStatsData.scales.totalAnswered +
+      newStatsData.pitch.totalAnswered +
+      newStatsData.chord_progressions.totalAnswered +
+      newStatsData.scale_degrees.totalAnswered +
+      newStatsData.intervals_in_context.totalAnswered +
+      newStatsData.melodic_dictation.totalAnswered;
+    newStatsData.totalTime = (
+      Number(newStatsData.totalTime) + finalTime
+    ).toFixed(1);
+    newStatsData.averageTimePerQuestion = (
+      newStatsData.totalTime / newStatsData.totalAnswered
+    ).toFixed(1);
     setStatsData(newStatsData);
     postStatsData();
+    scheduleComplete(statsData);
   };
 
   const postStatsData = async () => {
@@ -688,13 +665,13 @@ const AuthContextProvider = (props) => {
       (newStatsDataExercise.totalCorrect / newStatsDataExercise.totalAnswered) *
       100
     ).toFixed(1);
-    newStatsDataExercise.totalTime =
-      Number(newStatsDataExercise.totalTime) + time;
+    newStatsDataExercise.totalTime = (
+      Number(newStatsDataExercise.totalTime) + time
+    ).toFixed(1);
     newStatsDataExercise.averageTime = (
       newStatsDataExercise.totalTime / newStatsDataExercise.totalAnswered
     ).toFixed(1);
     newStatsData[exerciseMapped] = newStatsDataExercise;
-    console.log(newStatsDataExercise);
     setStatsData(newStatsData);
   };
 
@@ -816,6 +793,7 @@ const AuthContextProvider = (props) => {
         stopCampaign: stopCampaign,
         resetCampaign: resetCampaign,
         updateStatsDataExercise: updateStatsDataExercise,
+        getSchedule: getSchedule,
       }}
     >
       {props.children}
