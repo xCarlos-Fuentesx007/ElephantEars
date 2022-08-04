@@ -638,13 +638,23 @@ const AuthContextProvider = (props) => {
     var finalTime = Number(
       ((date.getTime().toFixed(1) - startedDate.getTime()) / 1000).toFixed(1)
     );
-
     let newStatsData = statsData;
     newStatsData.sessionsCompleted++;
-    newStatsData.totalAnswered = correctAnswers + incorrectAnswers;
-    newStatsData.totalTime = Number(newStatsData.totalTime) + finalTime;
-    newStatsData.averageTimePerQuestion =
-      newStatsData.totalTime / newStatsData.totalAnswered;
+    newStatsData.totalAnswered =
+      newStatsData.intervals.totalAnswered +
+      newStatsData.chords.totalAnswered +
+      newStatsData.scales.totalAnswered +
+      newStatsData.pitch.totalAnswered +
+      newStatsData.chord_progressions.totalAnswered +
+      newStatsData.scale_degrees.totalAnswered +
+      newStatsData.intervals_in_context.totalAnswered +
+      newStatsData.melodic_dictation.totalAnswered;
+    newStatsData.totalTime = (
+      Number(newStatsData.totalTime) + finalTime
+    ).toFixed(1);
+    newStatsData.averageTimePerQuestion = (
+      newStatsData.totalTime / newStatsData.totalAnswered
+    ).toFixed(1);
     setStatsData(newStatsData);
     postStatsData();
   };
@@ -688,13 +698,13 @@ const AuthContextProvider = (props) => {
       (newStatsDataExercise.totalCorrect / newStatsDataExercise.totalAnswered) *
       100
     ).toFixed(1);
-    newStatsDataExercise.totalTime =
-      Number(newStatsDataExercise.totalTime) + time;
+    newStatsDataExercise.totalTime = (
+      Number(newStatsDataExercise.totalTime) + time
+    ).toFixed(1);
     newStatsDataExercise.averageTime = (
       newStatsDataExercise.totalTime / newStatsDataExercise.totalAnswered
     ).toFixed(1);
     newStatsData[exerciseMapped] = newStatsDataExercise;
-    console.log(newStatsDataExercise);
     setStatsData(newStatsData);
   };
 

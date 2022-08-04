@@ -111,7 +111,7 @@ const DisplayErr = (errorCode, correctOption) => {
 
 const ExitContainer = ({ onCancel }) => {
   const authCtx = useContext(AuthContext);
-  const { stopCampaign } = authCtx;
+  const { stopCampaign, campaignRunning } = authCtx;
   return (
     <Container maxWidth="sm">
       <Paper
@@ -153,7 +153,11 @@ const ExitContainer = ({ onCancel }) => {
               <Button
                 variant="contained"
                 fullWidth
-                onClick={() => stopCampaign()}
+                onClick={() => {
+                  if (campaignRunning) {
+                    stopCampaign();
+                  }
+                }}
               >
                 Yes
               </Button>
