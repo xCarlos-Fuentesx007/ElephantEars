@@ -50,8 +50,8 @@ GIF created with [Recordit](https://recordit.co/).
 
 ## Notes
 
-1. Social Media is only used market the web application. Not for sharing personalized statistics/scores.
-2. We implemented Tone.js for the ear training exercises but only had synthesizer sounds. Wr migrated to the Web Audio API to redo those exercises and implement piano sounds.
+1. Social Media is only used to market our web application. Not for sharing personalized statistics/scores in it.
+2. We implemented Tone.js for the ear training exercises but only had synthesizer sounds. We migrated to the Web Audio API to redo those exercises and implement piano sounds.
 
 ## Figma Design
 ### Front-end
