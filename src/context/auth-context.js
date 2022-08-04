@@ -485,8 +485,12 @@ const AuthContextProvider = (props) => {
           exercise = EXERCISES_MAP.get(exercise);
           accuracies = accuracies.concat(parseFloat(statsData[exercise].totalAccuracy));
       });
-      console.log("accuracies: " + accuracies);
-      const accuraciesCopy = accuracies;
+      //console.log("accuracies: " + accuracies);
+      const accuraciesCopy = [];
+
+      for (i = 0; i < accuracies.length; i++) {
+        accuraciesCopy[i] = accuracies[i];
+      }
       var p = accuracies.length;
       var index = 0;
       //setting priority of each exercise based on accuracy
@@ -494,7 +498,7 @@ const AuthContextProvider = (props) => {
       //the higher the priority, the more it appears
       while (accuracies.length > 1) {
           var minimum = Math.min(...accuracies);
-          console.log("minimum: " + minimum);
+          //console.log("minimum: " + minimum);
           index = accuraciesCopy.indexOf(minimum);
           statsData[EXERCISES_MAP.get(statsData.unlocked[index])].priority = p;
           index = accuracies.indexOf(minimum);
@@ -523,14 +527,14 @@ const AuthContextProvider = (props) => {
           rates[rates.length-1] = 60;
       }
       
-      console.log("rates: " + rates);
+      //console.log("rates: " + rates);
 
       var totalRate = 0;
 
       rates.forEach(rate => {
           totalRate += rate;
       });
-      console.log("totalRate: " + totalRate);
+      //console.log("totalRate: " + totalRate);
 
       var occurances = [];
 
@@ -538,7 +542,7 @@ const AuthContextProvider = (props) => {
       rates.forEach(rate => {
           occurances = occurances.concat(Math.floor((rate / totalRate) * 10));
       });
-      console.log("occurances: " + occurances);
+      //console.log("occurances: " + occurances);
       var exercisesLeft = 0;
 
       //determines lenght of next schedule
@@ -556,7 +560,7 @@ const AuthContextProvider = (props) => {
               exercisesLeft -= 1;
           }
       }
-      console.log("scheduleBuilder: " + scheduleBuilder);
+      //console.log("scheduleBuilder: " + scheduleBuilder);
       const newSchedule = new Queue(scheduleBuilder);
       statsData.schedule = scheduleBuilder;
   };
@@ -588,7 +592,7 @@ const AuthContextProvider = (props) => {
         createSchedule(statsData, false);
     }
 
-    console.log(statsData);
+    //console.log(statsData);
     postStatsData();
   };
 
