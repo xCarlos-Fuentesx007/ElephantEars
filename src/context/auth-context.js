@@ -245,13 +245,13 @@ export const AuthContext = React.createContext({
   getStatsData: (userData) => {},
   statsData: "",
   runCampaign: () => {},
-  createSchedule: () => {},
-  unlockNextSet: () => {},
-  scheduleComplete: () => {},
+  createSchedule: (statsData) => {},
+  unlockNextSet: (statsData) => {},
+  scheduleComplete: (statsData) => {},
   stopCampaign: () => {},
   resetCampaign: () => {},
   updateStatsDataExercise: (exercise, correct, isMulti) => {},
-  getSchedule: (userData) => {},
+  getSchedule: (statsData) => {},
 });
 
 const AuthContextProvider = (props) => {
@@ -268,7 +268,7 @@ const AuthContextProvider = (props) => {
   const [token, setToken] = useState();
   const [campaignRunning, setCampaignRunning] = useState(false);
   const [fromCampaign, setFromCampaign] = useState(false);
-  const [schedule, setSchedule] = useState(new Queue([]));
+  const [schedule, setSchedule] = useState(new Queue(["Pitch"]));
   const [statsData, setStatsData] = useState();
   const [currQuestion, setCurrQuestion] = useState(-1);
   const [numQuestions, setNumQuestions] = useState(0);
@@ -281,7 +281,6 @@ const AuthContextProvider = (props) => {
       new Date(storedData.expiresIn) > new Date()
     ) {
       setUserData(storedData.userData);
-      setSchedule(new Queue(storedData.userData.schedule));
       setToken(storedData.token);
       setIsLoggedIn(true);
     } else {
@@ -401,6 +400,7 @@ const AuthContextProvider = (props) => {
       return;
     }
     setStatsData(responseData);
+    setSchedule(new Queue(responseData.schedule));
     return responseData;
   };
 
@@ -471,31 +471,21 @@ const AuthContextProvider = (props) => {
     exerciseHandler(schedule.peek());
   };
   
-  const getSchedule = (userData) => {
-    const storedData = JSON.parse(localStorage.getItem("userData"));
-    if (
-      storedData &&
-      storedData.token &&
-      new Date(storedData.expiresIn) > new Date()
-    ) {
-      console.log(storedData.userData.schedule);
-      setSchedule(new Queue(storedData.userData.schedule));
-    } else {
-      localStorage.removeItem("userData");
-    }
-  }; 
+  const getSchedule = (statsData) => {
+    //setSchedule(new Queue(statsData.schedule));
+  };
   
   //creates a new schedule of exercises based on previous performance, implements algorithm
-  const createSchedule = (userData, updated) => {
+  const createSchedule = (statsData, updated) => {
 
       var accuracies = [];
 
       //get accuracies of all available exercises
-      userData.unlocked.forEach(exercise => {
+      statsData.unlocked.forEach(exercise => {
           exercise = EXERCISES_MAP.get(exercise);
           accuracies = accuracies.concat(parseFloat(statsData[exercise].totalAccuracy));
       });
-
+      console.log("accuracies: " + accuracies);
       const accuraciesCopy = accuracies;
       var p = accuracies.length;
       var index = 0;
@@ -506,41 +496,49 @@ const AuthContextProvider = (props) => {
           var minimum = Math.min(...accuracies);
           console.log("minimum: " + minimum);
           index = accuraciesCopy.indexOf(minimum);
-          statsData[EXERCISES_MAP.get(userData.unlocked[index])].priority = p;
+          statsData[EXERCISES_MAP.get(statsData.unlocked[index])].priority = p;
           index = accuracies.indexOf(minimum);
           accuracies.splice(index, 1);
           p -= 1;
       }
 
       index = accuraciesCopy.indexOf(accuracies[0]);
-      statsData[EXERCISES_MAP.get(userData.unlocked[index])].priority = p;
+      statsData[EXERCISES_MAP.get(statsData.unlocked[index])].priority = p;
 
       var rates = [];
 
       //middle algorithm to determine the ratio between priority and accuracy
       var i = 0;
-      userData.unlocked.forEach(exercise => {
+      statsData.unlocked.forEach(exercise => {
           exercise = EXERCISES_MAP.get(exercise);
           rates = rates.concat((100 - statsData[exercise].totalAccuracy)*(statsData[exercise].priority));
+
+          if (rates[rates.length-1] == 0) {
+            rates[rates.length-1] = 10;
+          } 
       });
 
       //if a new set of exercises is unlocked, it will never appear unless hard set here
       if (updated) {
           rates[rates.length-1] = 60;
       }
+      
+      console.log("rates: " + rates);
 
       var totalRate = 0;
 
       rates.forEach(rate => {
           totalRate += rate;
       });
+      console.log("totalRate: " + totalRate);
+
       var occurances = [];
 
       //the algorithm, determines how many of each exercise will appear in the next schedule
       rates.forEach(rate => {
           occurances = occurances.concat(Math.floor((rate / totalRate) * 10));
       });
-
+      console.log("occurances: " + occurances);
       var exercisesLeft = 0;
 
       //determines lenght of next schedule
@@ -553,28 +551,29 @@ const AuthContextProvider = (props) => {
       while (exercisesLeft > 0) {
           var r = Math.floor(Math.random() * (occurances.length));
           if (occurances[r] > 0) {
-              scheduleBuilder = scheduleBuilder.concat(userData.unlocked[r]);
+              scheduleBuilder = scheduleBuilder.concat(statsData.unlocked[r]);
               occurances[r] -= 1;
               exercisesLeft -= 1;
           }
       }
+      console.log("scheduleBuilder: " + scheduleBuilder);
       const newSchedule = new Queue(scheduleBuilder);
-      userData.schedule = scheduleBuilder;
+      statsData.schedule = scheduleBuilder;
   };
 
   //if the user reaches 80% accuracy on all previous exercises, unlocks next exercise set
-  const unlockNextSet = (userData) => {
+  const unlockNextSet = (statsData) => {
     //move new exercise set from locked to unlocked
-    userData.unlocked = userData.unlocked.concat(userData.locked[0]);
-    userData.locked = userData.locked.slice(1);
+    statsData.unlocked = statsData.unlocked.concat(statsData.locked[0]);
+    statsData.locked = statsData.locked.slice(1);
 
-    createSchedule(userData, true);
+    createSchedule(statsData, true);
   };
 
-  const scheduleComplete = (userData) => {
+  const scheduleComplete = (statsData) => {
     var levelUp = true;
     
-    userData.unlocked.forEach(exercise => {
+    statsData.unlocked.forEach(exercise => {
       exercise = EXERCISES_MAP.get(exercise);
 
       if (statsData[exercise].totalAccuracy < 70) {
@@ -584,12 +583,13 @@ const AuthContextProvider = (props) => {
     });
 
     if (levelUp) {
-        unlockNextSet(userData);
+        unlockNextSet(statsData);
     } else {
-        createSchedule(userData, false);
+        createSchedule(statsData, false);
     }
 
-    updateUser(userData);
+    console.log(statsData);
+    postStatsData();
   };
 
   const stopCampaign = () => {
@@ -618,7 +618,7 @@ const AuthContextProvider = (props) => {
     ).toFixed(1);
     setStatsData(newStatsData);
     postStatsData();
-    scheduleComplete(userData);
+    scheduleComplete(statsData);
   };
 
   const postStatsData = async () => {
