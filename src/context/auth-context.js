@@ -135,6 +135,7 @@ const EXERCISES_MAP = new Map([
   ["Chords", "chords"],
   ["Scales", "scales"],
   ["Perfect Pitch", "pitch"],
+  ["Pitch", "pitch"],
   ["Scale Degrees", "scale_degrees"],
   ["Chord Progressions", "chord_progressions"],
   ["Intervals In Context", "intervals_in_context"],
