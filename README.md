@@ -6,7 +6,7 @@ Time spent: SD1 + SD2.
 ## Table of Contents
 1. [Overview](#overview)
 2. [Product Spec](#product-spec)
-3. [GIFS](#gIFS)
+3. [GIFS](#gifs)
 4. [Notes](#notes)
 5. [Figma](#figma-design)
 6. [Hosting](#hosting)
