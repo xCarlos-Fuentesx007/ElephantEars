@@ -1,16 +1,16 @@
 # Senior Design Project - *Elephant Ears*
-
-**Elephant Ears** is a MERN web application.
+## **Elephant Ears** is a MERNN web application.
 
 Time spent: SD1 + SD2.
 
 ## Table of Contents
 1. [Overview](#Overview)
-1. [Product Spec](#Product-Spec)
-1. [GIFS](#GIFS)
-1. [Notes](#Notes)
-1. [Figma](#Figma-Design)
-1. [Hosting](#Hosting)
+2. [Product Spec](#Product-Spec)
+3. [GIFS](#GIFS)
+4. [Notes](#Notes)
+5. [Figma](#Figma-Design)
+6. [Hosting](#Hosting)
+
 ## Overview
 ### Description
 A music-oriented web application that focuses on ear training.
