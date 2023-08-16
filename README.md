@@ -2,6 +2,7 @@
 ## **Elephant Ears** is a MERN web application.
 
 [Elephant Ears Website](https://elephant-ears.netlify.app/)
+
 **Time spent**: SD1 + SD2.
 
 ## Table of Contents
