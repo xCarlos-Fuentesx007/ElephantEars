@@ -1,7 +1,8 @@
 # Senior Design Project - *Elephant Ears*
-## **Elephant Ears** is a MERNN web application.
+## **Elephant Ears** is a MERN web application.
 
-Time spent: SD1 + SD2.
+[Elephant Ears Website](https://elephant-ears.netlify.app/)
+**Time spent**: SD1 + SD2.
 
 ## Table of Contents
 1. [Overview](#overview)
